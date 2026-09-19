@@ -224,6 +224,7 @@ export function App() {
                 <MapViewer
                   language={language}
                   selectedAOI={selectedAOI}
+                  onSelectAOI={setSelectedAOI}
                   hotspots={displayedHotspots}
                   selectedWeekData={isLiveSync ? null : selectedWeekData}
                   rawMode={rawMode}

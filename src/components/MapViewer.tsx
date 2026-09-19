@@ -2,12 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { AOIRegion, RawHotspot, HarmonizedWeekData } from '../engine/harmonizer';
-import { Layers } from 'lucide-react';
+import { Layers, Maximize2 } from 'lucide-react';
 import { Language, translations } from '../data/translations';
+import { FullMapModal } from './FullMapModal';
 
 interface MapViewerProps {
   language: Language;
   selectedAOI: AOIRegion;
+  onSelectAOI?: (aoi: AOIRegion) => void;
   hotspots: RawHotspot[];
   selectedWeekData: HarmonizedWeekData | null;
   rawMode: boolean;
@@ -50,6 +52,7 @@ const REGION_NAMES: Record<string, string> = {
 export const MapViewer: React.FC<MapViewerProps> = ({
   language,
   selectedAOI,
+  onSelectAOI,
   hotspots,
   selectedWeekData,
   rawMode,
@@ -62,6 +65,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({
   const layerGroupRef = useRef<L.LayerGroup | null>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
   const [basemap, setBasemap] = useState<'dark' | 'satellite'>('satellite');
+  const [isFullMapOpen, setIsFullMapOpen] = useState<boolean>(false);
 
   // Init map once
   useEffect(() => {
@@ -257,6 +261,16 @@ export const MapViewer: React.FC<MapViewerProps> = ({
               VIIRS
             </span>
           </div>
+
+          {/* Full Screen Map Explorer Button */}
+          <button
+            onClick={() => setIsFullMapOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1d1d1f] text-white hover:bg-black rounded-xl text-xs font-medium transition-all shadow-xs shrink-0"
+            title={language === 'id' ? 'Buka Peta Penuh dengan Mini Dashboard' : 'Open Full Screen Map Explorer with HUD'}
+          >
+            <Maximize2 className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">{language === 'id' ? 'Peta Penuh' : 'Full Map'}</span>
+          </button>
         </div>
       </div>
 
@@ -278,6 +292,19 @@ export const MapViewer: React.FC<MapViewerProps> = ({
           </span>
         )}
       </div>
+
+      {/* Full-Screen Immersive Map Explorer Modal */}
+      <FullMapModal
+        language={language}
+        isOpen={isFullMapOpen}
+        onClose={() => setIsFullMapOpen(false)}
+        selectedAOI={selectedAOI}
+        onSelectAOI={(aoi) => {
+          if (onSelectAOI) onSelectAOI(aoi);
+        }}
+        hotspots={hotspots}
+        isLiveSync={isLiveSync}
+      />
     </div>
   );
 };
