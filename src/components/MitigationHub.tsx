@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Download, FileText } from 'lucide-react';
 import { PRESET_AOIS, AOIRegion } from '../engine/harmonizer';
 import { Language } from '../data/translations';
+import { PeatlandSimulator } from './PeatlandSimulator';
 
 interface MitigationHubProps {
   language: Language;
@@ -214,6 +215,14 @@ Data acuan satelit: NASA FIRMS (MODIS/VIIRS Harmonized Grid 5.5 km)
           </div>
         </div>
       </div>
+
+      {/* Interactive Peatland Hydrology & Fire Spread Simulator */}
+      <section className="pt-2">
+        <PeatlandSimulator
+          language={language}
+          selectedAOI={selectedAOI}
+        />
+      </section>
     </div>
   );
 };

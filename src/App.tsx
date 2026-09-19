@@ -12,6 +12,9 @@ import { MitigationHub } from './components/MitigationHub';
 import { DataHub } from './components/DataHub';
 import { TeamModal } from './components/TeamModal';
 import { NasaApiKeyModal } from './components/NasaApiKeyModal';
+import { DualMapComparison } from './components/DualMapComparison';
+import { ExecutiveReportModal } from './components/ExecutiveReportModal';
+import { PolygonInspectorModal } from './components/PolygonInspectorModal';
 import { PRESET_AOIS, AOIRegion, RawHotspot, HarmonizedWeekData, harmonizeHotspots } from './engine/harmonizer';
 import { generateHistoricalFireData } from './data/generator';
 import { fetchLiveNASAHotspots, LiveSyncResult } from './services/nasaFirmsApi';
@@ -27,6 +30,9 @@ export function App() {
   const [selectedWeekData, setSelectedWeekData] = useState<HarmonizedWeekData | null>(null);
   const [isTeamModalOpen, setIsTeamModalOpen] = useState<boolean>(false);
   const [isNasaModalOpen, setIsNasaModalOpen] = useState<boolean>(false);
+  const [isDualMapOpen, setIsDualMapOpen] = useState<boolean>(false);
+  const [isExecutiveReportOpen, setIsExecutiveReportOpen] = useState<boolean>(false);
+  const [isPolygonInspectorOpen, setIsPolygonInspectorOpen] = useState<boolean>(false);
 
   const [isLiveSync, setIsLiveSync] = useState<boolean>(false);
   const [isLoadingLive, setIsLoadingLive] = useState<boolean>(false);
@@ -130,6 +136,11 @@ export function App() {
               onToggleLiveSync={handleToggleLiveSync}
               isLoadingLive={isLoadingLive}
               onOpenApiKeyModal={() => setIsNasaModalOpen(true)}
+              onOpenDualMap={() => setIsDualMapOpen(true)}
+              onOpenExecutiveReport={() => setIsExecutiveReportOpen(true)}
+              onOpenPolygonInspector={() => setIsPolygonInspectorOpen(true)}
+              totalHotspots={totalEvents}
+              anomalyCount={anomalyCount}
             />
 
             {/* Live sync notification banner */}
@@ -332,6 +343,28 @@ export function App() {
             ? (language === 'id' ? 'Terhubung: NASA FIRMS API Resmi' : 'Connected: NASA FIRMS Authorized API')
             : undefined
         }
+      />
+      <DualMapComparison
+        language={language}
+        isOpen={isDualMapOpen}
+        onClose={() => setIsDualMapOpen(false)}
+        selectedAOI={selectedAOI}
+        allHotspots={displayedHotspots}
+      />
+      <ExecutiveReportModal
+        language={language}
+        isOpen={isExecutiveReportOpen}
+        onClose={() => setIsExecutiveReportOpen(false)}
+        selectedAOI={selectedAOI}
+        calendarMatrix={calendarMatrix}
+        totalHotspots={totalEvents}
+      />
+      <PolygonInspectorModal
+        language={language}
+        isOpen={isPolygonInspectorOpen}
+        onClose={() => setIsPolygonInspectorOpen(false)}
+        selectedAOI={selectedAOI}
+        allHotspots={displayedHotspots}
       />
     </div>
   );
