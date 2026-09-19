@@ -163,7 +163,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({
     .length;
 
   return (
-    <div className="bg-white border border-[#e5e5e7] rounded-2xl overflow-hidden shadow-xs flex flex-col">
+    <div className="relative z-0 bg-white border border-[#e5e5e7] rounded-2xl overflow-hidden shadow-xs flex flex-col [isolation:isolate]">
       {/* Map header */}
       <div className="px-5 py-3 border-b border-[#e5e5e7] flex flex-wrap items-center justify-between gap-2 bg-white">
         <div className="flex items-baseline gap-2">
@@ -216,8 +216,8 @@ export const MapViewer: React.FC<MapViewerProps> = ({
       </div>
 
       {/* Map tile */}
-      <div className="relative">
-        <div ref={mapContainerRef} className="w-full h-[540px] lg:h-[600px]" />
+      <div className="relative z-0 [isolation:isolate]">
+        <div ref={mapContainerRef} className="w-full h-[520px] lg:h-[580px] z-0" />
       </div>
 
       {/* Map footer */}

@@ -34,23 +34,23 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-[#e5e5e7] transition-all">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-12 sm:h-14 flex items-center justify-between gap-4">
+      <header className="sticky top-0 z-[1000] bg-white/85 backdrop-blur-xl border-b border-[#e5e5e7] transition-all">
+        <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 h-13 sm:h-14 flex items-center justify-between gap-4">
           
           {/* Brand */}
-          <div className="flex items-center cursor-pointer" onClick={() => onSelectTab('overview')}>
+          <div className="flex items-center cursor-pointer shrink-0" onClick={() => onSelectTab('overview')}>
             <Logo size="md" />
           </div>
 
           {/* Desktop Navigation Links (Apple Style Clean Typography) */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-7">
             {navItems.map((item) => {
               const isActive = activeTab === item.id;
               return (
                 <button
                   key={item.id}
                   onClick={() => onSelectTab(item.id)}
-                  className={`text-[13px] font-medium transition-colors relative py-1 ${
+                  className={`text-[13px] font-medium transition-colors relative py-1.5 ${
                     isActive
                       ? 'text-[#1d1d1f] font-semibold'
                       : 'text-[#86868b] hover:text-[#1d1d1f]'
@@ -59,7 +59,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   {item.label}
                   {isActive && (
-                    <span className="absolute -bottom-2.5 left-0 right-0 h-[2px] bg-[#1d1d1f] rounded-full" />
+                    <span className="absolute -bottom-[9px] left-0 right-0 h-[2px] bg-[#1d1d1f] rounded-full" />
                   )}
                 </button>
               );
@@ -67,7 +67,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </nav>
 
           {/* Right Controls */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0">
             
             {/* Live Indicator */}
             {isLiveSync && (
@@ -81,7 +81,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="flex items-center bg-[#e5e5ea] rounded-full p-0.5 text-[11px] font-medium">
               <button
                 onClick={() => onToggleLanguage('en')}
-                className={`px-2 py-0.5 rounded-full transition-all ${
+                className={`px-2.5 py-0.5 rounded-full transition-all ${
                   language === 'en'
                     ? 'bg-white text-[#1d1d1f] shadow-xs font-semibold'
                     : 'text-[#86868b] hover:text-[#1d1d1f]'
@@ -91,7 +91,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
               <button
                 onClick={() => onToggleLanguage('id')}
-                className={`px-2 py-0.5 rounded-full transition-all ${
+                className={`px-2.5 py-0.5 rounded-full transition-all ${
                   language === 'id'
                     ? 'bg-white text-[#1d1d1f] shadow-xs font-semibold'
                     : 'text-[#86868b] hover:text-[#1d1d1f]'
@@ -123,8 +123,8 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Mobile Drawer */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-30 md:hidden bg-black/20 backdrop-blur-xs pt-12 flex flex-col">
-          <div className="bg-white border-b border-[#e5e5e7] p-4 space-y-1 shadow-lg animate-in slide-in-from-top-2 duration-150">
+        <div className="fixed inset-0 z-[1001] md:hidden bg-black/25 backdrop-blur-xs pt-14 flex flex-col">
+          <div className="bg-white border-b border-[#e5e5e7] p-4 space-y-1 shadow-xl animate-in slide-in-from-top-2 duration-150">
             {navItems.map((item) => {
               const isActive = activeTab === item.id;
               return (
@@ -134,7 +134,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     onSelectTab(item.id);
                     setIsMobileMenuOpen(false);
                   }}
-                  className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition min-h-[44px] ${
+                  className={`w-full text-left px-3.5 py-3 rounded-xl text-sm font-medium transition min-h-[44px] ${
                     isActive
                       ? 'bg-[#f5f5f7] text-[#1d1d1f] font-semibold'
                       : 'text-[#86868b] hover:bg-[#f5f5f7] hover:text-[#1d1d1f]'

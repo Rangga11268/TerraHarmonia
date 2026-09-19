@@ -107,11 +107,12 @@ export function App() {
         isLiveSync={isLiveSync}
       />
 
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6">
+      {/* Expansive Full-Width Main Canvas */}
+      <main className="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
         {/* Tab 1: Live Intelligence & Harmonized Calendar (Overview) */}
         {activeTab === 'overview' && (
-          <div className="space-y-5 animate-in fade-in duration-200">
+          <div className="space-y-6 animate-in fade-in duration-200">
             
             {/* Control bar */}
             <DashboardControlBar
@@ -130,7 +131,7 @@ export function App() {
               onOpenApiKeyModal={() => setIsNasaModalOpen(true)}
             />
 
-            {/* Live sync banner */}
+            {/* Live sync notification banner */}
             {isLiveSync && (
               <div className="bg-white border border-[#e5e5e7] rounded-2xl px-5 py-3 flex items-center justify-between gap-3 text-xs shadow-xs">
                 <div>
@@ -154,10 +155,9 @@ export function App() {
               </div>
             )}
 
-            {/* Metric Strip (Clean Apple Editorial Design) */}
+            {/* Metric Strip (Clean Apple Design) */}
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-0 bg-white border border-[#e5e5e7] rounded-2xl shadow-xs overflow-hidden">
               
-              {/* Primary metric */}
               <div className="sm:col-span-1 px-5 py-5 flex flex-col justify-between border-b sm:border-b-0 sm:border-r border-[#e5e5e7] bg-[#fbfbfd]">
                 <span className="text-xs font-semibold text-[#86868b] tracking-wider uppercase">{t.rawDetections}</span>
                 <div>
@@ -170,7 +170,6 @@ export function App() {
                 </div>
               </div>
 
-              {/* 3 Secondary metrics */}
               {[
                 {
                   label: t.historicPeakYear,
@@ -206,7 +205,7 @@ export function App() {
               ))}
             </div>
 
-            {/* 26-Year Burning Calendar */}
+            {/* Interactive 26-Year Burning Calendar */}
             <section>
               <BurningCalendar
                 language={language}
@@ -217,9 +216,11 @@ export function App() {
               />
             </section>
 
-            {/* Map + Side Analytics */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-              <div className="lg:col-span-8">
+            {/* Geospatial & Prognosis Section (Balanced Proportions) */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              
+              {/* Map Viewer */}
+              <div className="lg:col-span-7">
                 <MapViewer
                   language={language}
                   selectedAOI={selectedAOI}
@@ -231,7 +232,8 @@ export function App() {
                 />
               </div>
 
-              <div className="lg:col-span-4 space-y-5">
+              {/* Side Prognosis & Directives Column */}
+              <div className="lg:col-span-5 space-y-5">
                 <RiskForecast
                   language={language}
                   selectedAOI={selectedAOI}
@@ -240,11 +242,7 @@ export function App() {
                   isLiveSync={isLiveSync}
                   liveHotspotCount={displayedHotspots.length}
                 />
-                <ComparisonMetrics
-                  language={language}
-                  selectedAOI={selectedAOI}
-                  yearlyAverages={yearlyAverages}
-                />
+                
                 <CriticalAlerts
                   language={language}
                   selectedAOI={selectedAOI}
@@ -252,6 +250,15 @@ export function App() {
                   weeklyBaselines={weeklyBaselines}
                 />
               </div>
+            </div>
+
+            {/* Science Comparison Section */}
+            <div className="grid grid-cols-1 gap-6">
+              <ComparisonMetrics
+                language={language}
+                selectedAOI={selectedAOI}
+                yearlyAverages={yearlyAverages}
+              />
             </div>
           </div>
         )}
