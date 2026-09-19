@@ -3,6 +3,14 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
   body {
     background-color: #f5f5f7; /* Apple standard light canvas */
     color: #1d1d1f; /* Apple standard primary text */
