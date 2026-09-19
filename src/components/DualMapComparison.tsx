@@ -181,22 +181,22 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
   const years = Array.from({ length: 27 }, (_, i) => 2000 + i);
 
   return (
-    <div className="bg-white border border-[#e5e5e7] rounded-2xl shadow-xs overflow-hidden space-y-0 transition-all">
+    <div className="bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl shadow-xs overflow-hidden transition-colors">
       
-      {/* Section Header */}
-      <div className="px-5 py-4 border-b border-[#e5e5e7] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#fbfbfd]">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-white rounded-xl border border-[#e5e5e7] text-[#1d1d1f]">
-            <Split className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="text-[11px] font-bold uppercase tracking-wider text-[#86868b]">
-              {language === 'id' ? 'Komparasi Spasial Lintas Waktu' : 'Cross-Temporal Spatial Comparison'}
-            </div>
-            <h2 className="text-base sm:text-lg font-bold text-[#1d1d1f] tracking-tight">
-              {language === 'id' ? 'Komparasi Spasial Dua Tahun Berdampingan' : 'Side-by-Side Dual-Year Spatial Comparison'}
+      {/* Header Bar */}
+      <div className="px-5 py-4 border-b border-[#e5e5e7] dark:border-[#1f2937] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#fbfbfd] dark:bg-[#0f172a]">
+        <div>
+          <div className="flex items-center gap-2">
+            <Split className="w-4 h-4 text-[#0071e3] dark:text-blue-400" />
+            <h2 className="font-bold text-base text-[#1d1d1f] dark:text-white">
+              {language === 'id' ? 'Komparasi Spasial Dua Titik Waktu (Side-by-Side)' : 'Side-by-Side Dual Year Spatial Comparison'}
             </h2>
           </div>
+          <p className="text-xs text-[#6e6e73] dark:text-[#9ca3af] mt-1">
+            {language === 'id'
+              ? `Bandingkan sebaran titik panas di ${selectedAOI.name} antara dua tahun berbeda dengan sinkronisasi navigasi peta otomatis.`
+              : `Compare hotspot distributions in ${selectedAOI.name} between two years with locked synchronous map navigation.`}
+          </p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -204,8 +204,8 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
             onClick={() => setIsSyncMove(!isSyncMove)}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition flex items-center gap-1.5 cursor-pointer min-h-[36px] ${
               isSyncMove
-                ? 'bg-[#1d1d1f] text-white border-[#1d1d1f]'
-                : 'bg-white text-[#6e6e73] border-[#e5e5e7] hover:border-[#1d1d1f]'
+                ? 'bg-[#1d1d1f] dark:bg-white text-white dark:text-[#111827] border-[#1d1d1f] dark:border-white'
+                : 'bg-white dark:bg-[#1f2937] text-[#6e6e73] dark:text-[#9ca3af] border-[#e5e5e7] dark:border-[#374151] hover:border-[#1d1d1f] dark:hover:border-white'
             }`}
           >
             <RefreshCw className="w-3.5 h-3.5" />
@@ -219,23 +219,23 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
       </div>
 
       {/* Dual Viewport Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 border-b border-[#e5e5e7]">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 border-b border-[#e5e5e7] dark:border-[#1f2937]">
         
         {/* Pane A */}
-        <div className="border-b lg:border-b-0 lg:border-r border-[#e5e5e7] flex flex-col min-h-[380px] sm:min-h-[440px]">
+        <div className="border-b lg:border-b-0 lg:border-r border-[#e5e5e7] dark:border-[#1f2937] flex flex-col min-h-[380px] sm:min-h-[440px]">
           {/* Controls Bar A */}
-          <div className="bg-white px-4 py-3 border-b border-[#e5e5e7] flex items-center justify-between">
+          <div className="bg-white dark:bg-[#111827] px-4 py-3 border-b border-[#e5e5e7] dark:border-[#1f2937] flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-[#86868b] uppercase">
+              <span className="text-xs font-bold text-[#86868b] dark:text-[#9ca3af] uppercase">
                 {language === 'id' ? 'Tahun A:' : 'Year A:'}
               </span>
               <select
                 value={yearA}
                 onChange={(e) => setYearA(Number(e.target.value))}
-                className="bg-[#f5f5f7] border border-[#e5e5e7] rounded-lg px-3 py-1.5 text-xs font-bold text-[#1d1d1f] focus:outline-none focus:border-[#1d1d1f] cursor-pointer min-h-[36px]"
+                className="bg-[#f5f5f7] dark:bg-[#1f2937] border border-[#e5e5e7] dark:border-[#374151] rounded-lg px-3 py-1.5 text-xs font-bold text-[#1d1d1f] dark:text-white focus:outline-none focus:border-[#1d1d1f] dark:focus:border-white cursor-pointer min-h-[36px]"
               >
                 {years.map((y) => (
-                  <option key={y} value={y}>
+                  <option key={y} value={y} className="bg-white dark:bg-[#1f2937] text-[#1d1d1f] dark:text-white">
                     {y} {y === 2015 ? (language === 'id' ? '(El Niño Super)' : '(Super El Niño)') : y === 2019 ? (language === 'id' ? '(El Niño Moderat)' : '(Moderate El Niño)') : y === 2021 ? (language === 'id' ? '(La Niña Basah)' : '(Wet La Niña)') : ''}
                   </option>
                 ))}
@@ -244,12 +244,12 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
 
             <div className="flex items-center gap-3 text-xs">
               <div>
-                <span className="text-[#86868b]">{language === 'id' ? 'Titik: ' : 'Points: '}</span>
-                <strong className="num text-[#1d1d1f]">{statsA.count.toLocaleString()}</strong>
+                <span className="text-[#86868b] dark:text-[#9ca3af]">{language === 'id' ? 'Titik: ' : 'Points: '}</span>
+                <strong className="num text-[#1d1d1f] dark:text-white">{statsA.count.toLocaleString()}</strong>
               </div>
               <div>
-                <span className="text-[#86868b]">FRP: </span>
-                <strong className="num text-orange-600">{statsA.totalFrp.toLocaleString()} MW</strong>
+                <span className="text-[#86868b] dark:text-[#9ca3af]">FRP: </span>
+                <strong className="num text-orange-600 dark:text-orange-400">{statsA.totalFrp.toLocaleString()} MW</strong>
               </div>
             </div>
           </div>
@@ -261,18 +261,18 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
         {/* Pane B */}
         <div className="flex flex-col min-h-[380px] sm:min-h-[440px]">
           {/* Controls Bar B */}
-          <div className="bg-white px-4 py-3 border-b border-[#e5e5e7] flex items-center justify-between">
+          <div className="bg-white dark:bg-[#111827] px-4 py-3 border-b border-[#e5e5e7] dark:border-[#1f2937] flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-[#86868b] uppercase">
+              <span className="text-xs font-bold text-[#86868b] dark:text-[#9ca3af] uppercase">
                 {language === 'id' ? 'Tahun B:' : 'Year B:'}
               </span>
               <select
                 value={yearB}
                 onChange={(e) => setYearB(Number(e.target.value))}
-                className="bg-[#f5f5f7] border border-[#e5e5e7] rounded-lg px-3 py-1.5 text-xs font-bold text-[#1d1d1f] focus:outline-none focus:border-[#1d1d1f] cursor-pointer min-h-[36px]"
+                className="bg-[#f5f5f7] dark:bg-[#1f2937] border border-[#e5e5e7] dark:border-[#374151] rounded-lg px-3 py-1.5 text-xs font-bold text-[#1d1d1f] dark:text-white focus:outline-none focus:border-[#1d1d1f] dark:focus:border-white cursor-pointer min-h-[36px]"
               >
                 {years.map((y) => (
-                  <option key={y} value={y}>
+                  <option key={y} value={y} className="bg-white dark:bg-[#1f2937] text-[#1d1d1f] dark:text-white">
                     {y} {y === 2015 ? (language === 'id' ? '(El Niño Super)' : '(Super El Niño)') : y === 2019 ? (language === 'id' ? '(El Niño Moderat)' : '(Moderate El Niño)') : y === 2021 ? (language === 'id' ? '(La Niña Basah)' : '(Wet La Niña)') : ''}
                   </option>
                 ))}
@@ -281,12 +281,12 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
 
             <div className="flex items-center gap-3 text-xs">
               <div>
-                <span className="text-[#86868b]">{language === 'id' ? 'Titik: ' : 'Points: '}</span>
-                <strong className="num text-[#1d1d1f]">{statsB.count.toLocaleString()}</strong>
+                <span className="text-[#86868b] dark:text-[#9ca3af]">{language === 'id' ? 'Titik: ' : 'Points: '}</span>
+                <strong className="num text-[#1d1d1f] dark:text-white">{statsB.count.toLocaleString()}</strong>
               </div>
               <div>
-                <span className="text-[#86868b]">FRP: </span>
-                <strong className="num text-orange-600">{statsB.totalFrp.toLocaleString()} MW</strong>
+                <span className="text-[#86868b] dark:text-[#9ca3af]">FRP: </span>
+                <strong className="num text-orange-600 dark:text-orange-400">{statsB.totalFrp.toLocaleString()} MW</strong>
               </div>
             </div>
           </div>
@@ -298,9 +298,9 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
       </div>
 
       {/* Comparative Analytical Summary Footer */}
-      <div className="px-5 py-3.5 bg-[#fbfbfd] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-        <div className="text-[#3a3a3c] leading-relaxed">
-          <strong className="font-semibold text-[#1d1d1f]">
+      <div className="px-5 py-3.5 bg-[#fbfbfd] dark:bg-[#0f172a] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+        <div className="text-[#3a3a3c] dark:text-[#d1d5db] leading-relaxed">
+          <strong className="font-semibold text-[#1d1d1f] dark:text-white">
             {language === 'id' ? 'Kesimpulan Analisis Spasial: ' : 'Spatial Synthesis: '}
           </strong>
           {statsA.count > statsB.count ? (
@@ -318,7 +318,7 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
           )}
         </div>
 
-        <div className="flex items-center gap-4 text-[#86868b] text-[11px] shrink-0">
+        <div className="flex items-center gap-4 text-[#86868b] dark:text-[#9ca3af] text-[11px] shrink-0">
           <span>Grid: 5.5 km Harmonized</span>
           <span>MODIS + VIIRS Data Sync</span>
         </div>

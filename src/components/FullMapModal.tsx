@@ -429,16 +429,16 @@ STATUS RISIKO & REKOMENDASI:
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[2000] bg-[#1d1d1f] flex flex-col font-sans select-none overflow-hidden animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[2000] bg-[#1d1d1f] dark:bg-black flex flex-col font-sans select-none overflow-hidden animate-in fade-in duration-200">
       
       {/* Top Navigation Header with ultra-high z-index */}
-      <header className="relative z-[3000] h-14 bg-white border-b border-[#e5e5e7] px-4 sm:px-6 flex items-center justify-between gap-3 shrink-0 shadow-xs">
+      <header className="relative z-[3000] h-14 bg-white dark:bg-[#111827] border-b border-[#e5e5e7] dark:border-[#1f2937] px-4 sm:px-6 flex items-center justify-between gap-3 shrink-0 shadow-xs">
         
         {/* Left: Back / Return Button & Title */}
         <div className="flex items-center gap-3 min-w-0">
           <button
             onClick={onClose}
-            className="flex items-center gap-2 px-3.5 py-2 bg-[#1d1d1f] hover:bg-black text-white font-bold text-xs rounded-xl transition-all shadow-md shrink-0 cursor-pointer"
+            className="flex items-center gap-2 px-3.5 py-2 bg-[#1d1d1f] dark:bg-white hover:bg-black dark:hover:bg-neutral-200 text-white dark:text-[#111827] font-bold text-xs rounded-xl transition-all shadow-md shrink-0 cursor-pointer"
             title="Kembali ke Dashboard (Esc)"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -448,11 +448,11 @@ STATUS RISIKO & REKOMENDASI:
           <div className="w-2 h-2 rounded-full bg-red-600 shrink-0 hidden sm:inline-block" />
 
           <div className="min-w-0">
-            <h1 className="text-sm font-bold text-[#1d1d1f] tracking-tight truncate">
+            <h1 className="text-sm font-bold text-[#1d1d1f] dark:text-white tracking-tight truncate">
               Terra Harmonia GIS Full Explorer
             </h1>
-            <p className="text-[11px] text-[#86868b] truncate">
-              {selectedAOI.name} &bull; {selectedYear} ({filteredHotspots.length} titik aktif)
+            <p className="text-[11px] text-[#86868b] dark:text-[#9ca3af] truncate">
+              {selectedAOI.name} &bull; {selectedYear} ({filteredHotspots.length} {language === 'id' ? 'titik aktif' : 'active points'})
             </p>
           </div>
         </div>
@@ -467,11 +467,11 @@ STATUS RISIKO & REKOMENDASI:
                 onClick={() => onSelectAOI(aoi)}
                 className={`px-3 py-1 text-xs rounded-full transition-all whitespace-nowrap cursor-pointer ${
                   isSel
-                    ? 'bg-[#1d1d1f] text-white font-medium shadow-xs'
-                    : 'bg-[#f5f5f7] text-[#6e6e73] hover:text-[#1d1d1f] hover:bg-[#e5e5ea]'
+                    ? 'bg-[#1d1d1f] dark:bg-white text-white dark:text-[#111827] font-medium shadow-xs'
+                    : 'bg-[#f5f5f7] dark:bg-[#1f2937] text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white hover:bg-[#e5e5ea] dark:hover:bg-[#374151]'
                 }`}
               >
-                {aoi.id === 'indonesia' ? 'Seluruh Indonesia' : aoi.name.split(' (')[0]}
+                {aoi.id === 'indonesia' ? (language === 'id' ? 'Seluruh Indonesia' : 'All Indonesia') : aoi.name.split(' (')[0]}
               </button>
             );
           })}
@@ -480,19 +480,19 @@ STATUS RISIKO & REKOMENDASI:
         {/* Right Controls: Basemap & Close Button */}
         <div className="flex items-center gap-2.5">
           {/* Basemap switch */}
-          <div className="flex items-center bg-[#f5f5f7] rounded-xl p-0.5 text-xs font-medium border border-[#e5e5e7]">
+          <div className="flex items-center bg-[#f5f5f7] dark:bg-[#1f2937] rounded-xl p-0.5 text-xs font-medium border border-[#e5e5e7] dark:border-[#374151]">
             <button
               onClick={() => setBasemap('satellite')}
               className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                basemap === 'satellite' ? 'bg-white text-[#1d1d1f] shadow-xs font-semibold' : 'text-[#86868b]'
+                basemap === 'satellite' ? 'bg-white dark:bg-[#374151] text-[#1d1d1f] dark:text-white shadow-xs font-semibold' : 'text-[#86868b] dark:text-[#9ca3af]'
               }`}
             >
-              Satelit
+              {language === 'id' ? 'Satelit' : 'Satellite'}
             </button>
             <button
               onClick={() => setBasemap('dark')}
               className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                basemap === 'dark' ? 'bg-white text-[#1d1d1f] shadow-xs font-semibold' : 'text-[#86868b]'
+                basemap === 'dark' ? 'bg-white dark:bg-[#374151] text-[#1d1d1f] dark:text-white shadow-xs font-semibold' : 'text-[#86868b] dark:text-[#9ca3af]'
               }`}
             >
               Dark
@@ -500,7 +500,7 @@ STATUS RISIKO & REKOMENDASI:
             <button
               onClick={() => setBasemap('topo')}
               className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                basemap === 'topo' ? 'bg-white text-[#1d1d1f] shadow-xs font-semibold' : 'text-[#86868b]'
+                basemap === 'topo' ? 'bg-white dark:bg-[#374151] text-[#1d1d1f] dark:text-white shadow-xs font-semibold' : 'text-[#86868b] dark:text-[#9ca3af]'
               }`}
             >
               Topo
@@ -520,26 +520,26 @@ STATUS RISIKO & REKOMENDASI:
       </header>
 
       {/* Main Map Canvas Area */}
-      <div className="relative flex-1 w-full h-full bg-[#1d1d1f] [isolation:isolate] z-0">
+      <div className="relative flex-1 w-full h-full bg-[#1d1d1f] dark:bg-black [isolation:isolate] z-0">
         
         {/* Leaflet DOM Node */}
         <div ref={mapContainerRef} className="absolute inset-0 w-full h-full z-0" />
 
         {/* Floating Apple-Style Mini Dashboard (HUD) */}
         <div className="absolute top-4 left-4 z-20 w-80 max-w-[calc(100vw-2rem)]">
-          <div className="bg-white/90 backdrop-blur-xl border border-[#e5e5e7] rounded-2xl shadow-xl overflow-hidden transition-all duration-300">
+          <div className="bg-white/95 dark:bg-[#111827]/95 backdrop-blur-xl border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl shadow-xl overflow-hidden transition-all duration-300">
             
             {/* HUD Header */}
-            <div className="px-4 py-3 border-b border-[#e5e5e7] flex items-center justify-between bg-white/50">
+            <div className="px-4 py-3 border-b border-[#e5e5e7] dark:border-[#1f2937] flex items-center justify-between bg-white/50 dark:bg-[#111827]/50">
               <div className="flex items-center gap-2">
-                <Activity className="w-4 h-4 text-[#0071e3]" />
-                <span className="font-semibold text-xs text-[#1d1d1f] tracking-tight">
-                  {isRadiusToolActive && bufferCenter ? `Analisis Buffer (${bufferRadiusKm} km)` : 'Statistik Intelijen Spasial'}
+                <Activity className="w-4 h-4 text-[#0071e3] dark:text-blue-400" />
+                <span className="font-semibold text-xs text-[#1d1d1f] dark:text-white tracking-tight">
+                  {isRadiusToolActive && bufferCenter ? `Analisis Buffer (${bufferRadiusKm} km)` : (language === 'id' ? 'Statistik Intelijen Spasial' : 'Spatial Intelligence Stats')}
                 </span>
               </div>
               <button
                 onClick={() => setIsHudCollapsed(!isHudCollapsed)}
-                className="text-[#86868b] hover:text-[#1d1d1f] transition-colors p-0.5"
+                className="text-[#86868b] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white transition-colors p-0.5"
               >
                 {isHudCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
               </button>
@@ -551,55 +551,55 @@ STATUS RISIKO & REKOMENDASI:
                 
                 {/* Primary Metrics Grid */}
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="p-2.5 bg-[#f5f5f7] rounded-xl border border-[#e5e5e7]">
-                    <div className="text-[10px] text-[#86868b] uppercase tracking-wider font-medium">Titik Api Aktif</div>
-                    <div className="text-xl font-bold text-[#1d1d1f] num mt-0.5">
+                  <div className="p-2.5 bg-[#f5f5f7] dark:bg-[#1f2937] rounded-xl border border-[#e5e5e7] dark:border-[#374151]">
+                    <div className="text-[10px] text-[#86868b] dark:text-[#9ca3af] uppercase tracking-wider font-medium">{language === 'id' ? 'Titik Api Aktif' : 'Active Hotspots'}</div>
+                    <div className="text-xl font-bold text-[#1d1d1f] dark:text-white num mt-0.5">
                       {hudMetrics.totalCount.toLocaleString()}
                     </div>
-                    <div className="text-[10px] text-[#6e6e73] mt-0.5">
+                    <div className="text-[10px] text-[#6e6e73] dark:text-[#9ca3af] mt-0.5">
                       MODIS: {hudMetrics.modisCount} &bull; VIIRS: {hudMetrics.viirsCount}
                     </div>
                   </div>
 
-                  <div className="p-2.5 bg-[#f5f5f7] rounded-xl border border-[#e5e5e7]">
-                    <div className="text-[10px] text-[#86868b] uppercase tracking-wider font-medium">Klaster 5.5km</div>
-                    <div className="text-xl font-bold text-[#0071e3] num mt-0.5">
+                  <div className="p-2.5 bg-[#f5f5f7] dark:bg-[#1f2937] rounded-xl border border-[#e5e5e7] dark:border-[#374151]">
+                    <div className="text-[10px] text-[#86868b] dark:text-[#9ca3af] uppercase tracking-wider font-medium">{language === 'id' ? 'Klaster 5.5km' : '5.5km Clusters'}</div>
+                    <div className="text-xl font-bold text-[#0071e3] dark:text-blue-400 num mt-0.5">
                       {hudMetrics.harmonizedClusters.toLocaleString()}
                     </div>
-                    <div className="text-[10px] text-[#6e6e73] mt-0.5">
-                      Terkalibrasi NASA
+                    <div className="text-[10px] text-[#6e6e73] dark:text-[#9ca3af] mt-0.5">
+                      {language === 'id' ? 'Terkalibrasi NASA' : 'NASA Calibrated'}
                     </div>
                   </div>
                 </div>
 
                 {/* Energy & Carbon */}
-                <div className="space-y-1.5 border-t border-[#e5e5e7] pt-2.5">
-                  <div className="flex items-center justify-between text-[#6e6e73]">
+                <div className="space-y-1.5 border-t border-[#e5e5e7] dark:border-[#1f2937] pt-2.5">
+                  <div className="flex items-center justify-between text-[#6e6e73] dark:text-[#9ca3af]">
                     <span className="flex items-center gap-1.5">
                       <Flame className="w-3.5 h-3.5 text-red-500" />
-                      Total Daya Radiasi (FRP)
+                      {language === 'id' ? 'Total Daya Radiasi (FRP)' : 'Total Thermal FRP'}
                     </span>
-                    <span className="font-semibold text-[#1d1d1f] num">
+                    <span className="font-semibold text-[#1d1d1f] dark:text-white num">
                       {hudMetrics.totalFRP.toLocaleString()} MW
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between text-[#6e6e73]">
+                  <div className="flex items-center justify-between text-[#6e6e73] dark:text-[#9ca3af]">
                     <span className="flex items-center gap-1.5">
                       <Wind className="w-3.5 h-3.5 text-amber-500" />
-                      Estimasi Emisi Gambut
+                      {language === 'id' ? 'Estimasi Emisi Gambut' : 'Peat Emission Est.'}
                     </span>
-                    <span className="font-semibold text-[#1d1d1f] num">
+                    <span className="font-semibold text-[#1d1d1f] dark:text-white num">
                       {hudMetrics.estimatedCO2eTons.toLocaleString()} ton CO₂e
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between text-[#6e6e73]">
+                  <div className="flex items-center justify-between text-[#6e6e73] dark:text-[#9ca3af]">
                     <span className="flex items-center gap-1.5">
                       <ShieldAlert className="w-3.5 h-3.5 text-blue-500" />
-                      Rerata Keyakinan Sensor
+                      {language === 'id' ? 'Rerata Keyakinan Sensor' : 'Avg Confidence'}
                     </span>
-                    <span className="font-semibold text-[#1d1d1f] num">
+                    <span className="font-semibold text-[#1d1d1f] dark:text-white num">
                       {hudMetrics.avgConfidence}%
                     </span>
                   </div>
@@ -607,18 +607,18 @@ STATUS RISIKO & REKOMENDASI:
 
                 {/* Buffer status banner */}
                 {isRadiusToolActive && (
-                  <div className="p-2 rounded-xl bg-blue-50/80 border border-blue-200 text-blue-900 text-[11px] leading-snug">
+                  <div className="p-2 rounded-xl bg-blue-50/80 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-900 text-blue-900 dark:text-blue-200 text-[11px] leading-snug">
                     {bufferCenter ? (
                       <div>
-                        <b>Titik Inspeksi Terpilih:</b> {bufferCenter.lat.toFixed(4)}&deg;, {bufferCenter.lon.toFixed(4)}&deg;.
-                        <div className="mt-0.5 text-blue-700">
-                          Klik lokasi lain di peta untuk memindahkan zona radius.
+                        <b>{language === 'id' ? 'Titik Inspeksi Terpilih:' : 'Selected Center:'}</b> {bufferCenter.lat.toFixed(4)}&deg;, {bufferCenter.lon.toFixed(4)}&deg;.
+                        <div className="mt-0.5 text-blue-700 dark:text-blue-300">
+                          {language === 'id' ? 'Klik lokasi lain di peta untuk memindahkan zona radius.' : 'Click elsewhere on map to relocate buffer zone.'}
                         </div>
                       </div>
                     ) : (
                       <div className="flex items-center gap-1.5">
                         <Crosshair className="w-3.5 h-3.5 shrink-0" />
-                        <span>Klik di mana saja pada peta untuk meletakkan radius buffer.</span>
+                        <span>{language === 'id' ? 'Klik di mana saja pada peta untuk meletakkan radius buffer.' : 'Click anywhere on map to drop buffer radius.'}</span>
                       </div>
                     )}
                   </div>
@@ -630,7 +630,7 @@ STATUS RISIKO & REKOMENDASI:
 
         {/* Floating Bottom Control Deck / Toolbar */}
         <div className="absolute bottom-6 left-4 right-4 z-20 max-w-4xl mx-auto">
-          <div className="bg-white/90 backdrop-blur-xl border border-[#e5e5e7] rounded-3xl p-4 sm:p-5 shadow-2xl space-y-4">
+          <div className="bg-white/95 dark:bg-[#111827]/95 backdrop-blur-xl border border-[#e5e5e7] dark:border-[#1f2937] rounded-3xl p-4 sm:p-5 shadow-2xl space-y-4">
             
             {/* Row 1: Time Scrubber & Anomaly Presets */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
@@ -639,17 +639,17 @@ STATUS RISIKO & REKOMENDASI:
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setIsPlaying(!isPlaying)}
-                  className="w-10 h-10 rounded-full bg-[#1d1d1f] text-white flex items-center justify-center hover:bg-black transition-all shrink-0 shadow-sm"
+                  className="w-10 h-10 rounded-full bg-[#1d1d1f] dark:bg-white text-white dark:text-[#111827] flex items-center justify-center hover:bg-black dark:hover:bg-neutral-200 transition-all shrink-0 shadow-sm cursor-pointer"
                   title={isPlaying ? 'Jeda Animasi' : 'Putar Animasi (2000–2026)'}
                 >
                   {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
                 </button>
 
                 <div>
-                  <div className="text-[11px] text-[#86868b] uppercase tracking-wider font-semibold">
-                    Tahun Observasi
+                  <div className="text-[11px] text-[#86868b] dark:text-[#9ca3af] uppercase tracking-wider font-semibold">
+                    {language === 'id' ? 'Tahun Observasi' : 'Observation Year'}
                   </div>
-                  <div className="text-xl font-bold text-[#1d1d1f] num leading-none mt-0.5">
+                  <div className="text-xl font-bold text-[#1d1d1f] dark:text-white num leading-none mt-0.5">
                     {selectedYear}
                   </div>
                 </div>
@@ -664,12 +664,12 @@ STATUS RISIKO & REKOMENDASI:
                   step="1"
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                  className="w-full h-1.5 bg-[#e5e5e7] rounded-lg appearance-none cursor-pointer accent-[#1d1d1f]"
+                  className="w-full h-1.5 bg-[#e5e5e7] dark:bg-[#374151] rounded-lg appearance-none cursor-pointer accent-[#1d1d1f] dark:accent-white"
                 />
-                <div className="flex justify-between text-[10px] text-[#86868b] font-medium mt-1">
+                <div className="flex justify-between text-[10px] text-[#86868b] dark:text-[#9ca3af] font-medium mt-1">
                   <span>2000 (MODIS Era)</span>
-                  <span className="font-semibold text-red-600">2015 El Niño</span>
-                  <span>2026 (Sekarang)</span>
+                  <span className="font-semibold text-red-600 dark:text-red-400">2015 El Niño</span>
+                  <span>2026 ({language === 'id' ? 'Sekarang' : 'Current'})</span>
                 </div>
               </div>
 
@@ -687,10 +687,10 @@ STATUS RISIKO & REKOMENDASI:
                       setSelectedYear(yr);
                       setIsPlaying(false);
                     }}
-                    className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all cursor-pointer ${
                       selectedYear === yr
                         ? 'bg-red-500 text-white shadow-xs font-semibold'
-                        : 'bg-[#f5f5f7] text-[#6e6e73] hover:text-[#1d1d1f]'
+                        : 'bg-[#f5f5f7] dark:bg-[#1f2937] text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
                     }`}
                   >
                     {label}
@@ -700,7 +700,7 @@ STATUS RISIKO & REKOMENDASI:
             </div>
 
             {/* Row 2: Tool Actions & GIS Exports */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#e5e5e7] text-xs">
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#e5e5e7] dark:border-[#1f2937] text-xs">
               
               {/* Interactive Tools Group */}
               <div className="flex items-center gap-2 flex-wrap">
@@ -708,27 +708,27 @@ STATUS RISIKO & REKOMENDASI:
                 {/* Radius Tool Toggle */}
                 <button
                   onClick={() => setIsRadiusToolActive(!isRadiusToolActive)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-medium transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-medium transition-all cursor-pointer ${
                     isRadiusToolActive
                       ? 'bg-[#0071e3] text-white shadow-xs'
-                      : 'bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e5e5ea]'
+                      : 'bg-[#f5f5f7] dark:bg-[#1f2937] text-[#1d1d1f] dark:text-white hover:bg-[#e5e5ea] dark:hover:bg-[#374151]'
                   }`}
                 >
                   <Crosshair className="w-3.5 h-3.5" />
-                  <span>{isRadiusToolActive ? 'Radius Aktif' : 'Alat Radius Ancaman'}</span>
+                  <span>{isRadiusToolActive ? (language === 'id' ? 'Radius Aktif' : 'Radius Active') : (language === 'id' ? 'Alat Radius Ancaman' : 'Threat Buffer Radius')}</span>
                 </button>
 
                 {/* Radius Distance Selector */}
                 {isRadiusToolActive && (
-                  <div className="flex items-center bg-[#f5f5f7] rounded-xl p-0.5 border border-[#e5e5e7]">
+                  <div className="flex items-center bg-[#f5f5f7] dark:bg-[#1f2937] rounded-xl p-0.5 border border-[#e5e5e7] dark:border-[#374151]">
                     {[10, 25, 50, 100].map((km) => (
                       <button
                         key={km}
                         onClick={() => setBufferRadiusKm(km)}
-                        className={`px-2 py-1 rounded-lg text-[11px] font-medium transition-all ${
+                        className={`px-2 py-1 rounded-lg text-[11px] font-medium transition-all cursor-pointer ${
                           bufferRadiusKm === km
-                            ? 'bg-white text-[#0071e3] shadow-xs font-bold'
-                            : 'text-[#6e6e73] hover:text-[#1d1d1f]'
+                            ? 'bg-white dark:bg-[#374151] text-[#0071e3] dark:text-blue-400 shadow-xs font-bold'
+                            : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
                         }`}
                       >
                         {km} km
@@ -738,18 +738,18 @@ STATUS RISIKO & REKOMENDASI:
                 )}
 
                 {/* Sensor Filter */}
-                <div className="flex items-center bg-[#f5f5f7] rounded-xl p-0.5 border border-[#e5e5e7]">
+                <div className="flex items-center bg-[#f5f5f7] dark:bg-[#1f2937] rounded-xl p-0.5 border border-[#e5e5e7] dark:border-[#374151]">
                   {(['ALL', 'MODIS', 'VIIRS'] as const).map((s) => (
                     <button
                       key={s}
                       onClick={() => setSensorFilter(s)}
-                      className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all cursor-pointer ${
                         sensorFilter === s
-                          ? 'bg-white text-[#1d1d1f] shadow-xs font-bold'
-                          : 'text-[#6e6e73] hover:text-[#1d1d1f]'
+                          ? 'bg-white dark:bg-[#374151] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
+                          : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
                       }`}
                     >
-                      {s === 'ALL' ? 'Semua Sensor' : s}
+                      {s === 'ALL' ? (language === 'id' ? 'Semua Sensor' : 'All Sensors') : s}
                     </button>
                   ))}
                 </div>
@@ -759,16 +759,16 @@ STATUS RISIKO & REKOMENDASI:
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleExportGeoJSON}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e5e5ea] rounded-xl font-medium transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#f5f5f7] dark:bg-[#1f2937] text-[#1d1d1f] dark:text-white hover:bg-[#e5e5ea] dark:hover:bg-[#374151] rounded-xl font-medium transition-all cursor-pointer"
                   title="Unduh dataset spasial dalam format GeoJSON"
                 >
-                  <Download className="w-3.5 h-3.5 text-[#0071e3]" />
+                  <Download className="w-3.5 h-3.5 text-[#0071e3] dark:text-blue-400" />
                   <span>GeoJSON</span>
                 </button>
 
                 <button
                   onClick={handleExportSitRep}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e5e5ea] rounded-xl font-medium transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#f5f5f7] dark:bg-[#1f2937] text-[#1d1d1f] dark:text-white hover:bg-[#e5e5ea] dark:hover:bg-[#374151] rounded-xl font-medium transition-all cursor-pointer"
                   title="Unduh ringkasan memorandum situasi operasional lapangan"
                 >
                   <Download className="w-3.5 h-3.5" />
@@ -781,7 +781,7 @@ STATUS RISIKO & REKOMENDASI:
                   title="Tutup Peta Penuh dan Kembali (Esc)"
                 >
                   <X className="w-3.5 h-3.5" />
-                  <span>Tutup</span>
+                  <span>{language === 'id' ? 'Tutup' : 'Close'}</span>
                 </button>
               </div>
             </div>

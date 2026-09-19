@@ -45,11 +45,11 @@ export const RiskForecast: React.FC<RiskForecastProps> = ({
   }[riskTier];
 
   return (
-    <div className="bg-white border border-[#e5e5e7] rounded-2xl p-5 shadow-xs flex flex-col justify-between">
+    <div className="bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl p-5 shadow-xs flex flex-col justify-between transition-colors">
       <div>
         {/* Clean Header */}
-        <div className="flex items-baseline justify-between pb-3 border-b border-[#e5e5e7]">
-          <h2 className="font-semibold text-sm text-[#1d1d1f]">
+        <div className="flex items-baseline justify-between pb-3 border-b border-[#e5e5e7] dark:border-[#1f2937]">
+          <h2 className="font-semibold text-sm text-[#1d1d1f] dark:text-white">
             {language === 'id' ? 'Prognosis Risiko 14 Hari' : '14-Day Fire Risk Forecast'}
           </h2>
           <span className={`text-xs font-bold ${riskLabels.color}`}>
@@ -58,14 +58,14 @@ export const RiskForecast: React.FC<RiskForecastProps> = ({
         </div>
 
         {/* Risk meter score */}
-        <div className="mt-3.5 p-3.5 bg-[#f5f5f7] rounded-xl border border-[#e5e5e7]">
-          <div className="flex items-center justify-between text-xs text-[#6e6e73] mb-2">
+        <div className="mt-3.5 p-3.5 bg-[#f5f5f7] dark:bg-[#1f2937] rounded-xl border border-[#e5e5e7] dark:border-[#374151]">
+          <div className="flex items-center justify-between text-xs text-[#6e6e73] dark:text-[#9ca3af] mb-2">
             <span>{language === 'id' ? 'Indeks Kerentanan Gambut' : 'Peat Vulnerability Index'}</span>
-            <span className="font-bold text-[#1d1d1f] num">{compositeScore} / 100</span>
+            <span className="font-bold text-[#1d1d1f] dark:text-white num">{compositeScore} / 100</span>
           </div>
-          <div className="w-full h-2 bg-[#e5e5ea] rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-[#e5e5ea] dark:bg-[#374151] rounded-full overflow-hidden">
             <div
-              className="h-full bg-[#1d1d1f] transition-all duration-300"
+              className="h-full bg-[#1d1d1f] dark:bg-white transition-all duration-300"
               style={{ width: `${compositeScore}%` }}
             />
           </div>
@@ -73,54 +73,54 @@ export const RiskForecast: React.FC<RiskForecastProps> = ({
 
         {/* 3-Week outlook cards */}
         <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
-          <div className="p-2.5 rounded-xl border border-[#e5e5e7] bg-white">
-            <span className="text-[10px] text-[#86868b] block font-medium">
+          <div className="p-2.5 rounded-xl border border-[#e5e5e7] dark:border-[#374151] bg-white dark:bg-[#1f2937]">
+            <span className="text-[10px] text-[#86868b] dark:text-[#9ca3af] block font-medium">
               {language === 'id' ? 'Minggu Ini' : 'This Week'}
             </span>
-            <span className="font-bold text-[#1d1d1f] block text-xs mt-0.5 num">
+            <span className="font-bold text-[#1d1d1f] dark:text-white block text-xs mt-0.5 num">
               Wk {safeWeek}
             </span>
-            <span className={`text-[10px] font-semibold mt-1 inline-block ${baseline.isCritical ? 'text-red-600' : 'text-[#86868b]'}`}>
+            <span className={`text-[10px] font-semibold mt-1 inline-block ${baseline.isCritical ? 'text-red-600 dark:text-red-400' : 'text-[#86868b] dark:text-[#9ca3af]'}`}>
               {baseline.isCritical ? (language === 'id' ? 'Kritis' : 'Critical') : (language === 'id' ? 'Normal' : 'Normal')}
             </span>
           </div>
 
-          <div className="p-2.5 rounded-xl border border-[#e5e5e7] bg-white">
-            <span className="text-[10px] text-[#86868b] block font-medium">
+          <div className="p-2.5 rounded-xl border border-[#e5e5e7] dark:border-[#374151] bg-white dark:bg-[#1f2937]">
+            <span className="text-[10px] text-[#86868b] dark:text-[#9ca3af] block font-medium">
               +7 {language === 'id' ? 'Hari' : 'Days'}
             </span>
-            <span className="font-bold text-[#1d1d1f] block text-xs mt-0.5 num">
+            <span className="font-bold text-[#1d1d1f] dark:text-white block text-xs mt-0.5 num">
               Wk {Math.min(52, safeWeek + 1)}
             </span>
-            <span className={`text-[10px] font-semibold mt-1 inline-block ${nextWeekBaseline.isCritical ? 'text-red-600' : 'text-[#86868b]'}`}>
+            <span className={`text-[10px] font-semibold mt-1 inline-block ${nextWeekBaseline.isCritical ? 'text-red-600 dark:text-red-400' : 'text-[#86868b] dark:text-[#9ca3af]'}`}>
               {nextWeekBaseline.isCritical ? (language === 'id' ? 'Kritis' : 'Critical') : (language === 'id' ? 'Normal' : 'Normal')}
             </span>
           </div>
 
-          <div className="p-2.5 rounded-xl border border-[#e5e5e7] bg-white">
-            <span className="text-[10px] text-[#86868b] block font-medium">
+          <div className="p-2.5 rounded-xl border border-[#e5e5e7] dark:border-[#374151] bg-white dark:bg-[#1f2937]">
+            <span className="text-[10px] text-[#86868b] dark:text-[#9ca3af] block font-medium">
               +14 {language === 'id' ? 'Hari' : 'Days'}
             </span>
-            <span className="font-bold text-[#1d1d1f] block text-xs mt-0.5 num">
+            <span className="font-bold text-[#1d1d1f] dark:text-white block text-xs mt-0.5 num">
               Wk {Math.min(52, safeWeek + 2)}
             </span>
-            <span className={`text-[10px] font-semibold mt-1 inline-block ${weekAfterBaseline.isCritical ? 'text-red-600' : 'text-[#86868b]'}`}>
+            <span className={`text-[10px] font-semibold mt-1 inline-block ${weekAfterBaseline.isCritical ? 'text-red-600 dark:text-red-400' : 'text-[#86868b] dark:text-[#9ca3af]'}`}>
               {weekAfterBaseline.isCritical ? (language === 'id' ? 'Kritis' : 'Critical') : (language === 'id' ? 'Normal' : 'Normal')}
             </span>
           </div>
         </div>
 
         {/* Operational Note */}
-        <p className="text-[11px] text-[#6e6e73] mt-3 leading-relaxed">
+        <p className="text-[11px] text-[#6e6e73] dark:text-[#9ca3af] mt-3 leading-relaxed">
           {language === 'id'
             ? `Berdasarkan klimatologi 26 tahun, zona ${selectedAOI.name} memerlukan pemantauan kelembapan gambut secara berkala.`
             : `Synthesized from 26-year baseline and active satellite passes for ${selectedAOI.name}.`}
         </p>
       </div>
 
-      <div className="mt-4 pt-2 border-t border-[#e5e5e7] text-[10px] text-[#86868b] flex items-center justify-between">
-        <span>Status Operasional</span>
-        <span className="font-medium text-[#1d1d1f]">{selectedAOI.name}</span>
+      <div className="mt-4 pt-2 border-t border-[#e5e5e7] dark:border-[#1f2937] text-[10px] text-[#86868b] dark:text-[#9ca3af] flex items-center justify-between">
+        <span>{language === 'id' ? 'Status Operasional' : 'Operational Status'}</span>
+        <span className="font-medium text-[#1d1d1f] dark:text-white">{selectedAOI.name}</span>
       </div>
     </div>
   );

@@ -49,16 +49,16 @@ export const CriticalAlerts: React.FC<CriticalAlertsProps> = ({
   };
 
   return (
-    <div className="bg-white border border-[#e5e5e7] rounded-2xl p-5 shadow-xs flex flex-col justify-between">
+    <div className="bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl p-5 shadow-xs flex flex-col justify-between transition-colors">
       <div>
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-[#e5e5e7]">
-          <h2 className="font-semibold text-sm text-[#1d1d1f]">
+        <div className="flex items-center justify-between pb-3 border-b border-[#e5e5e7] dark:border-[#1f2937]">
+          <h2 className="font-semibold text-sm text-[#1d1d1f] dark:text-white">
             {t.earlyWarningTitle}
           </h2>
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-[#0071e3] hover:underline"
+            className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-[#0071e3] dark:text-blue-400 hover:underline cursor-pointer"
             title="Download full dataset as CSV"
           >
             <Download className="w-3.5 h-3.5" />
@@ -67,47 +67,47 @@ export const CriticalAlerts: React.FC<CriticalAlertsProps> = ({
         </div>
 
         {/* Peak season summary in clean neutral card */}
-        <div className="mt-3.5 p-3.5 bg-[#f5f5f7] border border-[#e5e5e7] rounded-xl">
-          <div className="text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1">
+        <div className="mt-3.5 p-3.5 bg-[#f5f5f7] dark:bg-[#1f2937] border border-[#e5e5e7] dark:border-[#374151] rounded-xl">
+          <div className="text-xs font-semibold text-[#86868b] dark:text-[#9ca3af] uppercase tracking-wider mb-1">
             {t.annualPeakSeason}
           </div>
-          <div className="text-xl font-bold text-[#1d1d1f] num">
+          <div className="text-xl font-bold text-[#1d1d1f] dark:text-white num">
             {language === 'id' ? 'Minggu' : 'Weeks'} {startWeek} – {endWeek}{' '}
-            <span className="text-xs text-[#86868b] font-normal">
+            <span className="text-xs text-[#86868b] dark:text-[#9ca3af] font-normal">
               ({Math.round(endWeek - startWeek + 1)} {t.weeksDuration})
             </span>
           </div>
-          <p className="text-xs text-[#6e6e73] mt-1.5 leading-relaxed">
+          <p className="text-xs text-[#6e6e73] dark:text-[#9ca3af] mt-1.5 leading-relaxed">
             {language === 'id'
-              ? <>Data historis 26 tahun membuktikan konsentrasi kebakaran terbesar di <strong className="text-[#1d1d1f]">{selectedAOI.name}</strong> terjadi pada rentang minggu ini.</>
-              : <>26-year satellite records confirm that major fire events in <strong className="text-[#1d1d1f]">{selectedAOI.name}</strong> concentrate in this annual dry window.</>}
+              ? <>Data historis 26 tahun membuktikan konsentrasi kebakaran terbesar di <strong className="text-[#1d1d1f] dark:text-white">{selectedAOI.name}</strong> terjadi pada rentang minggu ini.</>
+              : <>26-year satellite records confirm that major fire events in <strong className="text-[#1d1d1f] dark:text-white">{selectedAOI.name}</strong> concentrate in this annual dry window.</>}
           </p>
         </div>
 
         {/* Top anomalies */}
         <div className="mt-4">
-          <div className="text-xs font-semibold text-[#1d1d1f] mb-2">
+          <div className="text-xs font-semibold text-[#1d1d1f] dark:text-white mb-2">
             {t.highestAnomalies}
           </div>
           <div className="space-y-1.5">
             {anomalies.map((anom, idx) => (
               <div
                 key={`${anom.year}-${anom.week}`}
-                className="flex items-center justify-between p-2 rounded-lg border border-[#e5e5e7] bg-white text-xs"
+                className="flex items-center justify-between p-2 rounded-lg border border-[#e5e5e7] dark:border-[#374151] bg-white dark:bg-[#1f2937] text-xs"
               >
                 <div className="flex items-center gap-2">
-                  <span className="w-4 h-4 rounded-full bg-[#1d1d1f] text-white flex items-center justify-center text-[10px] font-bold shrink-0 num">
+                  <span className="w-4 h-4 rounded-full bg-[#1d1d1f] dark:bg-white text-white dark:text-[#111827] flex items-center justify-center text-[10px] font-bold shrink-0 num">
                     {idx + 1}
                   </span>
                   <div>
-                    <strong className="text-[#1d1d1f]">{t.year} {anom.year}, {language === 'id' ? 'Minggu' : 'Wk'} {anom.week}</strong>
-                    <span className="text-[#86868b] ml-1.5">({anom.dominantSensor})</span>
+                    <strong className="text-[#1d1d1f] dark:text-white">{t.year} {anom.year}, {language === 'id' ? 'Minggu' : 'Wk'} {anom.week}</strong>
+                    <span className="text-[#86868b] dark:text-[#9ca3af] ml-1.5">({anom.dominantSensor})</span>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-red-600 font-semibold num">+{anom.zScore.toFixed(1)}x</span>
-                  <span className="text-[#86868b] mx-1.5">·</span>
-                  <span className="text-[#1d1d1f] num font-medium">{anom.totalFrpCalibrated} MW</span>
+                  <span className="text-red-600 dark:text-red-400 font-semibold num">+{anom.zScore.toFixed(1)}x</span>
+                  <span className="text-[#86868b] dark:text-[#6b7280] mx-1.5">·</span>
+                  <span className="text-[#1d1d1f] dark:text-white num font-medium">{anom.totalFrpCalibrated} MW</span>
                 </div>
               </div>
             ))}
@@ -115,11 +115,11 @@ export const CriticalAlerts: React.FC<CriticalAlertsProps> = ({
         </div>
 
         {/* Directives in clean typography */}
-        <div className="mt-4 border-t border-[#e5e5e7] pt-3">
-          <div className="font-semibold text-xs text-[#1d1d1f] mb-1.5">
+        <div className="mt-4 border-t border-[#e5e5e7] dark:border-[#1f2937] pt-3">
+          <div className="font-semibold text-xs text-[#1d1d1f] dark:text-white mb-1.5">
             {t.directivesTitle}
           </div>
-          <ul className="list-disc list-inside space-y-1 text-xs text-[#6e6e73]">
+          <ul className="list-disc list-inside space-y-1 text-xs text-[#6e6e73] dark:text-[#9ca3af]">
             <li>{language === 'id' ? `Mulai patroli lapangan 2 minggu sebelum Minggu ${startWeek}.` : `Deploy field patrols 2 weeks prior to Week ${startWeek}.`}</li>
             <li>{t.directive2}</li>
             <li>{t.directive3}</li>
@@ -127,7 +127,7 @@ export const CriticalAlerts: React.FC<CriticalAlertsProps> = ({
         </div>
       </div>
 
-      <div className="mt-4 pt-2 border-t border-[#e5e5e7] text-[10px] text-[#86868b] flex items-center justify-between">
+      <div className="mt-4 pt-2 border-t border-[#e5e5e7] dark:border-[#1f2937] text-[10px] text-[#86868b] dark:text-[#9ca3af] flex items-center justify-between">
         <span>{t.verificationComplete}</span>
         <span className="num">{t.archiveSpan}</span>
       </div>

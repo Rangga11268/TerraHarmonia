@@ -23,6 +23,13 @@ import { RefreshCw } from 'lucide-react';
 
 export function App() {
   const [language, setLanguage] = useState<Language>('en');
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const saved = localStorage.getItem('terra_harmonia_theme');
+    if (saved === 'dark' || saved === 'light') return saved;
+    return typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
+  });
   const [activeTab, setActiveTab] = useState<NavTab>('overview');
   const [overviewView, setOverviewView] = useState<OverviewViewMode>('main');
   const [selectedAOI, setSelectedAOI] = useState<AOIRegion>(PRESET_AOIS[0]);
@@ -37,6 +44,20 @@ export function App() {
   const [userMapKey, setUserMapKey] = useState<string>(() =>
     localStorage.getItem('terra_harmonia_map_key') || ''
   );
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('terra_harmonia_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
 
   const t = translations[language];
 
@@ -99,12 +120,14 @@ export function App() {
   const peakFRP = highestYear ? Math.round(highestYear[1].frp).toLocaleString() : '0';
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7] text-[#1d1d1f] flex flex-col font-sans">
+    <div className="min-h-screen bg-[#f5f5f7] dark:bg-[#0b0f19] text-[#1d1d1f] dark:text-[#f3f4f6] flex flex-col font-sans transition-colors duration-200">
       
       {/* Apple-style Navigation */}
       <Navbar
         language={language}
         onToggleLanguage={setLanguage}
+        theme={theme}
+        onToggleTheme={toggleTheme}
         activeTab={activeTab}
         onSelectTab={setActiveTab}
         onOpenTeam={() => setActiveTab('team')}
@@ -141,12 +164,12 @@ export function App() {
 
             {/* Live sync notification banner */}
             {isLiveSync && (
-              <div className="bg-white border border-[#e5e5e7] rounded-2xl px-5 py-3 flex items-center justify-between gap-3 text-xs shadow-xs">
+              <div className="bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl px-5 py-3 flex items-center justify-between gap-3 text-xs shadow-xs">
                 <div>
-                  <span className="font-semibold text-[#1d1d1f]">
+                  <span className="font-semibold text-[#1d1d1f] dark:text-white">
                     {t.liveSyncNotice} {selectedAOI.name}
                   </span>
-                  <p className="text-[#86868b] mt-0.5">
+                  <p className="text-[#86868b] dark:text-[#9ca3af] mt-0.5">
                     {liveResult
                       ? `${liveResult.modisCount} MODIS + ${liveResult.viirsCount} VIIRS. ${t.liveSyncOvercount}`
                       : t.fetchingNasa}
@@ -155,7 +178,7 @@ export function App() {
                 <button
                   onClick={() => loadLiveFeed(selectedAOI, userMapKey)}
                   disabled={isLoadingLive}
-                  className="p-1.5 text-[#0071e3] hover:underline transition-colors flex items-center gap-1 font-medium cursor-pointer"
+                  className="p-1.5 text-[#0071e3] dark:text-[#38bdf8] hover:underline transition-colors flex items-center gap-1 font-medium cursor-pointer"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${isLoadingLive ? 'animate-spin' : ''}`} />
                   <span>{language === 'id' ? 'Segarkan' : 'Refresh'}</span>
@@ -167,15 +190,15 @@ export function App() {
             {overviewView === 'main' && (
               <div className="space-y-6 animate-in fade-in duration-150">
                 {/* Metric Strip (Clean Apple Design) */}
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-0 bg-white border border-[#e5e5e7] rounded-2xl shadow-xs overflow-hidden">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-0 bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl shadow-xs overflow-hidden">
                   
-                  <div className="sm:col-span-1 px-5 py-5 flex flex-col justify-between border-b sm:border-b-0 sm:border-r border-[#e5e5e7] bg-[#fbfbfd]">
-                    <span className="text-xs font-semibold text-[#86868b] tracking-wider uppercase">{t.rawDetections}</span>
+                  <div className="sm:col-span-1 px-5 py-5 flex flex-col justify-between border-b sm:border-b-0 sm:border-r border-[#e5e5e7] dark:border-[#1f2937] bg-[#fbfbfd] dark:bg-[#151d2f]">
+                    <span className="text-xs font-semibold text-[#86868b] dark:text-[#9ca3af] tracking-wider uppercase">{t.rawDetections}</span>
                     <div>
-                      <div className="text-3xl sm:text-4xl font-bold text-[#1d1d1f] num tracking-tight leading-none mt-2">
+                      <div className="text-3xl sm:text-4xl font-bold text-[#1d1d1f] dark:text-white num tracking-tight leading-none mt-2">
                         {totalEvents.toLocaleString()}
                       </div>
-                      <p className="text-xs text-[#86868b] mt-1.5 font-medium">
+                      <p className="text-xs text-[#86868b] dark:text-[#9ca3af] mt-1.5 font-medium">
                         {isLiveSync ? `${selectedAOI.name} (Live)` : t.rawDetectionsDesc}
                       </p>
                     </div>
@@ -186,31 +209,31 @@ export function App() {
                       label: t.historicPeakYear,
                       value: peakYear,
                       sub: `${t.energyTotal}: ${peakFRP} MW`,
-                      valueClass: 'text-[#1d1d1f]',
+                      valueClass: 'text-[#1d1d1f] dark:text-white',
                     },
                     {
                       label: t.spatialResolution,
                       value: '5.5 km',
                       sub: t.spatialResolutionDesc,
-                      valueClass: 'text-[#1d1d1f]',
+                      valueClass: 'text-[#1d1d1f] dark:text-white',
                     },
                     {
                       label: t.unusualAnomalies,
                       value: `${anomalyCount}`,
                       sub: t.unusualAnomaliesDesc,
-                      valueClass: anomalyCount > 10 ? 'text-red-600' : 'text-[#1d1d1f]',
+                      valueClass: anomalyCount > 10 ? 'text-red-600 dark:text-red-400' : 'text-[#1d1d1f] dark:text-white',
                     },
                   ].map((kpi) => (
                     <div
                       key={kpi.label}
-                      className="px-5 py-5 flex flex-col justify-between border-b sm:border-b-0 sm:border-r last:border-r-0 border-[#e5e5e7]"
+                      className="px-5 py-5 flex flex-col justify-between border-b sm:border-b-0 sm:border-r last:border-r-0 border-[#e5e5e7] dark:border-[#1f2937]"
                     >
-                      <span className="text-xs font-semibold text-[#86868b] uppercase tracking-wider">{kpi.label}</span>
+                      <span className="text-xs font-semibold text-[#86868b] dark:text-[#9ca3af] uppercase tracking-wider">{kpi.label}</span>
                       <div>
                         <div className={`text-3xl sm:text-4xl font-bold num tracking-tight leading-none mt-2 ${kpi.valueClass}`}>
                           {kpi.value}
                         </div>
-                        <p className="text-[11px] text-[#86868b] mt-1.5 leading-snug">{kpi.sub}</p>
+                        <p className="text-[11px] text-[#86868b] dark:text-[#9ca3af] mt-1.5 leading-snug">{kpi.sub}</p>
                       </div>
                     </div>
                   ))}

@@ -33,11 +33,11 @@ export const Logo: React.FC<LogoProps> = ({
 
       {/* Apple-style Clean Typography */}
       <div className="flex flex-col justify-center min-w-0 leading-tight">
-        <div className={`tracking-tight text-[#1d1d1f] font-bold ${title}`}>
+        <div className={`tracking-tight text-[#1d1d1f] dark:text-white font-bold ${title}`}>
           Terra Harmonia
         </div>
         {showSubtitle && (
-          <span className={`text-[#86868b] tracking-normal font-medium hidden sm:block ${sub}`}>
+          <span className={`text-[#86868b] dark:text-[#9ca3af] tracking-normal font-medium hidden sm:block ${sub}`}>
             NASA Space Apps Challenge 2026
           </span>
         )}

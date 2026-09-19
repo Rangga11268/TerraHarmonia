@@ -65,14 +65,14 @@ export const DataHub: React.FC<DataHubProps> = ({
     <div className="w-full space-y-6">
       
       {/* Editorial Header */}
-      <div className="space-y-2 pt-2 pb-4 border-b border-[#e5e5e7]">
-        <div className="text-xs font-semibold uppercase tracking-wider text-[#86868b]">
+      <div className="space-y-2 pt-2 pb-4 border-b border-[#e5e5e7] dark:border-[#1f2937]">
+        <div className="text-xs font-semibold uppercase tracking-wider text-[#86868b] dark:text-[#9ca3af]">
           {language === 'id' ? 'Arsip & Sumber Data Terbuka' : 'Open Data & Satellite Registry'}
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#1d1d1f] tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#1d1d1f] dark:text-white tracking-tight">
           {t.dataHubTitle}
         </h1>
-        <p className="text-sm text-[#6e6e73] max-w-3xl leading-relaxed">
+        <p className="text-sm text-[#6e6e73] dark:text-[#9ca3af] max-w-3xl leading-relaxed">
           {t.dataHubDesc}
         </p>
       </div>
@@ -81,8 +81,8 @@ export const DataHub: React.FC<DataHubProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         
         {/* Constellation Registry */}
-        <div className="lg:col-span-7 bg-white border border-[#e5e5e7] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
-          <h2 className="font-semibold text-sm text-[#1d1d1f]">
+        <div className="lg:col-span-7 bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+          <h2 className="font-semibold text-sm text-[#1d1d1f] dark:text-white">
             {t.constellationTitle}
           </h2>
 
@@ -90,23 +90,23 @@ export const DataHub: React.FC<DataHubProps> = ({
             {satellites.map((sat) => (
               <div
                 key={sat.name}
-                className="p-3.5 rounded-xl border border-[#e5e5e7] bg-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs"
+                className="p-3.5 rounded-xl border border-[#e5e5e7] dark:border-[#1f2937] bg-white dark:bg-[#151d2f] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs"
               >
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-[#1d1d1f]">{sat.name}</span>
-                    <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-[#f5f5f7] text-[#1d1d1f] border border-[#e5e5e7]">
+                    <span className="font-bold text-[#1d1d1f] dark:text-white">{sat.name}</span>
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-[#f5f5f7] dark:bg-[#1f2937] text-[#1d1d1f] dark:text-white border border-[#e5e5e7] dark:border-[#374151]">
                       {sat.sensor}
                     </span>
                   </div>
-                  <div className="text-[11px] text-[#86868b] mt-1">
+                  <div className="text-[11px] text-[#86868b] dark:text-[#9ca3af] mt-1">
                     {t.equatorPass} {sat.orbit}
                   </div>
                 </div>
 
-                <div className="text-right sm:self-center text-[11px] text-[#1d1d1f]">
+                <div className="text-right sm:self-center text-[11px] text-[#1d1d1f] dark:text-white">
                   <span className="font-semibold block num">{sat.resolution}</span>
-                  <span className="text-[#86868b] text-[10px]">{sat.waveband}</span>
+                  <span className="text-[#86868b] dark:text-[#9ca3af] text-[10px]">{sat.waveband}</span>
                 </div>
               </div>
             ))}
@@ -114,15 +114,15 @@ export const DataHub: React.FC<DataHubProps> = ({
         </div>
 
         {/* Export Engine Card */}
-        <div className="lg:col-span-5 bg-white border border-[#e5e5e7] rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col justify-between space-y-5">
+        <div className="lg:col-span-5 bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col justify-between space-y-5">
           <div>
-            <h2 className="font-semibold text-sm text-[#1d1d1f] pb-3 border-b border-[#e5e5e7]">
+            <h2 className="font-semibold text-sm text-[#1d1d1f] dark:text-white pb-3 border-b border-[#e5e5e7] dark:border-[#1f2937]">
               {t.exportDatasetTitle}
             </h2>
 
             <div className="mt-4 space-y-4 text-xs">
               <div>
-                <label className="block text-[#6e6e73] font-medium mb-1.5">
+                <label className="block text-[#6e6e73] dark:text-[#9ca3af] font-medium mb-1.5">
                   {t.fileFormat}:
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -130,8 +130,8 @@ export const DataHub: React.FC<DataHubProps> = ({
                     onClick={() => setDownloadFormat('csv')}
                     className={`p-2.5 rounded-xl border flex items-center justify-center gap-2 font-medium min-h-[44px] transition cursor-pointer ${
                       downloadFormat === 'csv'
-                        ? 'bg-[#1d1d1f] text-white border-[#1d1d1f]'
-                        : 'bg-white border-[#e5e5e7] text-[#1d1d1f] hover:bg-[#f5f5f7]'
+                        ? 'bg-[#1d1d1f] dark:bg-emerald-600 text-white border-[#1d1d1f] dark:border-emerald-600'
+                        : 'bg-white dark:bg-[#151d2f] border-[#e5e5e7] dark:border-[#1f2937] text-[#1d1d1f] dark:text-white hover:bg-[#f5f5f7] dark:hover:bg-[#1f2937]'
                     }`}
                   >
                     <FileSpreadsheet className="w-4 h-4" />
@@ -141,8 +141,8 @@ export const DataHub: React.FC<DataHubProps> = ({
                     onClick={() => setDownloadFormat('json')}
                     className={`p-2.5 rounded-xl border flex items-center justify-center gap-2 font-medium min-h-[44px] transition cursor-pointer ${
                       downloadFormat === 'json'
-                        ? 'bg-[#1d1d1f] text-white border-[#1d1d1f]'
-                        : 'bg-white border-[#e5e5e7] text-[#1d1d1f] hover:bg-[#f5f5f7]'
+                        ? 'bg-[#1d1d1f] dark:bg-emerald-600 text-white border-[#1d1d1f] dark:border-emerald-600'
+                        : 'bg-white dark:bg-[#151d2f] border-[#e5e5e7] dark:border-[#1f2937] text-[#1d1d1f] dark:text-white hover:bg-[#f5f5f7] dark:hover:bg-[#1f2937]'
                     }`}
                   >
                     <Code2 className="w-4 h-4" />
@@ -152,10 +152,10 @@ export const DataHub: React.FC<DataHubProps> = ({
               </div>
 
               <div>
-                <label className="block text-[#6e6e73] font-medium mb-1">
+                <label className="block text-[#6e6e73] dark:text-[#9ca3af] font-medium mb-1">
                   {t.selectedDataset}:
                 </label>
-                <div className="p-2.5 rounded-lg bg-[#f5f5f7] border border-[#e5e5e7] font-semibold text-[#1d1d1f]">
+                <div className="p-2.5 rounded-lg bg-[#f5f5f7] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937] font-semibold text-[#1d1d1f] dark:text-white">
                   {selectedAOI.name} (2000 – 2026 Archive)
                 </div>
               </div>
@@ -173,7 +173,7 @@ export const DataHub: React.FC<DataHubProps> = ({
 
             <button
               onClick={onOpenApiKeyModal}
-              className="w-full flex items-center justify-center gap-1.5 py-2.5 text-xs text-[#6e6e73] hover:text-[#1d1d1f] transition font-medium min-h-[40px] cursor-pointer"
+              className="w-full flex items-center justify-center gap-1.5 py-2.5 text-xs text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white transition font-medium min-h-[40px] cursor-pointer"
             >
               <Key className="w-3.5 h-3.5" />
               <span>{userMapKey ? t.nasaMapKeyInstalled : t.configurePersonalMapKey}</span>

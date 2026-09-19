@@ -146,26 +146,26 @@ export const PolygonInspector: React.FC<PolygonInspectorProps> = ({
     : '0.00';
 
   return (
-    <div className="bg-white border border-[#e5e5e7] rounded-2xl p-4 sm:p-6 shadow-xs space-y-6 transition-all">
+    <div className="bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl p-5 sm:p-6 shadow-xs space-y-6 transition-colors">
       
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-[#e5e5e7]">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-[#e5e5e7] dark:border-[#1f2937]">
         <div>
-          <div className="text-xs font-semibold text-[#86868b] uppercase tracking-wider">
+          <div className="text-xs font-semibold text-[#86868b] dark:text-[#9ca3af] uppercase tracking-wider">
             {language === 'id' ? 'Analisis Spasial Perimeter Khusus' : 'Spatial Custom Boundary Inspection'}
           </div>
-          <h2 className="text-lg sm:text-xl font-bold text-[#1d1d1f] tracking-tight mt-0.5">
+          <h2 className="text-lg sm:text-xl font-bold text-[#1d1d1f] dark:text-white tracking-tight mt-0.5">
             {t.polygonInspectorTitle}
           </h2>
-          <p className="text-xs text-[#6e6e73] mt-1 leading-relaxed max-w-3xl">
+          <p className="text-xs text-[#6e6e73] dark:text-[#9ca3af] mt-1 leading-relaxed max-w-3xl">
             {t.polygonInspectorDesc}
           </p>
         </div>
 
         {/* Verification Badge */}
-        <div className="px-3.5 py-2 rounded-xl bg-[#f5f5f7] border border-[#e5e5e7] text-xs flex items-center gap-2 shrink-0">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-          <span className="font-medium text-[#1d1d1f]">{t.rayCastingNotice}</span>
+        <div className="px-3.5 py-2 rounded-xl bg-[#f5f5f7] dark:bg-[#1f2937] border border-[#e5e5e7] dark:border-[#374151] text-xs flex items-center gap-2 shrink-0">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+          <span className="font-medium text-[#1d1d1f] dark:text-white">{t.rayCastingNotice}</span>
         </div>
       </div>
 
@@ -174,7 +174,7 @@ export const PolygonInspector: React.FC<PolygonInspectorProps> = ({
         
         {/* Left: Preset Selector */}
         <div className="lg:col-span-8 space-y-3">
-          <label className="text-xs font-bold text-[#1d1d1f] block">
+          <label className="text-xs font-bold text-[#1d1d1f] dark:text-white block">
             {t.presetZones}
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -186,17 +186,17 @@ export const PolygonInspector: React.FC<PolygonInspectorProps> = ({
                   onClick={() => handleSelectPreset(preset)}
                   className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer min-h-[44px] ${
                     isSelected
-                      ? 'bg-[#1d1d1f] text-white border-[#1d1d1f] shadow-xs'
-                      : 'bg-white border-[#e5e5e7] text-[#1d1d1f] hover:border-[#1d1d1f]/40'
+                      ? 'bg-[#1d1d1f] dark:bg-white text-white dark:text-[#111827] border-[#1d1d1f] dark:border-white shadow-xs'
+                      : 'bg-white dark:bg-[#1f2937] border-[#e5e5e7] dark:border-[#374151] text-[#1d1d1f] dark:text-white hover:border-[#1d1d1f]/40 dark:hover:border-white/40'
                   }`}
                 >
                   <div className="font-bold text-xs truncate">
                     {language === 'id' ? preset.nameId : preset.nameEn}
                   </div>
-                  <div className={`text-[11px] mt-1 ${isSelected ? 'text-slate-300' : 'text-[#86868b]'}`}>
+                  <div className={`text-[11px] mt-1 ${isSelected ? 'text-slate-300 dark:text-neutral-600' : 'text-[#86868b] dark:text-[#9ca3af]'}`}>
                     {language === 'id' ? preset.provinceId : preset.provinceEn}
                   </div>
-                  <div className={`text-[10px] mt-2 font-mono ${isSelected ? 'text-cyan-300' : 'text-[#0071e3]'}`}>
+                  <div className={`text-[10px] mt-2 font-mono ${isSelected ? 'text-cyan-300 dark:text-blue-700' : 'text-[#0071e3] dark:text-blue-400'}`}>
                     {preset.areaHa.toLocaleString()} Ha
                   </div>
                 </button>
@@ -207,15 +207,15 @@ export const PolygonInspector: React.FC<PolygonInspectorProps> = ({
 
         {/* Right: Custom GeoJSON Upload */}
         <div className="lg:col-span-4 space-y-3">
-          <label className="text-xs font-bold text-[#1d1d1f] block">
+          <label className="text-xs font-bold text-[#1d1d1f] dark:text-white block">
             {t.uploadCustomGeoJson}
           </label>
-          <label className="p-3.5 rounded-xl border-2 border-dashed border-[#e5e5e7] hover:border-[#1d1d1f] bg-[#fafafa] flex flex-col items-center justify-center text-center cursor-pointer transition min-h-[92px]">
-            <Upload className="w-5 h-5 text-[#86868b] mb-1" />
-            <span className="text-xs font-semibold text-[#1d1d1f]">
+          <label className="p-3.5 rounded-xl border-2 border-dashed border-[#e5e5e7] dark:border-[#374151] hover:border-[#1d1d1f] dark:hover:border-white bg-[#fafafa] dark:bg-[#1f2937] flex flex-col items-center justify-center text-center cursor-pointer transition min-h-[92px]">
+            <Upload className="w-5 h-5 text-[#86868b] dark:text-[#9ca3af] mb-1" />
+            <span className="text-xs font-semibold text-[#1d1d1f] dark:text-white">
               {customGeoJsonName || (language === 'id' ? 'Pilih berkas .geojson / .json' : 'Choose .geojson / .json file')}
             </span>
-            <span className="text-[10px] text-[#86868b] mt-0.5">
+            <span className="text-[10px] text-[#86868b] dark:text-[#9ca3af] mt-0.5">
               {language === 'id' ? 'Format Polygon EPSG:4326 WGS84' : 'EPSG:4326 WGS84 Polygon format'}
             </span>
             <input
@@ -232,42 +232,42 @@ export const PolygonInspector: React.FC<PolygonInspectorProps> = ({
       {/* Calculated Stats within Selected Polygon */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 text-xs">
         
-        <div className="p-4 rounded-xl border border-[#e5e5e7] bg-[#fbfbfd]">
-          <span className="text-[10px] uppercase font-bold text-[#86868b]">{t.zoneArea}</span>
-          <div className="text-2xl font-black text-[#1d1d1f] mt-1 num">
+        <div className="p-4 rounded-xl border border-[#e5e5e7] dark:border-[#374151] bg-[#fbfbfd] dark:bg-[#1f2937]">
+          <span className="text-[10px] uppercase font-bold text-[#86868b] dark:text-[#9ca3af]">{t.zoneArea}</span>
+          <div className="text-2xl font-black text-[#1d1d1f] dark:text-white mt-1 num">
             {areaHectares.toLocaleString()} Ha
           </div>
-          <span className="text-[11px] text-[#6e6e73]">
+          <span className="text-[11px] text-[#6e6e73] dark:text-[#9ca3af]">
             {language === 'id' ? 'Kawasan konservasi terpilih' : 'Selected boundary perimeter'}
           </span>
         </div>
 
-        <div className="p-4 rounded-xl border border-[#e5e5e7] bg-[#fbfbfd]">
-          <span className="text-[10px] uppercase font-bold text-[#86868b]">{t.hotspotsInside}</span>
-          <div className="text-2xl font-black text-red-600 mt-1 num">
+        <div className="p-4 rounded-xl border border-[#e5e5e7] dark:border-[#374151] bg-[#fbfbfd] dark:bg-[#1f2937]">
+          <span className="text-[10px] uppercase font-bold text-[#86868b] dark:text-[#9ca3af]">{t.hotspotsInside}</span>
+          <div className="text-2xl font-black text-red-600 dark:text-red-400 mt-1 num">
             {filteredHotspots.length.toLocaleString()}
           </div>
-          <span className="text-[11px] text-[#6e6e73]">
+          <span className="text-[11px] text-[#6e6e73] dark:text-[#9ca3af]">
             MODIS: {modisCount} &bull; VIIRS: {viirsCount}
           </span>
         </div>
 
-        <div className="p-4 rounded-xl border border-[#e5e5e7] bg-[#fbfbfd]">
-          <span className="text-[10px] uppercase font-bold text-[#86868b]">{language === 'id' ? 'Total Radiasi (FRP)' : 'Total Radiative Power'}</span>
-          <div className="text-2xl font-black text-[#1d1d1f] mt-1 num">
+        <div className="p-4 rounded-xl border border-[#e5e5e7] dark:border-[#374151] bg-[#fbfbfd] dark:bg-[#1f2937]">
+          <span className="text-[10px] uppercase font-bold text-[#86868b] dark:text-[#9ca3af]">{language === 'id' ? 'Total Radiasi (FRP)' : 'Total Radiative Power'}</span>
+          <div className="text-2xl font-black text-[#1d1d1f] dark:text-white mt-1 num">
             {totalFrp.toLocaleString()} MW
           </div>
-          <span className="text-[11px] text-[#6e6e73]">
+          <span className="text-[11px] text-[#6e6e73] dark:text-[#9ca3af]">
             {language === 'id' ? 'Energi panas kumulatif' : 'Cumulative thermal energy'}
           </span>
         </div>
 
-        <div className="p-4 rounded-xl border border-[#e5e5e7] bg-[#fbfbfd]">
-          <span className="text-[10px] uppercase font-bold text-[#86868b]">{t.fireDensity}</span>
-          <div className="text-2xl font-black text-[#0071e3] mt-1 num">
+        <div className="p-4 rounded-xl border border-[#e5e5e7] dark:border-[#374151] bg-[#fbfbfd] dark:bg-[#1f2937]">
+          <span className="text-[10px] uppercase font-bold text-[#86868b] dark:text-[#9ca3af]">{t.fireDensity}</span>
+          <div className="text-2xl font-black text-[#0071e3] dark:text-blue-400 mt-1 num">
             {fireDensityPer1kHa}
           </div>
-          <span className="text-[11px] text-[#6e6e73]">
+          <span className="text-[11px] text-[#6e6e73] dark:text-[#9ca3af]">
             {language === 'id' ? 'Titik api per 1.000 Hektar' : 'Detections per 1,000 Hectares'}
           </span>
         </div>

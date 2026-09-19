@@ -212,14 +212,14 @@ export const MapViewer: React.FC<MapViewerProps> = ({
     .length;
 
   return (
-    <div className="relative z-0 bg-white border border-[#e5e5e7] rounded-2xl overflow-hidden shadow-xs flex flex-col [isolation:isolate]">
+    <div className="relative z-0 bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl overflow-hidden shadow-xs flex flex-col [isolation:isolate] transition-colors">
       {/* Map header */}
-      <div className="px-5 py-3 border-b border-[#e5e5e7] flex flex-wrap items-center justify-between gap-2 bg-white">
+      <div className="px-5 py-3 border-b border-[#e5e5e7] dark:border-[#1f2937] flex flex-wrap items-center justify-between gap-2 bg-white dark:bg-[#111827]">
         <div className="flex items-baseline gap-2">
-          <span className="font-semibold text-[#1d1d1f] text-sm">{selectedAOI.name}</span>
-          <span className="text-xs text-[#86868b]">({selectedAOI.biome})</span>
+          <span className="font-semibold text-[#1d1d1f] dark:text-white text-sm">{selectedAOI.name}</span>
+          <span className="text-xs text-[#86868b] dark:text-[#9ca3af]">({selectedAOI.biome})</span>
           {markerCount > 0 && (
-            <span className="text-xs text-[#6e6e73] font-medium num">
+            <span className="text-xs text-[#6e6e73] dark:text-[#9ca3af] font-medium num">
               · {markerCount.toLocaleString()} {language === 'id' ? 'titik' : 'points'}
             </span>
           )}
@@ -227,23 +227,23 @@ export const MapViewer: React.FC<MapViewerProps> = ({
 
         <div className="flex items-center gap-3">
           {/* Basemap switch */}
-          <div className="flex items-center bg-[#e5e5ea] rounded-xl p-0.5 text-xs font-medium">
+          <div className="flex items-center bg-[#e5e5ea] dark:bg-[#1f2937] rounded-xl p-0.5 text-xs font-medium">
             <button
               onClick={() => setBasemap('dark')}
-              className={`px-2.5 py-1 rounded-lg transition-all ${
+              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                 basemap === 'dark'
-                  ? 'bg-white text-[#1d1d1f] shadow-xs font-semibold'
-                  : 'text-[#6e6e73] hover:text-[#1d1d1f]'
+                  ? 'bg-white dark:bg-[#374151] text-[#1d1d1f] dark:text-white shadow-xs font-semibold'
+                  : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
               }`}
             >
               {t.darkMap}
             </button>
             <button
               onClick={() => setBasemap('satellite')}
-              className={`px-2.5 py-1 rounded-lg transition-all ${
+              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                 basemap === 'satellite'
-                  ? 'bg-white text-[#1d1d1f] shadow-xs font-semibold'
-                  : 'text-[#6e6e73] hover:text-[#1d1d1f]'
+                  ? 'bg-white dark:bg-[#374151] text-[#1d1d1f] dark:text-white shadow-xs font-semibold'
+                  : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
               }`}
             >
               {t.satelliteMap}
@@ -251,7 +251,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({
           </div>
 
           {/* Legend */}
-          <div className="hidden sm:flex items-center gap-2.5 text-xs text-[#86868b]">
+          <div className="hidden sm:flex items-center gap-2.5 text-xs text-[#86868b] dark:text-[#9ca3af]">
             <span className="flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-red-600 inline-block" />
               MODIS
@@ -265,7 +265,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({
           {/* Full Screen Map Explorer Button */}
           <button
             onClick={() => setIsFullMapOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1d1d1f] text-white hover:bg-black rounded-xl text-xs font-medium transition-all shadow-xs shrink-0"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1d1d1f] dark:bg-white text-white dark:text-[#111827] hover:bg-black dark:hover:bg-neutral-100 rounded-xl text-xs font-medium transition-all shadow-xs shrink-0 cursor-pointer"
             title={language === 'id' ? 'Buka Peta Penuh dengan Mini Dashboard' : 'Open Full Screen Map Explorer with HUD'}
           >
             <Maximize2 className="w-3.5 h-3.5" />
@@ -280,14 +280,14 @@ export const MapViewer: React.FC<MapViewerProps> = ({
       </div>
 
       {/* Map footer */}
-      <div className="px-5 py-2.5 border-t border-[#e5e5e7] bg-[#fbfbfd] flex flex-wrap items-center justify-between gap-2 text-xs text-[#86868b]">
+      <div className="px-5 py-2.5 border-t border-[#e5e5e7] dark:border-[#1f2937] bg-[#fbfbfd] dark:bg-[#0f172a] flex flex-wrap items-center justify-between gap-2 text-xs text-[#86868b] dark:text-[#9ca3af]">
         <span>
           {language === 'id'
             ? 'Ukuran lingkaran = Daya Radiatif Api (FRP Megawatt). Merah = MODIS (1km), Kuning = VIIRS (375m).'
             : 'Circle size = Fire Radiative Power (FRP Megawatt). Red = MODIS (1km), Amber = VIIRS (375m).'}
         </span>
         {isLiveSync && (
-          <span className="text-[#1d1d1f] font-medium">
+          <span className="text-[#1d1d1f] dark:text-emerald-400 font-medium">
             Keyakinan &ge; 70%
           </span>
         )}
