@@ -21,17 +21,17 @@ export const Logo: React.FC<LogoProps> = ({
 
   return (
     <div className={`inline-flex items-center gap-2.5 select-none ${className}`}>
-      {/* High-Contrast Crisp Vector Emblem */}
-      <div className={`overflow-hidden shrink-0 shadow-sm border border-black/10 bg-[#0f172a] ${img}`}>
+      {/* Original Terra Harmonia Logo with Crisp Frame */}
+      <div className={`overflow-hidden shrink-0 shadow-sm ring-1 ring-black/10 bg-white ${img}`}>
         <img
-          src="/favicon.svg"
-          alt="Terra Harmonia Emblem"
-          className="w-full h-full object-contain p-0.5"
+          src="/terra_harmonia_logo.jpg"
+          alt="Terra Harmonia"
+          className="w-full h-full object-cover"
           loading="eager"
         />
       </div>
 
-      {/* Clean Apple-style Typography */}
+      {/* Apple-style Typography */}
       <div className="flex flex-col justify-center min-w-0 leading-tight">
         <div className={`tracking-tight text-[#1d1d1f] font-bold ${title}`}>
           Terra Harmonia
