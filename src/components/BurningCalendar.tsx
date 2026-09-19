@@ -29,29 +29,29 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
   const [viewMode, setViewMode] = useState<'matrix' | 'focused'>('matrix');
 
   const getCellColor = (item?: HarmonizedWeekData) => {
-    if (!item) return 'bg-slate-900 border-slate-800';
+    if (!item) return 'bg-slate-900 border-slate-700/60';
 
     const value = rawMode 
       ? Math.min(100, item.rawTotalCount * 2.2) 
       : item.burningActivityIndex;
 
-    if (value <= 0) return 'bg-slate-900 border-slate-800';
-    if (value < 15) return 'bg-teal-950 border-teal-800';
-    if (value < 35) return 'bg-amber-800 border-amber-600 text-white';
+    if (value <= 0) return 'bg-slate-900 border-slate-700/60';
+    if (value < 15) return 'bg-teal-900/90 border-teal-700';
+    if (value < 35) return 'bg-amber-700 border-amber-500 text-white';
     if (value < 65) return 'bg-orange-600 border-orange-500 text-white';
     return 'bg-rose-600 border-rose-400 text-white font-bold';
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg text-slate-100">
+    <div className="bg-slate-800/90 border border-slate-700/80 rounded-xl p-4 shadow-md text-slate-100">
       {/* Calendar Title & View Toggles */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-700/80">
         <div className="flex items-center gap-2.5">
           <CalendarIcon className="w-5 h-5 text-amber-500 shrink-0" />
           <div>
             <h2 className="font-bold text-base tracking-wide flex items-center gap-2 text-white">
               <span>{t.calendarTitle}</span>
-              <span className="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono border border-slate-700">
+              <span className="text-xs px-2 py-0.5 rounded bg-slate-700/80 text-slate-200 font-mono border border-slate-600">
                 {t.calendarSpan}
               </span>
             </h2>
@@ -67,19 +67,19 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-1.5 text-xs font-mono text-slate-300">
             <span>{t.scale}</span>
-            <span className="inline-block w-3 h-3 bg-slate-900 border border-slate-700" title={t.zero} />
-            <span className="inline-block w-3 h-3 bg-teal-950 border border-teal-800" title={t.low} />
-            <span className="inline-block w-3 h-3 bg-amber-800 border border-amber-600" title={t.moderate} />
+            <span className="inline-block w-3 h-3 bg-slate-900 border border-slate-600" title={t.zero} />
+            <span className="inline-block w-3 h-3 bg-teal-900 border border-teal-700" title={t.low} />
+            <span className="inline-block w-3 h-3 bg-amber-700 border border-amber-500" title={t.moderate} />
             <span className="inline-block w-3 h-3 bg-orange-600 border border-orange-400" title={t.high} />
             <span className="inline-block w-3 h-3 bg-rose-600 border border-rose-400" title={t.severe} />
             <span className="text-slate-300 text-xs ml-1">{t.severe}</span>
           </div>
 
-          <div className="flex md:hidden bg-slate-950 p-0.5 rounded border border-slate-800 text-xs">
+          <div className="flex md:hidden bg-slate-900 p-0.5 rounded border border-slate-700 text-xs">
             <button
               onClick={() => setViewMode('matrix')}
               className={`px-2 py-1 rounded flex items-center gap-1 min-h-[36px] ${
-                viewMode === 'matrix' ? 'bg-slate-800 text-white' : 'text-slate-400'
+                viewMode === 'matrix' ? 'bg-slate-700 text-white font-medium' : 'text-slate-400'
               }`}
             >
               <Grid className="w-3.5 h-3.5" />
@@ -88,7 +88,7 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
             <button
               onClick={() => setViewMode('focused')}
               className={`px-2 py-1 rounded flex items-center gap-1 min-h-[36px] ${
-                viewMode === 'focused' ? 'bg-slate-800 text-white' : 'text-slate-400'
+                viewMode === 'focused' ? 'bg-slate-700 text-white font-medium' : 'text-slate-400'
               }`}
             >
               <ListFilter className="w-3.5 h-3.5" />
@@ -173,7 +173,7 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
             id="year-select"
             value={mobileViewYear}
             onChange={(e) => setMobileViewYear(Number(e.target.value))}
-            className="bg-slate-950 text-white border border-slate-700 px-3 py-1.5 rounded text-sm min-h-[44px]"
+            className="bg-slate-900 text-white border border-slate-700 px-3 py-1.5 rounded text-sm min-h-[44px]"
           >
             {YEARS.map((yr) => (
               <option key={yr} value={yr}>{t.year} {yr} {yr >= 2012 ? '(MODIS + VIIRS)' : '(MODIS only)'}</option>
@@ -198,7 +198,7 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
             return (
               <div 
                 key={mNum}
-                className="p-3 rounded-lg bg-slate-950 border border-slate-800 text-xs min-h-[70px] flex flex-col justify-between"
+                className="p-3 rounded-lg bg-slate-900/90 border border-slate-700/80 text-xs min-h-[70px] flex flex-col justify-between"
               >
                 <div className="flex items-center justify-between font-bold text-slate-200">
                   <span>{MONTHS[mIdx]}</span>
@@ -227,11 +227,11 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
       </div>
 
       {/* Selected/Hovered Detail Bar */}
-      <div className="mt-4 p-3.5 rounded-lg bg-slate-950 border border-slate-800 text-xs flex flex-wrap items-center justify-between gap-4">
+      <div className="mt-4 p-3.5 rounded-lg bg-slate-900/90 border border-slate-700/80 text-xs flex flex-wrap items-center justify-between gap-4">
         {hoveredData ? (
           <>
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded bg-slate-900 border border-slate-800 shrink-0">
+              <div className="p-2 rounded bg-slate-800 border border-slate-700 shrink-0">
                 <Flame className={`w-5 h-5 ${hoveredData.burningActivityIndex > 40 ? 'text-orange-500' : 'text-amber-500'}`} />
               </div>
               <div>
@@ -259,7 +259,7 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
               </div>
             </div>
 
-            <div className="flex items-center gap-4 font-mono text-slate-300 border-l border-slate-800 pl-4">
+            <div className="flex items-center gap-4 font-mono text-slate-300 border-l border-slate-700 pl-4">
               <div>
                 <div className="text-[11px] uppercase text-slate-400">MODIS</div>
                 <div className="text-sm font-semibold text-slate-100">{hoveredData.rawModisCount}</div>

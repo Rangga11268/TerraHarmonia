@@ -49,9 +49,9 @@ export const CriticalAlerts: React.FC<CriticalAlertsProps> = ({
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg text-slate-100 flex flex-col justify-between">
+    <div className="bg-slate-800/90 border border-slate-700/80 rounded-xl p-4 shadow-md text-slate-100 flex flex-col justify-between">
       <div>
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-700/80">
           <div className="flex items-center gap-2">
             <ShieldAlert className="w-5 h-5 text-amber-400" />
             <h3 className="font-bold text-sm tracking-wide text-white">
@@ -60,7 +60,7 @@ export const CriticalAlerts: React.FC<CriticalAlertsProps> = ({
           </div>
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-1.5 px-3 py-1.5 min-h-[36px] rounded bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-mono border border-slate-700 transition focus-visible:ring-2 focus-visible:ring-cyan-400"
+            className="flex items-center gap-1.5 px-3 py-1.5 min-h-[36px] rounded bg-slate-700 hover:bg-slate-600 text-cyan-300 text-xs font-mono border border-slate-600 transition focus-visible:ring-2 focus-visible:ring-cyan-400"
             title="Download full 26-year harmonized dataset as CSV"
           >
             <Download className="w-4 h-4" />
@@ -69,7 +69,7 @@ export const CriticalAlerts: React.FC<CriticalAlertsProps> = ({
         </div>
 
         {/* 1. Critical Period Forecast Banner */}
-        <div className="mt-3 p-3.5 bg-slate-950 border border-amber-800/60 rounded-lg">
+        <div className="mt-3 p-3.5 bg-slate-900/90 border border-amber-700/70 rounded-lg">
           <div className="flex items-center gap-2 text-amber-400 font-semibold text-xs mb-1">
             <Compass className="w-4 h-4 text-orange-400 shrink-0" />
             <span>{t.annualPeakSeason}</span>
@@ -95,7 +95,7 @@ export const CriticalAlerts: React.FC<CriticalAlertsProps> = ({
             {anomalies.map((anom, idx) => (
               <div
                 key={`${anom.year}-${anom.week}`}
-                className="flex items-center justify-between p-2 rounded bg-slate-950 border border-slate-800 text-xs font-mono"
+                className="flex items-center justify-between p-2 rounded bg-slate-900/90 border border-slate-700/80 text-xs font-mono"
               >
                 <div className="flex items-center gap-2">
                   <span className="w-5 h-5 rounded bg-slate-800 text-slate-200 border border-slate-700 flex items-center justify-center text-xs font-bold">
@@ -120,7 +120,7 @@ export const CriticalAlerts: React.FC<CriticalAlertsProps> = ({
         </div>
 
         {/* 3. Actionable Directives */}
-        <div className="mt-4 p-3 bg-slate-950 rounded-lg border border-slate-800 text-xs text-slate-300">
+        <div className="mt-4 p-3 bg-slate-900/90 rounded-lg border border-slate-700/80 text-xs text-slate-300">
           <div className="text-slate-100 font-semibold mb-1 flex items-center gap-1.5">
             <Flame className="w-3.5 h-3.5 text-orange-400" />
             <span>{t.directivesTitle}</span>
@@ -133,7 +133,7 @@ export const CriticalAlerts: React.FC<CriticalAlertsProps> = ({
         </div>
       </div>
 
-      <div className="mt-4 pt-2 border-t border-slate-800 text-xs text-slate-400 flex items-center justify-between">
+      <div className="mt-4 pt-2 border-t border-slate-700/80 text-xs text-slate-400 flex items-center justify-between">
         <span className="text-emerald-400 flex items-center gap-1.5">
           <CheckCircle2 className="w-3.5 h-3.5" />
           {t.verificationComplete}

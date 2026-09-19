@@ -48,7 +48,7 @@ export function App() {
   const highestYear = Object.entries(yearlyAverages).sort((a, b) => b[1].frp - a[1].frp)[0];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans">
       <Header
         language={language}
         onToggleLanguage={setLanguage}
@@ -71,7 +71,7 @@ export function App() {
 
         {/* KPI Metric Overview */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
+          <div className="bg-slate-800/90 border border-slate-700/80 rounded-xl p-4 shadow-md">
             <div className="flex items-center justify-between text-slate-300 text-xs mb-1 font-mono">
               <span>{t.rawDetections}</span>
               <Radio className="w-4 h-4 text-cyan-400" />
@@ -84,7 +84,7 @@ export function App() {
             </p>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
+          <div className="bg-slate-800/90 border border-slate-700/80 rounded-xl p-4 shadow-md">
             <div className="flex items-center justify-between text-slate-300 text-xs mb-1 font-mono">
               <span>{t.historicPeakYear}</span>
               <Flame className="w-4 h-4 text-orange-400" />
@@ -97,7 +97,7 @@ export function App() {
             </p>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
+          <div className="bg-slate-800/90 border border-slate-700/80 rounded-xl p-4 shadow-md">
             <div className="flex items-center justify-between text-slate-300 text-xs mb-1 font-mono">
               <span>{t.spatialResolution}</span>
               <RefreshCw className="w-4 h-4 text-emerald-400" />
@@ -110,7 +110,7 @@ export function App() {
             </p>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
+          <div className="bg-slate-800/90 border border-slate-700/80 rounded-xl p-4 shadow-md">
             <div className="flex items-center justify-between text-slate-300 text-xs mb-1 font-mono">
               <span>{t.unusualAnomalies}</span>
               <ShieldAlert className="w-4 h-4 text-rose-400" />
@@ -164,7 +164,7 @@ export function App() {
         </div>
       </main>
 
-      <footer className="border-t border-slate-800 bg-slate-950 py-4 px-4 text-center text-xs text-slate-400 font-mono">
+      <footer className="border-t border-slate-800 bg-slate-900 py-4 px-4 text-center text-xs text-slate-400 font-mono">
         <p>
           {t.appName} : {t.appTagline} : {t.footerChallenge}
         </p>

@@ -32,9 +32,9 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
   }, []);
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 sm:p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 shadow-sm">
+    <div className="bg-slate-800/90 border border-slate-700/80 rounded-xl p-3 sm:p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 shadow-md">
       {/* Region Selector */}
-      <div className="flex items-center gap-2.5 bg-slate-950 px-3 py-2 rounded-lg border border-slate-800 flex-1 max-w-lg">
+      <div className="flex items-center gap-2.5 bg-slate-900/90 px-3 py-2 rounded-lg border border-slate-700/80 flex-1 max-w-lg">
         <Globe2 className="w-4 h-4 text-cyan-400 shrink-0" />
         <label htmlFor="aoi-selector" className="text-xs text-slate-300 font-semibold whitespace-nowrap">
           {t.region}:
@@ -49,7 +49,7 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
           className="bg-transparent text-white font-medium focus:outline-none focus:ring-1 focus:ring-cyan-500 cursor-pointer text-xs sm:text-sm w-full"
         >
           {PRESET_AOIS.map((aoi) => (
-            <option key={aoi.id} value={aoi.id} className="bg-slate-900 text-slate-100">
+            <option key={aoi.id} value={aoi.id} className="bg-slate-800 text-slate-100">
               {aoi.name} ({aoi.country})
             </option>
           ))}
@@ -59,12 +59,12 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
       {/* Right Controls: Mode Toggle & UTC Clock */}
       <div className="flex items-center justify-between md:justify-end gap-3">
         {/* Data Mode Switch */}
-        <div className="flex items-center bg-slate-950 p-1 rounded-lg border border-slate-800">
+        <div className="flex items-center bg-slate-900/90 p-1 rounded-lg border border-slate-700/80">
           <button
             onClick={() => setRawMode(false)}
             className={`px-3 py-1.5 min-h-[38px] text-xs rounded font-medium transition-colors flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-amber-400 ${
               !rawMode 
-                ? 'bg-amber-600 text-white font-semibold' 
+                ? 'bg-amber-600 text-white font-semibold shadow-sm' 
                 : 'text-slate-300 hover:text-white'
             }`}
           >
@@ -75,7 +75,7 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
             onClick={() => setRawMode(true)}
             className={`px-3 py-1.5 min-h-[38px] text-xs rounded font-medium transition-colors flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-rose-400 ${
               rawMode 
-                ? 'bg-rose-700 text-white font-semibold' 
+                ? 'bg-rose-700 text-white font-semibold shadow-sm' 
                 : 'text-slate-300 hover:text-white'
             }`}
             title="Show uncalibrated sensor count with resolution bias"
@@ -86,7 +86,7 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
         </div>
 
         {/* Live UTC Clock */}
-        <div className="text-xs font-mono text-slate-300 bg-slate-950 border border-slate-800 px-3 py-2 rounded-lg hidden sm:block whitespace-nowrap">
+        <div className="text-xs font-mono text-slate-300 bg-slate-900/90 border border-slate-700/80 px-3 py-2 rounded-lg hidden sm:block whitespace-nowrap">
           {utcTime || 'LIVE UTC'}
         </div>
       </div>

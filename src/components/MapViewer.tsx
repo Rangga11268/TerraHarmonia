@@ -121,8 +121,8 @@ export const MapViewer: React.FC<MapViewerProps> = ({
   }, [selectedAOI, hotspots, selectedWeekData, rawMode, language]);
 
   return (
-    <div className="relative bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-lg flex flex-col h-[480px]">
-      <div className="bg-slate-950 border-b border-slate-800 px-3.5 py-2.5 flex items-center justify-between z-10">
+    <div className="relative bg-slate-800/90 border border-slate-700/80 rounded-xl overflow-hidden shadow-md flex flex-col h-[480px]">
+      <div className="bg-slate-900 border-b border-slate-700/80 px-3.5 py-2.5 flex items-center justify-between z-10">
         <div className="flex items-center gap-2 text-xs">
           <MapPin className="w-4 h-4 text-cyan-400 shrink-0" />
           <span className="font-semibold text-white">{selectedAOI.name}</span>
@@ -143,7 +143,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({
 
       <div ref={mapContainerRef} className="w-full flex-1 z-0" />
 
-      <div className="absolute bottom-3 left-3 z-10 bg-slate-950/95 border border-slate-800 rounded-lg p-3 text-xs max-w-xs pointer-events-none">
+      <div className="absolute bottom-3 left-3 z-10 bg-slate-900/95 border border-slate-700 rounded-lg p-3 text-xs max-w-xs pointer-events-none">
         <div className="flex items-center gap-1.5 font-bold text-amber-400 mb-1">
           <Flame className="w-4 h-4" />
           <span>{t.spatialActiveTitle}</span>
