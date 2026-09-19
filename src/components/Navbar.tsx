@@ -30,7 +30,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'lab' as NavTab, label: t.navLab },
     { id: 'mitigation' as NavTab, label: t.navMitigation },
     { id: 'data-hub' as NavTab, label: t.navData },
-    { id: 'team' as NavTab, label: language === 'id' ? 'Profil Tim' : 'Our Team' },
+    { id: 'team' as NavTab, label: t.navTeam },
   ];
 
   return (

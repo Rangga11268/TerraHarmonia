@@ -11,6 +11,7 @@ import { HarmonizationLab } from './components/HarmonizationLab';
 import { MitigationHub } from './components/MitigationHub';
 import { DataHub } from './components/DataHub';
 import { TeamPage } from './components/TeamPage';
+import { Footer } from './components/Footer';
 import { NasaApiKeyModal } from './components/NasaApiKeyModal';
 import { DualMapComparison } from './components/DualMapComparison';
 import { PolygonInspector } from './components/PolygonInspector';
@@ -349,13 +350,8 @@ export function App() {
         )}
       </main>
 
-      {/* Apple Minimal Footer */}
-      <footer className="border-t border-[#e5e5e7] bg-white py-6 px-4 sm:px-6 text-center text-xs text-[#86868b] space-y-1">
-        <p className="font-medium text-[#1d1d1f]">
-          {t.appName} &bull; {t.appTagline} &bull; {t.footerChallenge}
-        </p>
-        <p>{t.footerCourtesy}</p>
-      </footer>
+      {/* Immersive Orbital & NASA Terra Satellite Footer */}
+      <Footer language={language} onSelectTab={setActiveTab} />
 
       {/* Technical Configuration Modal for MAP_KEY if requested */}
       <NasaApiKeyModal

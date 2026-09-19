@@ -4,10 +4,9 @@ import {
   Key, 
   FileSpreadsheet, 
   Code2,
-  ExternalLink
 } from 'lucide-react';
 import { AOIRegion, HarmonizedWeekData } from '../engine/harmonizer';
-import { Language } from '../data/translations';
+import { Language, translations } from '../data/translations';
 
 interface DataHubProps {
   language: Language;
@@ -24,6 +23,7 @@ export const DataHub: React.FC<DataHubProps> = ({
   onOpenApiKeyModal,
   userMapKey,
 }) => {
+  const t = translations[language];
   const [downloadFormat, setDownloadFormat] = useState<'csv' | 'json'>('csv');
 
   // NASA Constellation Data
@@ -64,20 +64,16 @@ export const DataHub: React.FC<DataHubProps> = ({
   return (
     <div className="w-full space-y-6">
       
-      {/* Editorial Header (No capsule pills) */}
+      {/* Editorial Header */}
       <div className="space-y-2 pt-2 pb-4 border-b border-[#e5e5e7]">
         <div className="text-xs font-semibold uppercase tracking-wider text-[#86868b]">
           {language === 'id' ? 'Arsip & Sumber Data Terbuka' : 'Open Data & Satellite Registry'}
         </div>
         <h1 className="text-2xl sm:text-3xl font-bold text-[#1d1d1f] tracking-tight">
-          {language === 'id'
-            ? 'Registri Satelit & Unduh Dataset Terbuka'
-            : 'Satellite Registry & Open Data Access'}
+          {t.dataHubTitle}
         </h1>
         <p className="text-sm text-[#6e6e73] max-w-3xl leading-relaxed">
-          {language === 'id'
-            ? 'Akses ke dataset terharmonisasi 2000–2026 per wilayah gambut, dokumentasi instrumen sensor NASA, dan ekspor data dalam format standar untuk riset.'
-            : 'Access 2000–2026 harmonized datasets across Indonesian peatland regions, NASA Earth observation instrument records, and open data exports.'}
+          {t.dataHubDesc}
         </p>
       </div>
 
@@ -87,7 +83,7 @@ export const DataHub: React.FC<DataHubProps> = ({
         {/* Constellation Registry */}
         <div className="lg:col-span-7 bg-white border border-[#e5e5e7] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
           <h2 className="font-semibold text-sm text-[#1d1d1f]">
-            {language === 'id' ? 'Konstelasi Satelit Pengamat Bumi NASA' : 'NASA Earth Observation Constellation'}
+            {t.constellationTitle}
           </h2>
 
           <div className="space-y-2">
@@ -104,7 +100,7 @@ export const DataHub: React.FC<DataHubProps> = ({
                     </span>
                   </div>
                   <div className="text-[11px] text-[#86868b] mt-1">
-                    Lintasan Khatulistiwa: {sat.orbit}
+                    {t.equatorPass} {sat.orbit}
                   </div>
                 </div>
 
@@ -121,18 +117,18 @@ export const DataHub: React.FC<DataHubProps> = ({
         <div className="lg:col-span-5 bg-white border border-[#e5e5e7] rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col justify-between space-y-5">
           <div>
             <h2 className="font-semibold text-sm text-[#1d1d1f] pb-3 border-b border-[#e5e5e7]">
-              {language === 'id' ? 'Ekspor Dataset Terharmonisasi' : 'Export Harmonized Dataset'}
+              {t.exportDatasetTitle}
             </h2>
 
             <div className="mt-4 space-y-4 text-xs">
               <div>
                 <label className="block text-[#6e6e73] font-medium mb-1.5">
-                  {language === 'id' ? 'Format Berkas' : 'File Format'}:
+                  {t.fileFormat}:
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => setDownloadFormat('csv')}
-                    className={`p-2.5 rounded-xl border flex items-center justify-center gap-2 font-medium min-h-[38px] transition ${
+                    className={`p-2.5 rounded-xl border flex items-center justify-center gap-2 font-medium min-h-[44px] transition cursor-pointer ${
                       downloadFormat === 'csv'
                         ? 'bg-[#1d1d1f] text-white border-[#1d1d1f]'
                         : 'bg-white border-[#e5e5e7] text-[#1d1d1f] hover:bg-[#f5f5f7]'
@@ -143,7 +139,7 @@ export const DataHub: React.FC<DataHubProps> = ({
                   </button>
                   <button
                     onClick={() => setDownloadFormat('json')}
-                    className={`p-2.5 rounded-xl border flex items-center justify-center gap-2 font-medium min-h-[38px] transition ${
+                    className={`p-2.5 rounded-xl border flex items-center justify-center gap-2 font-medium min-h-[44px] transition cursor-pointer ${
                       downloadFormat === 'json'
                         ? 'bg-[#1d1d1f] text-white border-[#1d1d1f]'
                         : 'bg-white border-[#e5e5e7] text-[#1d1d1f] hover:bg-[#f5f5f7]'
@@ -157,7 +153,7 @@ export const DataHub: React.FC<DataHubProps> = ({
 
               <div>
                 <label className="block text-[#6e6e73] font-medium mb-1">
-                  {language === 'id' ? 'Wilayah Terpilih' : 'Selected Dataset'}:
+                  {t.selectedDataset}:
                 </label>
                 <div className="p-2.5 rounded-lg bg-[#f5f5f7] border border-[#e5e5e7] font-semibold text-[#1d1d1f]">
                   {selectedAOI.name} (2000 – 2026 Archive)
@@ -169,18 +165,18 @@ export const DataHub: React.FC<DataHubProps> = ({
           <div className="space-y-2">
             <button
               onClick={handleExport}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-xs transition shadow-xs min-h-[42px]"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-xs transition shadow-xs min-h-[44px] cursor-pointer"
             >
               <Download className="w-4 h-4" />
-              <span>{language === 'id' ? 'Unduh Berkas Dataset' : 'Download Dataset File'}</span>
+              <span>{t.downloadDatasetFile}</span>
             </button>
 
             <button
               onClick={onOpenApiKeyModal}
-              className="w-full flex items-center justify-center gap-1.5 py-2 text-xs text-[#6e6e73] hover:text-[#1d1d1f] transition font-medium min-h-[36px]"
+              className="w-full flex items-center justify-center gap-1.5 py-2.5 text-xs text-[#6e6e73] hover:text-[#1d1d1f] transition font-medium min-h-[40px] cursor-pointer"
             >
               <Key className="w-3.5 h-3.5" />
-              <span>{userMapKey ? 'NASA MAP_KEY Terpasang' : 'Atur NASA MAP_KEY Pribadi'}</span>
+              <span>{userMapKey ? t.nasaMapKeyInstalled : t.configurePersonalMapKey}</span>
             </button>
           </div>
         </div>

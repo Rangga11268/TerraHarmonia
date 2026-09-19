@@ -61,14 +61,21 @@ export const PeatlandSimulator: React.FC<PeatlandSimulatorProps> = ({
     const waterNeededM3PerHa = Math.round(burnDepthCm * 85);
 
     // Emergency Status
-    const threatLevel: 'Aman' | 'Waspada' | 'Kritis' | 'Darurat' =
+    const threatKey: 'safe' | 'alert' | 'critical' | 'emergency' =
       moisturePct < 100 || (tmagDepthCm <= -60 && daysWithoutRain >= 14)
-        ? 'Darurat'
+        ? 'emergency'
         : tmagDepthCm <= -40 || daysWithoutRain >= 10
-        ? 'Kritis'
+        ? 'critical'
         : tmagDepthCm <= -25
-        ? 'Waspada'
-        : 'Aman';
+        ? 'alert'
+        : 'safe';
+
+    const threatLabel = {
+      safe: t.statusSafe,
+      alert: t.statusAlert,
+      critical: t.statusCritical,
+      emergency: t.statusEmergency,
+    }[threatKey];
 
     return {
       isCritical,
@@ -79,9 +86,10 @@ export const PeatlandSimulator: React.FC<PeatlandSimulatorProps> = ({
       burnDepthCm,
       co2eTonsPerHa,
       waterNeededM3PerHa,
-      threatLevel,
+      threatKey,
+      threatLabel,
     };
-  }, [tmagDepthCm, daysWithoutRain, windSpeedKnots, peatDrainageStatus]);
+  }, [tmagDepthCm, daysWithoutRain, windSpeedKnots, peatDrainageStatus, t]);
 
   return (
     <div className="bg-white border border-[#e5e5e7] rounded-2xl p-4 sm:p-6 shadow-xs space-y-5 transition-all">
@@ -90,32 +98,28 @@ export const PeatlandSimulator: React.FC<PeatlandSimulatorProps> = ({
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-4 border-b border-[#e5e5e7]">
         <div>
           <div className="text-xs font-semibold text-[#86868b] uppercase tracking-wider">
-            {language === 'id' ? 'Simulator Hidrologi & Perambatan Api Gambut' : 'Peatland Hydrology & Underground Fire Simulator'}
+            {t.simTitle}
           </div>
           <h2 className="text-lg sm:text-xl font-bold text-[#1d1d1f] tracking-tight mt-0.5">
-            {language === 'id'
-              ? 'Model Dinamika Muka Air Tanah (TMAG) & Emisi Bawah Permukaan'
-              : 'Groundwater Table (TMAG) Dynamics & Smoldering Fire Physics'}
+            {t.simSubtitle}
           </h2>
           <p className="text-xs text-[#6e6e73] mt-1 leading-relaxed max-w-3xl">
-            {language === 'id'
-              ? 'Kebakaran gambut Indonesia membakar lapisan bawah tanah saat Tinggi Muka Air Tanah (TMAG) turun melewati ambang batas kritis BRGM (-40 cm). Simulasikan skenario hidrologi untuk menghitung laju rambat dan kebutuhan air pemadaman.'
-              : 'Indonesian peat fires smolder underground when the groundwater table drops below the BRGM statutory critical threshold (-40 cm). Simulate hydrology scenarios to calculate burn depth and quenching water requirements.'}
+            {t.simDescription}
           </p>
         </div>
 
         {/* Threat Level Badge */}
         <div className={`px-4 py-2 rounded-2xl border text-center shrink-0 ${
-          simResults.threatLevel === 'Darurat'
+          simResults.threatKey === 'emergency'
             ? 'bg-red-50 border-red-200 text-red-700'
-            : simResults.threatLevel === 'Kritis'
+            : simResults.threatKey === 'critical'
             ? 'bg-amber-50 border-amber-200 text-amber-700'
-            : simResults.threatLevel === 'Waspada'
+            : simResults.threatKey === 'alert'
             ? 'bg-yellow-50 border-yellow-200 text-yellow-800'
             : 'bg-emerald-50 border-emerald-200 text-emerald-700'
         }`}>
-          <div className="text-[10px] uppercase tracking-wider font-semibold">Status Kerentanan</div>
-          <div className="text-base font-extrabold">{simResults.threatLevel}</div>
+          <div className="text-[10px] uppercase tracking-wider font-semibold">{t.threatLevel}</div>
+          <div className="text-base font-extrabold">{simResults.threatLabel}</div>
         </div>
       </div>
 
@@ -125,16 +129,18 @@ export const PeatlandSimulator: React.FC<PeatlandSimulatorProps> = ({
         {/* Left Column: Interactive Sliders (5 Cols) */}
         <div className="lg:col-span-5 bg-[#fafafa] border border-[#e5e5e7] rounded-2xl p-4 sm:p-5 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-bold text-xs sm:text-sm text-[#1d1d1f]">Parameter Kondisi Gambut</h3>
+            <h3 className="font-bold text-xs sm:text-sm text-[#1d1d1f]">
+              {language === 'id' ? 'Parameter Kondisi Gambut' : 'Peat Condition Parameters'}
+            </h3>
             <Sliders className="w-4 h-4 text-[#86868b]" />
           </div>
 
           {/* Slider 1: TMAG Groundwater Depth */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-medium text-[#1d1d1f]">Kedalaman Muka Air Tanah (TMAG)</span>
+              <span className="font-medium text-[#1d1d1f]">{t.tmagDepth}</span>
               <span className={`font-bold num ${simResults.isCritical ? 'text-red-600' : 'text-emerald-700'}`}>
-                {tmagDepthCm} cm {simResults.isCritical ? '(Kritis)' : '(Aman)'}
+                {tmagDepthCm} cm {simResults.isCritical ? t.tmagCriticalBadge : t.tmagSafeBadge}
               </span>
             </div>
             <input
@@ -147,17 +153,17 @@ export const PeatlandSimulator: React.FC<PeatlandSimulatorProps> = ({
               className="w-full h-1.5 bg-[#e5e5ea] rounded-lg appearance-none cursor-pointer accent-[#1d1d1f]"
             />
             <div className="flex justify-between text-[10px] text-[#86868b]">
-              <span>-80 cm (Kering Parah)</span>
-              <span className="font-semibold text-red-500">Batas BRGM (-40 cm)</span>
-              <span>0 cm (Banjir)</span>
+              <span>-80 cm ({language === 'id' ? 'Kering Parah' : 'Severe Dry'})</span>
+              <span className="font-semibold text-red-500">{t.brgmLimit}</span>
+              <span>0 cm ({language === 'id' ? 'Banjir' : 'Inundated'})</span>
             </div>
           </div>
 
           {/* Slider 2: Days without Rain (HTH) */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-medium text-[#1d1d1f]">Hari Tanpa Hujan (HTH)</span>
-              <span className="font-bold text-[#1d1d1f] num">{daysWithoutRain} Hari</span>
+              <span className="font-medium text-[#1d1d1f]">{t.dryDaysLabel}</span>
+              <span className="font-bold text-[#1d1d1f] num">{daysWithoutRain} {language === 'id' ? 'Hari' : 'Days'}</span>
             </div>
             <input
               type="range"
@@ -169,17 +175,17 @@ export const PeatlandSimulator: React.FC<PeatlandSimulatorProps> = ({
               className="w-full h-1.5 bg-[#e5e5ea] rounded-lg appearance-none cursor-pointer accent-[#1d1d1f]"
             />
             <div className="flex justify-between text-[10px] text-[#86868b]">
-              <span>0 Hari (Hujan)</span>
-              <span>15 Hari (Kering)</span>
-              <span>30 Hari (Kemarau Ekstrem)</span>
+              <span>0 {language === 'id' ? 'Hari (Hujan)' : 'Days (Rain)'}</span>
+              <span>15 {language === 'id' ? 'Hari (Kering)' : 'Days (Dry)'}</span>
+              <span>30 {language === 'id' ? 'Hari (Kemarau Ekstrem)' : 'Days (Severe Drought)'}</span>
             </div>
           </div>
 
           {/* Slider 3: Wind Speed */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-medium text-[#1d1d1f]">Kecepatan Angin Permukaan</span>
-              <span className="font-bold text-[#1d1d1f] num">{windSpeedKnots} Knot</span>
+              <span className="font-medium text-[#1d1d1f]">{t.windSpeedLabel}</span>
+              <span className="font-bold text-[#1d1d1f] num">{windSpeedKnots} Knots</span>
             </div>
             <input
               type="range"
@@ -195,18 +201,18 @@ export const PeatlandSimulator: React.FC<PeatlandSimulatorProps> = ({
           {/* Drainage Condition Mode */}
           <div className="space-y-1.5 pt-2 border-t border-[#e5e5e7]">
             <span className="text-[11px] font-semibold text-[#86868b] uppercase tracking-wider block">
-              Status Tata Kelola Kanal Gambut:
+              {t.drainageGovLabel}
             </span>
             <div className="grid grid-cols-3 gap-1.5">
               {[
-                { id: 'degraded', label: 'Terdrainase Terbuka' },
-                { id: 'canal_blocked', label: 'Sekat Kanal Aktif' },
-                { id: 'natural', label: 'Gambut Alami' },
+                { id: 'degraded', label: t.drainageOpen },
+                { id: 'canal_blocked', label: t.drainageBlocked },
+                { id: 'natural', label: t.drainageNatural },
               ].map((st) => (
                 <button
                   key={st.id}
                   onClick={() => setPeatDrainageStatus(st.id as any)}
-                  className={`p-2 rounded-xl text-[11px] font-medium transition-all text-center cursor-pointer ${
+                  className={`p-2 rounded-xl text-[11px] font-medium transition-all text-center cursor-pointer min-h-[36px] ${
                     peatDrainageStatus === st.id
                       ? 'bg-[#1d1d1f] text-white font-bold shadow-xs'
                       : 'bg-white border border-[#e5e5e7] text-[#6e6e73] hover:text-[#1d1d1f]'
@@ -228,81 +234,78 @@ export const PeatlandSimulator: React.FC<PeatlandSimulatorProps> = ({
             <div className="p-4 rounded-2xl border border-[#e5e5e7] bg-white shadow-2xs space-y-1">
               <div className="flex items-center gap-1.5 text-xs text-[#86868b] uppercase tracking-wider font-semibold">
                 <Flame className="w-3.5 h-3.5 text-red-500" />
-                <span>Kedalaman Bakar Gambut</span>
+                <span>{t.burnDepthLabel}</span>
               </div>
               <div className="text-2xl font-black text-[#1d1d1f] num">
                 {simResults.burnDepthCm} cm
               </div>
-              <p className="text-[11px] text-[#6e6e73]">Lapisan bahan organik gambut yang terbakar habis</p>
+              <p className="text-[11px] text-[#6e6e73]">{t.burnDepthDesc}</p>
             </div>
 
             <div className="p-4 rounded-2xl border border-[#e5e5e7] bg-white shadow-2xs space-y-1">
               <div className="flex items-center gap-1.5 text-xs text-[#86868b] uppercase tracking-wider font-semibold">
                 <Droplets className="w-3.5 h-3.5 text-[#0071e3]" />
-                <span>Kadar Air Gambut (KA)</span>
+                <span>{t.moistureLabel}</span>
               </div>
               <div className={`text-2xl font-black num ${simResults.moisturePct < 100 ? 'text-red-600' : 'text-[#0071e3]'}`}>
                 {simResults.moisturePct}%
               </div>
-              <p className="text-[11px] text-[#6e6e73]">Ambang mudah terbakar: &lt;100%</p>
+              <p className="text-[11px] text-[#6e6e73]">{t.moistureDesc}</p>
             </div>
 
             <div className="p-4 rounded-2xl border border-[#e5e5e7] bg-white shadow-2xs space-y-1">
               <div className="flex items-center gap-1.5 text-xs text-[#86868b] uppercase tracking-wider font-semibold">
-                <Wind className="w-3.5 h-3.5 text-amber-500" />
-                <span>Emisi Karbon per Hektar</span>
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                <span>{t.co2eLabel}</span>
               </div>
               <div className="text-2xl font-black text-[#1d1d1f] num">
-                {simResults.co2eTonsPerHa} Ton CO₂e
+                {simResults.co2eTonsPerHa} Ton
               </div>
-              <p className="text-[11px] text-[#6e6e73]">Gas rumah kaca terlepas ke atmosfer per 1 Ha</p>
+              <p className="text-[11px] text-[#6e6e73]">{t.co2eDesc}</p>
             </div>
 
             <div className="p-4 rounded-2xl border border-[#e5e5e7] bg-white shadow-2xs space-y-1">
               <div className="flex items-center gap-1.5 text-xs text-[#86868b] uppercase tracking-wider font-semibold">
-                <ShieldAlert className="w-3.5 h-3.5 text-blue-600" />
-                <span>Debit Air Pemadaman</span>
+                <ShieldAlert className="w-3.5 h-3.5 text-emerald-600" />
+                <span>{t.waterNeededLabel}</span>
               </div>
               <div className="text-2xl font-black text-[#1d1d1f] num">
-                {simResults.waterNeededM3PerHa.toLocaleString()} m³/Ha
+                {simResults.waterNeededM3PerHa} m³
               </div>
-              <p className="text-[11px] text-[#6e6e73]">Volume air untuk pemadaman total bawah tanah</p>
+              <p className="text-[11px] text-[#6e6e73]">{t.waterNeededDesc}</p>
+            </div>
+
+          </div>
+
+          {/* Action Callout based on TMAG */}
+          <div className={`p-4 rounded-2xl border text-xs flex items-start gap-3 ${
+            simResults.isCritical
+              ? 'bg-red-50 border-red-200 text-red-900'
+              : 'bg-emerald-50 border-emerald-200 text-emerald-900'
+          }`}>
+            <Info className="w-5 h-5 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <strong className="block text-sm font-bold">
+                {simResults.isCritical
+                  ? (language === 'id' ? 'Peringatan Mitigasi Lapangan Manggala Agni / BPBD:' : 'Field Mitigation Action Directive:')
+                  : (language === 'id' ? 'Status Gambut Terkendali Aman:' : 'Peatland Hydrology Within Safe Range:')}
+              </strong>
+              <p className="leading-relaxed">
+                {simResults.isCritical
+                  ? (language === 'id'
+                    ? `Tinggi Muka Air Tanah (${tmagDepthCm} cm) telah melewati batas aman BRGM (-40 cm). Lakukan penutupan sekat kanal segera dan siagakan pompa air untuk re-wetting sebelum bara bawah tanah (smoldering) meluas.`
+                    : `Groundwater depth (${tmagDepthCm} cm) has fallen below the -40 cm critical threshold. Engage canal gates immediately and mobilize high-pressure pumps for subsurface re-wetting to halt smoldering.`)
+                  : (language === 'id'
+                    ? `Tinggi Muka Air Tanah (${tmagDepthCm} cm) berada dalam batas aman. Pertahankan pintu sekat kanal tertutup untuk menjaga retensi air menjelang puncak musim kemarau.`
+                    : `Groundwater depth (${tmagDepthCm} cm) is within safe ecological parameters. Keep canal blocks active to retain hydrology ahead of peak dry season.`)}
+              </p>
             </div>
           </div>
 
-          {/* Operational Mitigation Directive Box */}
-          <div className="p-4 rounded-2xl bg-[#f5f5f7] border border-[#e5e5e7] space-y-2 text-xs">
-            <div className="font-bold text-sm text-[#1d1d1f] flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-[#0071e3]" />
-              <span>Rekomendasi Rencana Aksi Terpadu ({selectedAOI.name}):</span>
-            </div>
-            <ul className="space-y-1.5 text-[#6e6e73] list-disc list-inside leading-relaxed text-[11px]">
-              {simResults.isCritical ? (
-                <>
-                  <li className="text-red-700 font-semibold">
-                    Tinggi Muka Air Tanah melewati batas kritis BRGM. Tutup segera pintu sekat kanal (canal blocks) untuk membasahi kembali (*rewetting*) kubah gambut.
-                  </li>
-                  <li>
-                    Siagakan regu Manggala Agni dan posko BPBD untuk patroli mandiri dengan radius observasi 5 km dari titik terdeteksi.
-                  </li>
-                  <li>
-                    Siapkan sumur bor darurat dengan kapasitas pompa minimal 500 liter/menit untuk pemadaman asap (*smoldering quenching*).
-                  </li>
-                </>
-              ) : (
-                <>
-                  <li className="text-emerald-800 font-semibold">
-                    Kondisi kelembapan gambut berada pada rentang aman. Lakukan pemantauan tinggi muka air tanah rutin 1x per minggu.
-                  </li>
-                  <li>
-                    Pertahankan elevasi sekat kanal agar air gambut tidak terbuang ke kanal primer.
-                  </li>
-                </>
-              )}
-            </ul>
-          </div>
         </div>
+
       </div>
+
     </div>
   );
 };

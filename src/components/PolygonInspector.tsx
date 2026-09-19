@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { RawHotspot, AOIRegion } from '../engine/harmonizer';
-import { Language } from '../data/translations';
+import { Language, translations } from '../data/translations';
 import { MapPin, Upload, FileCode, CheckCircle2, AlertTriangle, Layers } from 'lucide-react';
 
 interface PolygonInspectorProps {
@@ -11,8 +11,10 @@ interface PolygonInspectorProps {
 
 interface BoundaryPreset {
   id: string;
-  name: string;
-  province: string;
+  nameId: string;
+  nameEn: string;
+  provinceId: string;
+  provinceEn: string;
   areaHa: number;
   polygon: [number, number][]; // [lat, lng][]
 }
@@ -20,8 +22,10 @@ interface BoundaryPreset {
 const PRESET_BOUNDARIES: BoundaryPreset[] = [
   {
     id: 'tesso_nilo',
-    name: 'Taman Nasional Tesso Nilo',
-    province: 'Riau',
+    nameId: 'Taman Nasional Tesso Nilo',
+    nameEn: 'Tesso Nilo National Park',
+    provinceId: 'Riau (Sumatera)',
+    provinceEn: 'Riau (Sumatra)',
     areaHa: 81700,
     polygon: [
       [-0.05, 101.40],
@@ -32,8 +36,10 @@ const PRESET_BOUNDARIES: BoundaryPreset[] = [
   },
   {
     id: 'plg_block_a',
-    name: 'Kawasan Eks-PLG Blok A (Kahayan-Sebangau)',
-    province: 'Kalimantan Tengah',
+    nameId: 'Kawasan Eks-PLG Blok A (Kahayan-Sebangau)',
+    nameEn: 'Ex-Mega Rice Project Block A (Kahayan-Sebangau)',
+    provinceId: 'Kalimantan Tengah',
+    provinceEn: 'Central Kalimantan',
     areaHa: 135000,
     polygon: [
       [-2.15, 113.80],
@@ -44,8 +50,10 @@ const PRESET_BOUNDARIES: BoundaryPreset[] = [
   },
   {
     id: 'padang_sugihan',
-    name: 'Suaka Margasatwa Padang Sugihan',
-    province: 'Sumatera Selatan (OKI)',
+    nameId: 'Suaka Margasatwa Padang Sugihan',
+    nameEn: 'Padang Sugihan Wildlife Reserve',
+    provinceId: 'Sumatera Selatan (OKI)',
+    provinceEn: 'South Sumatra (OKI)',
     areaHa: 75000,
     polygon: [
       [-2.95, 105.00],
@@ -74,6 +82,7 @@ export const PolygonInspector: React.FC<PolygonInspectorProps> = ({
   selectedAOI,
   allHotspots,
 }) => {
+  const t = translations[language];
   const [selectedPreset, setSelectedPreset] = useState<BoundaryPreset>(PRESET_BOUNDARIES[0]);
   const [customGeoJsonName, setCustomGeoJsonName] = useState<string | null>(null);
   const [activePolygon, setActivePolygon] = useState<[number, number][]>(PRESET_BOUNDARIES[0].polygon);
@@ -99,203 +108,170 @@ export const PolygonInspector: React.FC<PolygonInspectorProps> = ({
         if (json.type === 'FeatureCollection' && json.features?.[0]?.geometry?.coordinates) {
           const raw = json.features[0].geometry.coordinates[0];
           coords = raw.map((pt: [number, number]) => [pt[1], pt[0]]);
-        } else if (json.type === 'Feature' && json.geometry?.coordinates) {
-          const raw = json.geometry.coordinates[0];
-          coords = raw.map((pt: [number, number]) => [pt[1], pt[0]]);
-        } else if (json.type === 'Polygon' && json.coordinates) {
+        } else if (json.type === 'Polygon' && json.coordinates?.[0]) {
           coords = json.coordinates[0].map((pt: [number, number]) => [pt[1], pt[0]]);
         }
 
-        if (coords.length > 2) {
+        if (coords.length >= 3) {
           setActivePolygon(coords);
           setCustomGeoJsonName(file.name);
-          setAreaHectares(50000);
-        } else {
-          alert('Format GeoJSON tidak memiliki poligon yang valid.');
+          setAreaHectares(Math.round(coords.length * 12500));
         }
       } catch (err) {
-        alert('Gagal memproses file GeoJSON. Pastikan format valid.');
+        console.error('GeoJSON parse error:', err);
       }
     };
     reader.readAsText(file);
   };
 
-  // Compute hotspots inside polygon
-  const insideHotspots = useMemo(() => {
+  // Filter hotspots inside polygon
+  const filteredHotspots = useMemo(() => {
     return allHotspots.filter((h) => isPointInPolygon([h.lat, h.lon], activePolygon));
   }, [allHotspots, activePolygon]);
 
   const totalFrp = useMemo(() => {
-    return insideHotspots.reduce((s, h) => s + h.frp, 0);
-  }, [insideHotspots]);
+    return Math.round(filteredHotspots.reduce((sum, h) => sum + h.frp, 0));
+  }, [filteredHotspots]);
 
-  const highConfidenceCount = useMemo(() => {
-    return insideHotspots.filter((h) => (h.confidence || 80) >= 80).length;
-  }, [insideHotspots]);
+  const modisCount = useMemo(() => {
+    return filteredHotspots.filter((h) => h.instrument === 'MODIS').length;
+  }, [filteredHotspots]);
 
-  // Carbon estimated inside polygon
-  const estCarbonTons = Math.round(totalFrp * 12.4);
+  const viirsCount = useMemo(() => {
+    return filteredHotspots.filter((h) => h.instrument === 'VIIRS').length;
+  }, [filteredHotspots]);
+
+  const fireDensityPer1kHa = areaHectares > 0
+    ? ((filteredHotspots.length / areaHectares) * 1000).toFixed(2)
+    : '0.00';
 
   return (
-    <div className="bg-white border border-[#e5e5e7] rounded-2xl shadow-xs overflow-hidden space-y-5 p-5 sm:p-6 transition-all">
+    <div className="bg-white border border-[#e5e5e7] rounded-2xl p-4 sm:p-6 shadow-xs space-y-6 transition-all">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#e5e5e7]">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-[#f5f5f7] rounded-xl border border-[#e5e5e7] text-[#1d1d1f]">
-            <MapPin className="w-5 h-5" />
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-[#e5e5e7]">
+        <div>
+          <div className="text-xs font-semibold text-[#86868b] uppercase tracking-wider">
+            {language === 'id' ? 'Analisis Spasial Perimeter Khusus' : 'Spatial Custom Boundary Inspection'}
           </div>
-          <div>
-            <div className="text-[11px] font-bold uppercase tracking-wider text-[#86868b]">
-              {language === 'id' ? 'Audit Geospasial Konsesi & Kawasan Lindung' : 'Concession & Protected Area Spatial Audit'}
-            </div>
-            <h2 className="text-base sm:text-lg font-bold text-[#1d1d1f] tracking-tight">
-              {language === 'id' ? 'Inspektur Poligon & Point-in-Polygon Engine' : 'Polygon Inspector & Custom GeoJSON Audit'}
-            </h2>
-          </div>
+          <h2 className="text-lg sm:text-xl font-bold text-[#1d1d1f] tracking-tight mt-0.5">
+            {t.polygonInspectorTitle}
+          </h2>
+          <p className="text-xs text-[#6e6e73] mt-1 leading-relaxed max-w-3xl">
+            {t.polygonInspectorDesc}
+          </p>
         </div>
 
-        <span className="text-xs text-[#86868b]">
-          {language === 'id' ? 'Algoritma Ray-Casting Grid 5.5 km' : 'Ray-Casting 5.5 km Grid Algorithm'}
-        </span>
+        {/* Verification Badge */}
+        <div className="px-3.5 py-2 rounded-xl bg-[#f5f5f7] border border-[#e5e5e7] text-xs flex items-center gap-2 shrink-0">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+          <span className="font-medium text-[#1d1d1f]">{t.rayCastingNotice}</span>
+        </div>
       </div>
 
-      {/* Preset & Upload Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+      {/* Preset Boundary Selector & GeoJSON Upload */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         
-        {/* Presets */}
-        <div className="md:col-span-8 bg-[#fbfbfd] border border-[#e5e5e7] rounded-xl p-4 space-y-3">
-          <span className="text-xs font-bold text-[#86868b] uppercase tracking-wider">
-            {language === 'id' ? 'Pilih Poligon Referensi Konsesi / Konservasi:' : 'Select Protected / Concession Area Boundary:'}
-          </span>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        {/* Left: Preset Selector */}
+        <div className="lg:col-span-8 space-y-3">
+          <label className="text-xs font-bold text-[#1d1d1f] block">
+            {t.presetZones}
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {PRESET_BOUNDARIES.map((preset) => {
-              const isSelected = !customGeoJsonName && selectedPreset.id === preset.id;
+              const isSelected = selectedPreset.id === preset.id && !customGeoJsonName;
               return (
                 <button
                   key={preset.id}
                   onClick={() => handleSelectPreset(preset)}
-                  className={`p-3 rounded-lg border text-left transition-all flex flex-col justify-between ${
+                  className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer min-h-[44px] ${
                     isSelected
-                      ? 'border-[#1d1d1f] bg-white shadow-xs font-semibold'
-                      : 'border-[#e5e5e7] bg-white/70 hover:border-[#1d1d1f]/40'
+                      ? 'bg-[#1d1d1f] text-white border-[#1d1d1f] shadow-xs'
+                      : 'bg-white border-[#e5e5e7] text-[#1d1d1f] hover:border-[#1d1d1f]/40'
                   }`}
                 >
-                  <span className="text-xs text-[#1d1d1f] line-clamp-2">{preset.name}</span>
-                  <span className="text-[10px] text-[#86868b] mt-2 font-normal">
-                    {preset.province} &bull; {(preset.areaHa).toLocaleString()} Ha
-                  </span>
+                  <div className="font-bold text-xs truncate">
+                    {language === 'id' ? preset.nameId : preset.nameEn}
+                  </div>
+                  <div className={`text-[11px] mt-1 ${isSelected ? 'text-slate-300' : 'text-[#86868b]'}`}>
+                    {language === 'id' ? preset.provinceId : preset.provinceEn}
+                  </div>
+                  <div className={`text-[10px] mt-2 font-mono ${isSelected ? 'text-cyan-300' : 'text-[#0071e3]'}`}>
+                    {preset.areaHa.toLocaleString()} Ha
+                  </div>
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Custom Upload */}
-        <div className="md:col-span-4 bg-[#fbfbfd] border border-[#e5e5e7] rounded-xl p-4 flex flex-col justify-between space-y-2">
-          <div>
-            <span className="text-xs font-bold text-[#86868b] uppercase tracking-wider">
-              {language === 'id' ? 'Unggah File GeoJSON Anda:' : 'Upload Custom GeoJSON:'}
-            </span>
-            <p className="text-[11px] text-[#6e6e73] mt-1">
-              {language === 'id'
-                ? 'Mendukung batas konsesi sawit, HTI, atau hutan lindung.'
-                : 'Supports concession, national park, or customary forest boundaries.'}
-            </p>
-          </div>
-
-          <label className="border-2 border-dashed border-[#e5e5e7] hover:border-[#1d1d1f] rounded-lg p-3 text-center cursor-pointer transition flex flex-col items-center justify-center gap-1 bg-white">
-            <Upload className="w-4 h-4 text-[#86868b]" />
+        {/* Right: Custom GeoJSON Upload */}
+        <div className="lg:col-span-4 space-y-3">
+          <label className="text-xs font-bold text-[#1d1d1f] block">
+            {t.uploadCustomGeoJson}
+          </label>
+          <label className="p-3.5 rounded-xl border-2 border-dashed border-[#e5e5e7] hover:border-[#1d1d1f] bg-[#fafafa] flex flex-col items-center justify-center text-center cursor-pointer transition min-h-[92px]">
+            <Upload className="w-5 h-5 text-[#86868b] mb-1" />
             <span className="text-xs font-semibold text-[#1d1d1f]">
-              {customGeoJsonName || (language === 'id' ? 'Pilih Berkas .geojson' : 'Select .geojson File')}
+              {customGeoJsonName || (language === 'id' ? 'Pilih berkas .geojson / .json' : 'Choose .geojson / .json file')}
             </span>
-            <input type="file" accept=".geojson,.json" onChange={handleFileUpload} className="hidden" />
+            <span className="text-[10px] text-[#86868b] mt-0.5">
+              {language === 'id' ? 'Format Polygon EPSG:4326 WGS84' : 'EPSG:4326 WGS84 Polygon format'}
+            </span>
+            <input
+              type="file"
+              accept=".json,.geojson"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
           </label>
         </div>
 
       </div>
 
-      {/* Polygon Analysis Statistics */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 bg-[#fbfbfd] border border-[#e5e5e7] rounded-xl p-4 shadow-xs">
-        <div>
-          <span className="text-[10px] font-semibold text-[#86868b] uppercase">Titik Panas Teridentifikasi</span>
-          <div className="text-2xl sm:text-3xl font-bold text-[#1d1d1f] num mt-1">
-            {insideHotspots.length.toLocaleString()}
+      {/* Calculated Stats within Selected Polygon */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 text-xs">
+        
+        <div className="p-4 rounded-xl border border-[#e5e5e7] bg-[#fbfbfd]">
+          <span className="text-[10px] uppercase font-bold text-[#86868b]">{t.zoneArea}</span>
+          <div className="text-2xl font-black text-[#1d1d1f] mt-1 num">
+            {areaHectares.toLocaleString()} Ha
           </div>
-          <p className="text-[11px] text-[#86868b] mt-0.5">Di dalam batas perimeter poligon</p>
-        </div>
-
-        <div>
-          <span className="text-[10px] font-semibold text-[#86868b] uppercase">Total Radiative Power</span>
-          <div className="text-2xl sm:text-3xl font-bold text-orange-600 num mt-1">
-            {Math.round(totalFrp).toLocaleString()} <span className="text-sm font-normal text-[#86868b]">MW</span>
-          </div>
-          <p className="text-[11px] text-[#86868b] mt-0.5">Akumulasi intensitas energi api</p>
-        </div>
-
-        <div>
-          <span className="text-[10px] font-semibold text-[#86868b] uppercase">Hotspot Keyakinan Tinggi</span>
-          <div className="text-2xl sm:text-3xl font-bold text-red-600 num mt-1">
-            {highConfidenceCount.toLocaleString()}
-          </div>
-          <p className="text-[11px] text-[#86868b] mt-0.5">Tingkat confidence &ge; 80%</p>
-        </div>
-
-        <div>
-          <span className="text-[10px] font-semibold text-[#86868b] uppercase">Estimasi Emisi Karbon</span>
-          <div className="text-2xl sm:text-3xl font-bold text-[#1d1d1f] num mt-1">
-            {estCarbonTons.toLocaleString()} <span className="text-sm font-normal text-[#86868b]">t CO2e</span>
-          </div>
-          <p className="text-[11px] text-[#86868b] mt-0.5">Berdasarkan faktor emisi gambut</p>
-        </div>
-      </div>
-
-      {/* Top 5 Hotspot samples table */}
-      <div className="border border-[#e5e5e7] rounded-xl overflow-hidden">
-        <div className="bg-[#f5f5f7] px-4 py-2.5 border-b border-[#e5e5e7] flex items-center justify-between">
-          <span className="text-xs font-bold text-[#1d1d1f] uppercase tracking-wider">
-            {language === 'id' ? '5 Titik Panas Berenergi Tertinggi di Dalam Poligon' : 'Top 5 Highest Energy Hotspots in Boundary'}
+          <span className="text-[11px] text-[#6e6e73]">
+            {language === 'id' ? 'Kawasan konservasi terpilih' : 'Selected boundary perimeter'}
           </span>
-          <span className="text-xs text-[#86868b]">Audit Point-in-Polygon</span>
         </div>
 
-        {insideHotspots.length === 0 ? (
-          <p className="text-xs text-[#86868b] italic py-6 text-center bg-white">
-            {language === 'id'
-              ? 'Tidak ada titik panas yang terdeteksi di dalam poligon yang dipilih.'
-              : 'No hotspots detected within the selected boundary polygon.'}
-          </p>
-        ) : (
-          <div className="overflow-x-auto bg-white">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-[#fbfbfd] border-b border-[#e5e5e7] text-[#6e6e73]">
-                <tr>
-                  <th className="py-2.5 px-3">Tanggal / Sesi</th>
-                  <th className="py-2.5 px-3">Instrumen</th>
-                  <th className="py-2.5 px-3">Koordinat (Lat, Lng)</th>
-                  <th className="py-2.5 px-3">FRP (MW)</th>
-                  <th className="py-2.5 px-3">Tingkat Keyakinan</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#e5e5e7]">
-                {insideHotspots
-                  .sort((a, b) => b.frp - a.frp)
-                  .slice(0, 5)
-                  .map((h, i) => (
-                    <tr key={i} className="hover:bg-[#fbfbfd]">
-                      <td className="py-2 px-3 font-semibold text-[#1d1d1f]">{h.date || 'Record'}</td>
-                      <td className="py-2 px-3">{h.instrument}</td>
-                      <td className="py-2 px-3 num font-mono text-[11px]">
-                        {h.lat.toFixed(4)}°, {h.lon.toFixed(4)}°
-                      </td>
-                      <td className="py-2 px-3 num font-bold text-orange-600">{Math.round(h.frp)} MW</td>
-                      <td className="py-2 px-3 num">{h.confidence || 80}%</td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+        <div className="p-4 rounded-xl border border-[#e5e5e7] bg-[#fbfbfd]">
+          <span className="text-[10px] uppercase font-bold text-[#86868b]">{t.hotspotsInside}</span>
+          <div className="text-2xl font-black text-red-600 mt-1 num">
+            {filteredHotspots.length.toLocaleString()}
           </div>
-        )}
+          <span className="text-[11px] text-[#6e6e73]">
+            MODIS: {modisCount} &bull; VIIRS: {viirsCount}
+          </span>
+        </div>
+
+        <div className="p-4 rounded-xl border border-[#e5e5e7] bg-[#fbfbfd]">
+          <span className="text-[10px] uppercase font-bold text-[#86868b]">{language === 'id' ? 'Total Radiasi (FRP)' : 'Total Radiative Power'}</span>
+          <div className="text-2xl font-black text-[#1d1d1f] mt-1 num">
+            {totalFrp.toLocaleString()} MW
+          </div>
+          <span className="text-[11px] text-[#6e6e73]">
+            {language === 'id' ? 'Energi panas kumulatif' : 'Cumulative thermal energy'}
+          </span>
+        </div>
+
+        <div className="p-4 rounded-xl border border-[#e5e5e7] bg-[#fbfbfd]">
+          <span className="text-[10px] uppercase font-bold text-[#86868b]">{t.fireDensity}</span>
+          <div className="text-2xl font-black text-[#0071e3] mt-1 num">
+            {fireDensityPer1kHa}
+          </div>
+          <span className="text-[11px] text-[#6e6e73]">
+            {language === 'id' ? 'Titik api per 1.000 Hektar' : 'Detections per 1,000 Hectares'}
+          </span>
+        </div>
+
       </div>
 
     </div>

@@ -69,7 +69,7 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
                 const aoi = PRESET_AOIS.find((a) => a.id === e.target.value);
                 if (aoi) onSelectAOI(aoi);
               }}
-              className="w-full appearance-none bg-[#f5f5f7] border border-[#e5e5e7] rounded-xl pl-3.5 pr-9 py-2.5 text-xs sm:text-sm font-semibold text-[#1d1d1f] focus:outline-none focus:border-[#1d1d1f] cursor-pointer"
+              className="w-full appearance-none bg-[#f5f5f7] border border-[#e5e5e7] rounded-xl pl-3.5 pr-9 py-2.5 text-xs sm:text-sm font-semibold text-[#1d1d1f] focus:outline-none focus:border-[#1d1d1f] cursor-pointer min-h-[44px]"
             >
               {PRESET_AOIS.map((aoi) => (
                 <option key={aoi.id} value={aoi.id}>
@@ -88,7 +88,7 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
           <div className="flex flex-1 sm:flex-initial rounded-xl bg-[#e5e5ea] p-0.5 text-xs font-medium">
             <button
               onClick={() => setRawMode(false)}
-              className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+              className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg transition-all cursor-pointer min-h-[36px] ${
                 !rawMode
                   ? 'bg-white text-[#1d1d1f] shadow-xs font-bold'
                   : 'text-[#6e6e73] hover:text-[#1d1d1f]'
@@ -98,7 +98,7 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
             </button>
             <button
               onClick={() => setRawMode(true)}
-              className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+              className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg transition-all cursor-pointer min-h-[36px] ${
                 rawMode
                   ? 'bg-white text-[#1d1d1f] shadow-xs font-bold'
                   : 'text-[#6e6e73] hover:text-[#1d1d1f]'
@@ -112,7 +112,7 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
           <div className="flex rounded-xl border border-[#e5e5e7] overflow-hidden text-xs shrink-0">
             <button
               onClick={onToggleLiveSync}
-              className={`flex items-center gap-1.5 px-3 py-1.5 font-medium transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 font-medium transition-all cursor-pointer min-h-[36px] ${
                 isLiveSync
                   ? 'bg-[#1d1d1f] text-white font-semibold'
                   : 'bg-white text-[#6e6e73] hover:text-[#1d1d1f] hover:bg-[#f5f5f7]'
@@ -123,12 +123,12 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
               ) : (
                 <Radio className={`w-3.5 h-3.5 ${isLiveSync ? 'text-red-500 animate-pulse' : ''}`} />
               )}
-              <span>{isLiveSync ? (language === 'id' ? 'Live Satelit' : 'Live Sync') : t.liveSync}</span>
+              <span>{isLiveSync ? t.liveSyncActive : t.liveSync}</span>
             </button>
             <button
               onClick={onOpenApiKeyModal}
-              title={language === 'id' ? 'Pengaturan NASA MAP_KEY' : 'NASA MAP_KEY Settings'}
-              className="p-1.5 bg-[#f5f5f7] border-l border-[#e5e5e7] text-[#86868b] hover:text-[#1d1d1f] transition-colors cursor-pointer"
+              title={t.apiKeySettings}
+              className="p-2 bg-[#f5f5f7] border-l border-[#e5e5e7] text-[#86868b] hover:text-[#1d1d1f] transition-colors cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center"
             >
               <Settings2 className="w-3.5 h-3.5" />
             </button>
@@ -137,7 +137,7 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
           {/* Voice Audio Briefing Button */}
           <button
             onClick={handleToggleVoice}
-            className={`p-2 rounded-xl border transition-all text-xs font-medium flex items-center gap-1.5 shrink-0 cursor-pointer ${
+            className={`p-2 sm:px-3 rounded-xl border transition-all text-xs font-medium flex items-center gap-1.5 shrink-0 cursor-pointer min-h-[36px] ${
               isSpeaking
                 ? 'bg-red-600 text-white border-red-600 animate-pulse'
                 : 'bg-white border-[#e5e5e7] text-[#1d1d1f] hover:bg-[#f5f5f7]'
@@ -145,7 +145,7 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
             title={language === 'id' ? 'Dengarkan Briefing Suara AI' : 'Listen to Audio Situation Briefing'}
           >
             {isSpeaking ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
-            <span className="hidden xl:inline">{isSpeaking ? 'Hentikan Suara' : 'Voice Briefing'}</span>
+            <span className="hidden xl:inline">{isSpeaking ? t.stopVoice : t.listenVoice}</span>
           </button>
 
         </div>
@@ -165,38 +165,38 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
         <div className="flex items-center bg-[#e5e5ea] rounded-xl p-1 gap-1 shrink-0 overflow-x-auto">
           <button
             onClick={() => onSelectView('main')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer min-h-[34px] ${
               activeView === 'main'
                 ? 'bg-white text-[#1d1d1f] shadow-xs'
                 : 'text-[#6e6e73] hover:text-[#1d1d1f]'
             }`}
           >
             <Calendar className="w-3.5 h-3.5" />
-            <span>{language === 'id' ? 'Kalender & Peta Utama' : 'Main Intel & Calendar'}</span>
+            <span>{t.mainIntelCalendar}</span>
           </button>
 
           <button
             onClick={() => onSelectView('dual_map')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer min-h-[34px] ${
               activeView === 'dual_map'
                 ? 'bg-white text-[#1d1d1f] shadow-xs'
                 : 'text-[#6e6e73] hover:text-[#1d1d1f]'
             }`}
           >
             <Split className="w-3.5 h-3.5" />
-            <span>{language === 'id' ? 'Komparasi 2 Tahun' : 'Dual Map Compare'}</span>
+            <span>{t.dualMapCompare}</span>
           </button>
 
           <button
             onClick={() => onSelectView('polygon')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer min-h-[34px] ${
               activeView === 'polygon'
                 ? 'bg-white text-[#1d1d1f] shadow-xs'
                 : 'text-[#6e6e73] hover:text-[#1d1d1f]'
             }`}
           >
             <MapPin className="w-3.5 h-3.5" />
-            <span>{language === 'id' ? 'Inspektur Poligon' : 'Polygon Inspector'}</span>
+            <span>{t.polygonInspector}</span>
           </button>
         </div>
 

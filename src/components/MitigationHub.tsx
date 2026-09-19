@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Download, FileText, Activity, ShieldAlert } from 'lucide-react';
+import { Download, FileText, Activity } from 'lucide-react';
 import { PRESET_AOIS, AOIRegion, HarmonizedWeekData } from '../engine/harmonizer';
-import { Language } from '../data/translations';
+import { Language, translations } from '../data/translations';
 import { PeatlandSimulator } from './PeatlandSimulator';
 import { ExecutiveReport } from './ExecutiveReport';
 
@@ -20,6 +20,7 @@ export const MitigationHub: React.FC<MitigationHubProps> = ({
   calendarMatrix = {},
   totalHotspots = 0,
 }) => {
+  const t = translations[language];
   const [activeSubTab, setActiveSubTab] = useState<'simulator' | 'sitrep'>('simulator');
   const [selectedTeamUnit, setSelectedTeamUnit] = useState<'manggala_agni' | 'mpa' | 'bpbd'>('manggala_agni');
   const [patrolDate, setPatrolDate] = useState<string>(() => new Date().toISOString().split('T')[0]);
@@ -37,27 +38,27 @@ export const MitigationHub: React.FC<MitigationHubProps> = ({
 
   const handleDownloadDispatch = () => {
     const memo = `===============================================================
-MEMORANDUM PENUGASAN PATROLI LAPANGAN - TERRA HARMONIA INTELLIGENCE
-NASA Space Apps Challenge 2026 - Peringatan Dini Kebakaran Gambut
+${language === 'id' ? 'MEMORANDUM PENUGASAN PATROLI LAPANGAN - TERRA HARMONIA INTELLIGENCE' : 'FIELD PATROL DISPATCH MEMORANDUM - TERRA HARMONIA INTELLIGENCE'}
+NASA Space Apps Challenge 2026 - ${language === 'id' ? 'Peringatan Dini Kebakaran Gambut' : 'Peatland Wildfire Early Warning'}
 ===============================================================
-Tanggal Patroli    : ${patrolDate}
-Wilayah Target     : ${selectedAOI.name} (${selectedAOI.country})
-Tipe Ekosistem     : ${selectedAOI.biome}
-Koordinat Titik    : ${selectedAOI.center[0].toFixed(4)}° N, ${selectedAOI.center[1].toFixed(4)}° E
-Status Kerentanan  : ${currentRegionRisk.risk.toUpperCase()}
-Estimasi TMA Gambut: ${currentRegionRisk.tmag} cm (Batas Kritis: -40 cm)
-Sekat Kanal Pantau : ${currentRegionRisk.canalBlocks} Titik
+${language === 'id' ? 'Tanggal Patroli' : 'Patrol Date'}    : ${patrolDate}
+${language === 'id' ? 'Wilayah Target' : 'Target Region'}     : ${selectedAOI.name} (${selectedAOI.country})
+${language === 'id' ? 'Tipe Ekosistem' : 'Ecosystem Type'}    : ${selectedAOI.biome}
+${language === 'id' ? 'Koordinat Titik' : 'Coordinates'}    : ${selectedAOI.center[0].toFixed(4)}° N, ${selectedAOI.center[1].toFixed(4)}° E
+${language === 'id' ? 'Status Kerentanan' : 'Risk Status'}  : ${currentRegionRisk.risk.toUpperCase()}
+${language === 'id' ? 'Estimasi TMA Gambut' : 'Est. Groundwater'}: ${currentRegionRisk.tmag} cm (${language === 'id' ? 'Batas Kritis' : 'Critical Limit'}: -40 cm)
+${language === 'id' ? 'Sekat Kanal Pantau' : 'Monitored Gates'}: ${currentRegionRisk.canalBlocks} ${language === 'id' ? 'Titik' : 'Units'}
 
-SATUAN KERJA DITUGASKAN:
-- Unit Operasional : ${selectedTeamUnit === 'manggala_agni' ? 'Manggala Agni Daops KLHK' : selectedTeamUnit === 'mpa' ? 'Masyarakat Peduli Api (MPA) Desa' : 'Satgas Karhutla BPBD / Damkar'}
+${language === 'id' ? 'SATUAN KERJA DITUGASKAN' : 'ASSIGNED PATROL TASKFORCE'}:
+- ${language === 'id' ? 'Unit Operasional' : 'Operational Unit'} : ${selectedTeamUnit === 'manggala_agni' ? (language === 'id' ? 'Manggala Agni Daops KLHK' : 'Manggala Agni Brigade (KLHK)') : selectedTeamUnit === 'mpa' ? (language === 'id' ? 'Masyarakat Peduli Api (MPA) Desa' : 'Community Fire Patrol (MPA)') : (language === 'id' ? 'Satgas Karhutla BPBD / Damkar' : 'Disaster Management Agency (BPBD)')}
 
-INSTRUKSI OPERASIONAL:
-1. Lakukan pengecekan kelembapan serasah gambut dan kedalaman air tanah di perimeter.
-2. Pastikan pintu sekat kanal (canal blocking) tertutup rapat untuk mencegah pengeringan.
-3. Pantau tanda-tanda asap bawah tanah (smoldering) sebelum merambat ke tajuk pohon.
-4. Lakukan pendinginan lahan berkala di area bekas kebakaran terdahulu.
+${language === 'id' ? 'INSTRUKSI OPERASIONAL' : 'OPERATIONAL INSTRUCTIONS'}:
+1. ${language === 'id' ? 'Lakukan pengecekan kelembapan serasah gambut dan kedalaman air tanah di perimeter.' : 'Measure peat litter moisture content and groundwater depth along perimeter.'}
+2. ${language === 'id' ? 'Pastikan pintu sekat kanal (canal blocking) tertutup rapat untuk mencegah pengeringan.' : 'Ensure canal blocks remain firmly closed to retain hydrological dome.'}
+3. ${language === 'id' ? 'Pantau tanda-tanda asap bawah tanah (smoldering) sebelum merambat ke tajuk pohon.' : 'Scan for subsurface smoldering indicators before fire crowns to tree canopies.'}
+4. ${language === 'id' ? 'Lakukan pendinginan lahan berkala di area bekas kebakaran terdahulu.' : 'Execute periodic ground cooling in historical recurring burn scars.'}
 
-Data acuan satelit: NASA FIRMS (MODIS/VIIRS Harmonized Grid 5.5 km)
+${language === 'id' ? 'Data acuan satelit: NASA FIRMS (MODIS/VIIRS Harmonized Grid 5.5 km)' : 'Satellite Reference Data: NASA FIRMS (MODIS/VIIRS Harmonized Grid 5.5 km)'}
 ===============================================================`;
 
     const blob = new Blob([memo], { type: 'text/plain;charset=utf-8;' });
@@ -78,14 +79,10 @@ Data acuan satelit: NASA FIRMS (MODIS/VIIRS Harmonized Grid 5.5 km)
             {language === 'id' ? 'Operasi & Mitigasi Lapangan' : 'Field Operations & Mitigation'}
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-[#1d1d1f] tracking-tight">
-            {language === 'id'
-              ? 'Pusat Komando & Peringatan Dini Lahan Gambut'
-              : 'Peatland Early Warning & Patrol Command'}
+            {t.mitigationHubTitle}
           </h1>
           <p className="text-xs sm:text-sm text-[#6e6e73] max-w-2xl leading-relaxed">
-            {language === 'id'
-              ? 'Menghubungkan kalender historis 26 tahun dengan aksi lapangan, dinamika muka air tanah gambut (TMAG), dan pelaporan resmi.'
-              : 'Operationalizing 26-year satellite climatology into field action, peat hydrology dynamics, and official SitRep reporting.'}
+            {t.mitigationHubDesc}
           </p>
         </div>
 
@@ -93,26 +90,26 @@ Data acuan satelit: NASA FIRMS (MODIS/VIIRS Harmonized Grid 5.5 km)
         <div className="flex items-center bg-[#e5e5ea] rounded-xl p-1 gap-1 shrink-0">
           <button
             onClick={() => setActiveSubTab('simulator')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer min-h-[36px] ${
               activeSubTab === 'simulator'
                 ? 'bg-white text-[#1d1d1f] shadow-xs'
                 : 'text-[#6e6e73] hover:text-[#1d1d1f]'
             }`}
           >
             <Activity className="w-3.5 h-3.5" />
-            <span>{language === 'id' ? 'Simulasi Gambut & Patroli' : 'Peat Simulator & Patrol'}</span>
+            <span>{t.subTabSimulator}</span>
           </button>
 
           <button
             onClick={() => setActiveSubTab('sitrep')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer min-h-[36px] ${
               activeSubTab === 'sitrep'
                 ? 'bg-white text-[#1d1d1f] shadow-xs'
                 : 'text-[#6e6e73] hover:text-[#1d1d1f]'
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
-            <span>{language === 'id' ? 'Dossier SitRep A4' : 'Executive SitRep A4'}</span>
+            <span>{t.subTabSitRep}</span>
           </button>
         </div>
       </div>
@@ -125,9 +122,9 @@ Data acuan satelit: NASA FIRMS (MODIS/VIIRS Harmonized Grid 5.5 km)
           <div className="bg-white border border-[#e5e5e7] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-sm text-[#1d1d1f]">
-                {language === 'id' ? 'Status 5 Wilayah Gambut Prioritas' : 'Priority Peatland Regions Status'}
+                {t.priorityRegionsTitle}
               </h2>
-              <span className="text-xs text-[#86868b]">Pilih wilayah untuk memuat parameter</span>
+              <span className="text-xs text-[#86868b]">{t.selectRegionToLoad}</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
@@ -137,7 +134,7 @@ Data acuan satelit: NASA FIRMS (MODIS/VIIRS Harmonized Grid 5.5 km)
                   <div
                     key={item.aoi.id}
                     onClick={() => onSelectAOI(item.aoi)}
-                    className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
+                    className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col justify-between min-h-[120px] ${
                       isSelected
                         ? 'border-[#1d1d1f] bg-[#f5f5f7] shadow-xs font-semibold'
                         : 'border-[#e5e5e7] bg-white hover:border-[#1d1d1f]/30'
@@ -155,14 +152,14 @@ Data acuan satelit: NASA FIRMS (MODIS/VIIRS Harmonized Grid 5.5 km)
 
                     <div className="mt-4 pt-3 border-t border-[#e5e5e7] space-y-1 text-xs">
                       <div className="flex justify-between text-[11px]">
-                        <span className="text-[#86868b]">Muka Air (TMAG):</span>
+                        <span className="text-[#86868b]">{language === 'id' ? 'Muka Air (TMAG):' : 'Water Table:'}</span>
                         <span className={`font-semibold num ${item.tmag <= -40 ? 'text-red-600' : 'text-[#1d1d1f]'}`}>
                           {item.tmag} cm
                         </span>
                       </div>
                       <div className="flex justify-between text-[11px]">
-                        <span className="text-[#86868b]">Sekat Kanal:</span>
-                        <span className="font-medium text-[#1d1d1f] num">{item.canalBlocks} unit</span>
+                        <span className="text-[#86868b]">{t.canalBlocks}:</span>
+                        <span className="font-medium text-[#1d1d1f] num">{item.canalBlocks} {language === 'id' ? 'unit' : 'units'}</span>
                       </div>
                     </div>
                   </div>
@@ -177,13 +174,13 @@ Data acuan satelit: NASA FIRMS (MODIS/VIIRS Harmonized Grid 5.5 km)
             {/* Form */}
             <div className="lg:col-span-6 bg-white border border-[#e5e5e7] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
               <h2 className="font-semibold text-sm text-[#1d1d1f]">
-                {language === 'id' ? 'Pembuatan Memorandum Patroli' : 'Patrol Dispatch Briefing Generator'}
+                {t.dispatchGenTitle}
               </h2>
 
               <div className="space-y-3.5 text-xs">
                 <div>
                   <label className="block text-[#6e6e73] font-medium mb-1">
-                    {language === 'id' ? 'Wilayah Target' : 'Target Region'}:
+                    {t.targetRegion}:
                   </label>
                   <div className="p-2.5 rounded-lg bg-[#f5f5f7] border border-[#e5e5e7] font-semibold text-[#1d1d1f]">
                     {selectedAOI.name} ({selectedAOI.biome})
@@ -192,7 +189,7 @@ Data acuan satelit: NASA FIRMS (MODIS/VIIRS Harmonized Grid 5.5 km)
 
                 <div>
                   <label className="block text-[#6e6e73] font-medium mb-1">
-                    {language === 'id' ? 'Satuan Regu Operasional' : 'Assigned Patrol Unit'}:
+                    {t.assignedUnit}:
                   </label>
                   <select
                     value={selectedTeamUnit}
@@ -207,7 +204,7 @@ Data acuan satelit: NASA FIRMS (MODIS/VIIRS Harmonized Grid 5.5 km)
 
                 <div>
                   <label className="block text-[#6e6e73] font-medium mb-1">
-                    {language === 'id' ? 'Tanggal Pelaksanaan' : 'Patrol Date'}:
+                    {t.patrolDate}:
                   </label>
                   <input
                     type="date"
@@ -220,10 +217,10 @@ Data acuan satelit: NASA FIRMS (MODIS/VIIRS Harmonized Grid 5.5 km)
 
               <button
                 onClick={handleDownloadDispatch}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#1d1d1f] hover:bg-black text-white font-medium text-xs transition shadow-xs min-h-[42px] cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#1d1d1f] hover:bg-black text-white font-medium text-xs transition shadow-xs min-h-[44px] cursor-pointer"
               >
                 <Download className="w-4 h-4" />
-                <span>{language === 'id' ? 'Unduh Dokumen Memo (.TXT)' : 'Download Dispatch Memo'}</span>
+                <span>{t.downloadMemoTxt}</span>
               </button>
             </div>
 
@@ -233,7 +230,7 @@ Data acuan satelit: NASA FIRMS (MODIS/VIIRS Harmonized Grid 5.5 km)
                 <div className="flex items-center justify-between text-[#86868b] border-b border-[#e5e5e7] pb-2 text-[11px]">
                   <span className="font-semibold text-[#1d1d1f] flex items-center gap-1.5">
                     <FileText className="w-3.5 h-3.5" />
-                    DRAF MEMORANDUM BRIEFING
+                    {t.draftMemoHeader}
                   </span>
                   <span>TERRA HARMONIA</span>
                 </div>
@@ -241,9 +238,9 @@ Data acuan satelit: NASA FIRMS (MODIS/VIIRS Harmonized Grid 5.5 km)
                 <div className="mt-3 space-y-1.5 text-[11px] leading-relaxed text-[#1d1d1f]">
                   <p><span className="text-[#86868b]">TARGET:</span> {selectedAOI.name}</p>
                   <p><span className="text-[#86868b]">STATUS:</span> <strong className="text-red-600">SIAGA DARURAT (TMAG {currentRegionRisk.tmag} cm)</strong></p>
-                  <p><span className="text-[#86868b]">SEKAT KANAL:</span> {currentRegionRisk.canalBlocks} Titik Terpantau</p>
+                  <p><span className="text-[#86868b]">{t.canalBlocks.toUpperCase()}:</span> {currentRegionRisk.canalBlocks} {language === 'id' ? 'Titik Terpantau' : 'Monitored Gates'}</p>
                   <p className="mt-2 text-[#6e6e73] border-l-2 border-[#1d1d1f] pl-2.5">
-                    "Instruksi: Pertahankan tinggi muka air gambut di atas -40 cm dan lakukan pemantauan serasah untuk mencegah kebakaran bawah tanah smoldering."
+                    "{language === 'id' ? 'Instruksi: Pertahankan tinggi muka air gambut di atas -40 cm dan lakukan pemantauan serasah untuk mencegah kebakaran bawah tanah smoldering.' : 'Directive: Maintain peat groundwater level above -40 cm and conduct litter moisture monitoring to prevent underground smoldering.'}"
                   </p>
                 </div>
               </div>

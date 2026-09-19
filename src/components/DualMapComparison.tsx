@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { AOIRegion, RawHotspot, PRESET_AOIS } from '../engine/harmonizer';
-import { Language } from '../data/translations';
-import { Split, RefreshCw, Layers } from 'lucide-react';
+import { AOIRegion, RawHotspot } from '../engine/harmonizer';
+import { Language, translations } from '../data/translations';
+import { Split, RefreshCw } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -16,6 +16,7 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
   selectedAOI,
   allHotspots,
 }) => {
+  const t = translations[language];
   const [yearA, setYearA] = useState<number>(2015);
   const [yearB, setYearB] = useState<number>(2021);
   const [isSyncMove, setIsSyncMove] = useState<boolean>(true);
@@ -143,12 +144,12 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
       circle.bindTooltip(
         `<div class="font-sans text-xs">
           <strong>${h.instrument}</strong> &bull; FRP: ${Math.round(h.frp)} MW<br/>
-          Tgl: ${h.date || h.time}
+          ${language === 'id' ? 'Tgl' : 'Date'}: ${h.date || h.time}
         </div>`
       );
       circle.addTo(layerGroupA.current!);
     });
-  }, [hotspotsA]);
+  }, [hotspotsA, language]);
 
   useEffect(() => {
     if (!leafletMapB.current || !layerGroupB.current) return;
@@ -170,12 +171,12 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
       circle.bindTooltip(
         `<div class="font-sans text-xs">
           <strong>${h.instrument}</strong> &bull; FRP: ${Math.round(h.frp)} MW<br/>
-          Tgl: ${h.date || h.time}
+          ${language === 'id' ? 'Tgl' : 'Date'}: ${h.date || h.time}
         </div>`
       );
       circle.addTo(layerGroupB.current!);
     });
-  }, [hotspotsB]);
+  }, [hotspotsB, language]);
 
   const years = Array.from({ length: 27 }, (_, i) => 2000 + i);
 
@@ -201,7 +202,7 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsSyncMove(!isSyncMove)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition flex items-center gap-1.5 cursor-pointer min-h-[36px] ${
               isSyncMove
                 ? 'bg-[#1d1d1f] text-white border-[#1d1d1f]'
                 : 'bg-white text-[#6e6e73] border-[#e5e5e7] hover:border-[#1d1d1f]'
@@ -225,15 +226,17 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
           {/* Controls Bar A */}
           <div className="bg-white px-4 py-3 border-b border-[#e5e5e7] flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-[#86868b] uppercase">Tahun A:</span>
+              <span className="text-xs font-bold text-[#86868b] uppercase">
+                {language === 'id' ? 'Tahun A:' : 'Year A:'}
+              </span>
               <select
                 value={yearA}
                 onChange={(e) => setYearA(Number(e.target.value))}
-                className="bg-[#f5f5f7] border border-[#e5e5e7] rounded-lg px-3 py-1.5 text-xs font-bold text-[#1d1d1f] focus:outline-none focus:border-[#1d1d1f] cursor-pointer"
+                className="bg-[#f5f5f7] border border-[#e5e5e7] rounded-lg px-3 py-1.5 text-xs font-bold text-[#1d1d1f] focus:outline-none focus:border-[#1d1d1f] cursor-pointer min-h-[36px]"
               >
                 {years.map((y) => (
                   <option key={y} value={y}>
-                    {y} {y === 2015 ? '(El Niño Super)' : y === 2019 ? '(El Niño Moderat)' : y === 2021 ? '(La Niña Basah)' : ''}
+                    {y} {y === 2015 ? (language === 'id' ? '(El Niño Super)' : '(Super El Niño)') : y === 2019 ? (language === 'id' ? '(El Niño Moderat)' : '(Moderate El Niño)') : y === 2021 ? (language === 'id' ? '(La Niña Basah)' : '(Wet La Niña)') : ''}
                   </option>
                 ))}
               </select>
@@ -241,7 +244,7 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
 
             <div className="flex items-center gap-3 text-xs">
               <div>
-                <span className="text-[#86868b]">Titik: </span>
+                <span className="text-[#86868b]">{language === 'id' ? 'Titik: ' : 'Points: '}</span>
                 <strong className="num text-[#1d1d1f]">{statsA.count.toLocaleString()}</strong>
               </div>
               <div>
@@ -260,15 +263,17 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
           {/* Controls Bar B */}
           <div className="bg-white px-4 py-3 border-b border-[#e5e5e7] flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-[#86868b] uppercase">Tahun B:</span>
+              <span className="text-xs font-bold text-[#86868b] uppercase">
+                {language === 'id' ? 'Tahun B:' : 'Year B:'}
+              </span>
               <select
                 value={yearB}
                 onChange={(e) => setYearB(Number(e.target.value))}
-                className="bg-[#f5f5f7] border border-[#e5e5e7] rounded-lg px-3 py-1.5 text-xs font-bold text-[#1d1d1f] focus:outline-none focus:border-[#1d1d1f] cursor-pointer"
+                className="bg-[#f5f5f7] border border-[#e5e5e7] rounded-lg px-3 py-1.5 text-xs font-bold text-[#1d1d1f] focus:outline-none focus:border-[#1d1d1f] cursor-pointer min-h-[36px]"
               >
                 {years.map((y) => (
                   <option key={y} value={y}>
-                    {y} {y === 2015 ? '(El Niño Super)' : y === 2019 ? '(El Niño Moderat)' : y === 2021 ? '(La Niña Basah)' : ''}
+                    {y} {y === 2015 ? (language === 'id' ? '(El Niño Super)' : '(Super El Niño)') : y === 2019 ? (language === 'id' ? '(El Niño Moderat)' : '(Moderate El Niño)') : y === 2021 ? (language === 'id' ? '(La Niña Basah)' : '(Wet La Niña)') : ''}
                   </option>
                 ))}
               </select>
@@ -276,7 +281,7 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
 
             <div className="flex items-center gap-3 text-xs">
               <div>
-                <span className="text-[#86868b]">Titik: </span>
+                <span className="text-[#86868b]">{language === 'id' ? 'Titik: ' : 'Points: '}</span>
                 <strong className="num text-[#1d1d1f]">{statsB.count.toLocaleString()}</strong>
               </div>
               <div>
@@ -295,14 +300,20 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
       {/* Comparative Analytical Summary Footer */}
       <div className="px-5 py-3.5 bg-[#fbfbfd] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
         <div className="text-[#3a3a3c] leading-relaxed">
-          <strong className="font-semibold text-[#1d1d1f]">{language === 'id' ? 'Kesimpulan Analisis Spasial' : 'Spatial Synthesis'}: </strong>
+          <strong className="font-semibold text-[#1d1d1f]">
+            {language === 'id' ? 'Kesimpulan Analisis Spasial: ' : 'Spatial Synthesis: '}
+          </strong>
           {statsA.count > statsB.count ? (
             <span>
-              Tahun <strong>{yearA}</strong> mengalami aktivitas pembakaran <strong>{(statsA.count - statsB.count).toLocaleString()}</strong> titik lebih banyak dibandingkan {yearB} (+{Math.round(((statsA.count - statsB.count) / Math.max(1, statsB.count)) * 100)}%).
+              {language === 'id'
+                ? `Tahun ${yearA} mengalami aktivitas pembakaran ${(statsA.count - statsB.count).toLocaleString()} titik lebih banyak dibandingkan ${yearB} (+${Math.round(((statsA.count - statsB.count) / Math.max(1, statsB.count)) * 100)}%).`
+                : `Year ${yearA} recorded ${(statsA.count - statsB.count).toLocaleString()} more fire detections than ${yearB} (+${Math.round(((statsA.count - statsB.count) / Math.max(1, statsB.count)) * 100)}%).`}
             </span>
           ) : (
             <span>
-              Tahun <strong>{yearB}</strong> mengalami aktivitas pembakaran <strong>{(statsB.count - statsA.count).toLocaleString()}</strong> titik lebih banyak dibandingkan {yearA} (+{Math.round(((statsB.count - statsA.count) / Math.max(1, statsA.count)) * 100)}%).
+              {language === 'id'
+                ? `Tahun ${yearB} mengalami aktivitas pembakaran ${(statsB.count - statsA.count).toLocaleString()} titik lebih banyak dibandingkan ${yearA} (+${Math.round(((statsB.count - statsA.count) / Math.max(1, statsA.count)) * 100)}%).`
+                : `Year ${yearB} recorded ${(statsB.count - statsA.count).toLocaleString()} more fire detections than ${yearA} (+${Math.round(((statsB.count - statsA.count) / Math.max(1, statsA.count)) * 100)}%).`}
             </span>
           )}
         </div>

@@ -23,14 +23,8 @@ import {
 import {
   TrendingUp,
   BarChart3,
-  Flame,
-  Layers,
   Calendar,
-  Wind,
-  ShieldAlert,
   PieChart as PieIcon,
-  Sparkles,
-  Info,
 } from 'lucide-react';
 
 interface VisualAnalyticsProps {
@@ -82,18 +76,16 @@ export const VisualAnalytics: React.FC<VisualAnalyticsProps> = ({
     ? ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des']
     : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+  const harmonizedSeriesName = t.harmonizedClustersLegend;
+  const rawSeriesName = t.rawDetectionsLegend;
+  const climatologySeriesName = t.climatology26YrAvg;
+  const overlaySeriesName = `${t.yearActivityLegend} ${overlayYear}`;
+
   // 1. 26-Year Trend Aggregation (2000-2026)
   const yearlyTrendData = useMemo(() => {
     const list: Array<{
       year: number;
-      'Deteksi Mentah Satelit': number;
-      'Klaster Terharmonisasi (NASA 5.5km)': number;
-      'Daya Termal (FRP MW)': number;
-      'Emisi Karbon Gambut (Ton CO2e)': number;
-      rawCount: number;
-      harmonizedCount: number;
-      isElNino: boolean;
-      sensorEra: string;
+      [key: string]: string | number | boolean;
     }> = [];
 
     for (let yr = 2000; yr <= 2026; yr++) {
@@ -112,25 +104,22 @@ export const VisualAnalytics: React.FC<VisualAnalyticsProps> = ({
 
       list.push({
         year: yr,
-        'Deteksi Mentah Satelit': rawCount,
-        'Klaster Terharmonisasi (NASA 5.5km)': harmonizedCount,
-        'Daya Termal (FRP MW)': totalFRP,
-        'Emisi Karbon Gambut (Ton CO2e)': Math.round(totalFRP * 14.8),
-        rawCount,
-        harmonizedCount,
+        [rawSeriesName]: rawCount,
+        [harmonizedSeriesName]: harmonizedCount,
+        [t.thermalPowerLegend]: totalFRP,
+        [t.carbonEmissionsLegend]: Math.round(totalFRP * 14.8),
         isElNino: yr === 2006 || yr === 2015 || yr === 2019 || yr === 2023,
         sensorEra: yr >= 2012 ? 'Dual VIIRS+MODIS' : 'MODIS Only',
       });
     }
 
     return list;
-  }, [calendarMatrix]);
+  }, [calendarMatrix, rawSeriesName, harmonizedSeriesName, t]);
 
   // 2. Monthly Seasonality Data
   const monthlySeasonalityData = useMemo(() => {
     const list: Array<{
       month: string;
-      'Rata-rata Klimatologi 26 Thn': number;
       [key: string]: string | number;
     }> = [];
 
@@ -155,13 +144,13 @@ export const VisualAnalytics: React.FC<VisualAnalyticsProps> = ({
 
       list.push({
         month: mName,
-        'Rata-rata Klimatologi 26 Thn': avg,
-        [`Aktivitas Tahun ${overlayYear}`]: overlaySum,
+        [climatologySeriesName]: avg,
+        [overlaySeriesName]: overlaySum,
       });
     }
 
     return list;
-  }, [calendarMatrix, overlayYear, MONTHS]);
+  }, [calendarMatrix, overlayYear, MONTHS, climatologySeriesName, overlaySeriesName]);
 
   // 3. Provincial Peatland Carbon & Fire Energy Comparison
   const provincialRankings = useMemo(() => {
@@ -180,11 +169,11 @@ export const VisualAnalytics: React.FC<VisualAnalyticsProps> = ({
   // 4. Sensor Physics & Overlap Distribution Pie
   const sensorPhysicsData = useMemo(() => {
     return [
-      { name: 'VIIRS 375m Deteksi Resolusi Tinggi', value: 58, color: '#f59e0b' },
-      { name: 'MODIS 1km Deteksi Skala Lanskap', value: 24, color: '#dc2626' },
-      { name: 'Tumpang Tindih Ko-Deteksi Bersamaan', value: 18, color: '#0071e3' },
+      { name: language === 'id' ? 'VIIRS 375m Deteksi Resolusi Tinggi' : 'VIIRS 375m High-Resolution', value: 58, color: '#f59e0b' },
+      { name: language === 'id' ? 'MODIS 1km Deteksi Skala Lanskap' : 'MODIS 1km Synoptic Footprint', value: 24, color: '#dc2626' },
+      { name: language === 'id' ? 'Tumpang Tindih Ko-Deteksi Bersamaan' : 'Co-detected Overlapping Events', value: 18, color: '#0071e3' },
     ];
-  }, []);
+  }, [language]);
 
   return (
     <div className="bg-white border border-[#e5e5e7] rounded-2xl p-4 sm:p-6 shadow-xs space-y-5 transition-all">
@@ -193,35 +182,35 @@ export const VisualAnalytics: React.FC<VisualAnalyticsProps> = ({
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-[#e5e5e7]">
         <div>
           <div className="text-xs font-semibold text-[#86868b] uppercase tracking-wider">
-            {language === 'id' ? 'Visual Analytics Interaktif' : 'Interactive Visual Analytics'}
+            {t.analyticsTitle}
           </div>
           <h2 className="text-lg sm:text-xl font-bold text-[#1d1d1f] tracking-tight mt-0.5">
             {activeTab === 'trend'
-              ? (language === 'id' ? 'Apakah Lonjakan Titik Api Pasca-2012 Nyata atau Efek Resolusi Sensor?' : 'Is the Post-2012 Fire Surge Real or a Sensor Footprint Artifact?')
+              ? t.trendChartTitle
               : activeTab === 'seasonality'
-              ? (language === 'id' ? 'Kapan Puncak Musiman Kebakaran Terjadi & Kapan Patroli Harus Siaga?' : 'When is the Seasonal Peat Fire Peak & When Should Patrols Deploy?')
+              ? t.seasonalityChartTitle
               : activeTab === 'provincial'
-              ? (language === 'id' ? 'Provinsi Mana Penyumbang Emisi Karbon Gambut (CO₂e) Terbesar?' : 'Which Provinces Emit the Highest Peatland CO₂e Carbon?')
-              : (language === 'id' ? 'Fisika Resolusi Piksel Satelit: MODIS 1km vs VIIRS 375m' : 'Pixel Resolution Physics: MODIS 1km vs VIIRS 375m')}
+              ? t.provincialChartTitle
+              : t.physicsChartTitle}
           </h2>
-          <p className="text-xs text-[#6e6e73] mt-1 leading-relaxed">
+          <p className="text-xs text-[#6e6e73] mt-1 leading-relaxed max-w-3xl">
             {activeTab === 'trend'
-              ? (language === 'id' ? 'Visualisasi multi-kurva 26 tahun (2000–2026) membedakan titik api mentah dari klaster terharmonisasi 5.5 km NASA.' : '26-Year multi-series curve isolating raw sensor inflation from NASA 5.5 km harmonized clusters.')
+              ? t.trendChartDesc
               : activeTab === 'seasonality'
-              ? (language === 'id' ? 'Kurva gelombang musiman bulanan dengan penanda periode rawan kering (Agustus–Oktober) dan puncak Riau (Februari–Maret).' : 'Monthly seasonality wave curve highlighting primary dry season (Aug–Oct) and early Sumatra peak (Feb–Mar).')
+              ? t.seasonalityChartDesc
               : activeTab === 'provincial'
-              ? (language === 'id' ? 'Diagram batang perbandingan daya radiasi termal (FRP Megawatt) dan estimasi pelepasan karbon per wilayah.' : 'Ranked comparison of thermal energy (FRP MW) and peat carbon emissions across Indonesian priority zones.')
-              : (language === 'id' ? 'Komposisi deteksi resolusi sensor satelit dan pemodelan tumpang-tindih spasial Terra Harmonia.' : 'Satellite sensor footprint resolution breakdown and spatial overlap modeling.')}
+              ? t.provincialChartDesc
+              : t.physicsChartDesc}
           </p>
         </div>
 
         {/* Tab Selector */}
-        <div className="flex items-center bg-[#f5f5f7] rounded-xl p-0.5 text-xs font-medium border border-[#e5e5e7] shrink-0 overflow-x-auto">
+        <div className="flex items-center bg-[#f5f5f7] rounded-xl p-0.5 text-xs font-medium border border-[#e5e5e7] shrink-0 overflow-x-auto max-w-full">
           {[
-            { id: 'trend' as ChartTab, label: language === 'id' ? 'Tren 26 Tahun' : '26-Year Trend', icon: TrendingUp },
-            { id: 'seasonality' as ChartTab, label: language === 'id' ? 'Siklus Musiman' : 'Seasonality', icon: Calendar },
-            { id: 'provincial' as ChartTab, label: language === 'id' ? 'Emisi per Wilayah' : 'Provincial Carbon', icon: BarChart3 },
-            { id: 'physics' as ChartTab, label: language === 'id' ? 'Fisika Sensor' : 'Sensor Physics', icon: PieIcon },
+            { id: 'trend' as ChartTab, label: t.tabTrend, icon: TrendingUp },
+            { id: 'seasonality' as ChartTab, label: t.tabSeasonality, icon: Calendar },
+            { id: 'provincial' as ChartTab, label: t.tabProvincial, icon: BarChart3 },
+            { id: 'physics' as ChartTab, label: t.tabPhysics, icon: PieIcon },
           ].map((tab) => {
             const Icon = tab.icon;
             const isSel = activeTab === tab.id;
@@ -229,7 +218,7 @@ export const VisualAnalytics: React.FC<VisualAnalyticsProps> = ({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all whitespace-nowrap cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all whitespace-nowrap cursor-pointer min-h-[34px] ${
                   isSel
                     ? 'bg-white text-[#1d1d1f] shadow-xs font-bold'
                     : 'text-[#6e6e73] hover:text-[#1d1d1f]'
@@ -268,7 +257,7 @@ export const VisualAnalytics: React.FC<VisualAnalyticsProps> = ({
                   />
                   <YAxis stroke="#86868b" fontSize={11} tickLine={false} axisLine={false} />
                   
-                  <Tooltip content={<CustomChartTooltip unit="titik/klaster" />} />
+                  <Tooltip content={<CustomChartTooltip unit={language === 'id' ? 'titik/klaster' : 'pts/clusters'} />} />
                   <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
 
                   {/* 2012 VIIRS Launch Divider */}
@@ -280,7 +269,7 @@ export const VisualAnalytics: React.FC<VisualAnalyticsProps> = ({
                   {/* NASA Harmonized Area Spline */}
                   <Area
                     type="monotone"
-                    dataKey="Klaster Terharmonisasi (NASA 5.5km)"
+                    dataKey={harmonizedSeriesName}
                     stroke="#0071e3"
                     strokeWidth={3}
                     fillOpacity={1}
@@ -292,7 +281,7 @@ export const VisualAnalytics: React.FC<VisualAnalyticsProps> = ({
                   {/* Raw Spike Line */}
                   <Line
                     type="monotone"
-                    dataKey="Deteksi Mentah Satelit"
+                    dataKey={rawSeriesName}
                     stroke="#64748b"
                     strokeWidth={2}
                     strokeDasharray="5 4"
@@ -309,9 +298,13 @@ export const VisualAnalytics: React.FC<VisualAnalyticsProps> = ({
           {/* Scientific Insight Card */}
           <div className="p-4 bg-[#f5f5f7] border border-[#e5e5e7] rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
             <div className="space-y-0.5">
-              <span className="font-bold text-[#1d1d1f] text-sm">Kesimpulan Analisis Ilmiah:</span>
+              <span className="font-bold text-[#1d1d1f] text-sm">
+                {language === 'id' ? 'Kesimpulan Analisis Ilmiah:' : 'Scientific Analysis Takeaway:'}
+              </span>
               <p className="text-[#6e6e73] leading-relaxed">
-                Garis abu-abu putus-putus menunjukkan lonjakan semu 3x lipat sejak 2012 akibat ukuran piksel VIIRS 375m (14 Ha). Garis biru terharmonisasi mengembalikan perbandingan historis yang valid dengan mengelompokkan ke grid 5.5 km.
+                {language === 'id'
+                  ? 'Garis abu-abu putus-putus menunjukkan lonjakan semu 3x lipat sejak 2012 akibat ukuran piksel VIIRS 375m (14 Ha). Garis biru terharmonisasi mengembalikan perbandingan historis yang valid dengan mengelompokkan ke grid 5.5 km.'
+                  : 'Dashed gray line illustrates artificial 3x inflation post-2012 caused by VIIRS 375m pixels. The solid blue harmonized series restores continuous historical validity via 5.5 km equal-area binning.'}
               </p>
             </div>
           </div>
@@ -322,19 +315,21 @@ export const VisualAnalytics: React.FC<VisualAnalyticsProps> = ({
       {activeTab === 'seasonality' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2 text-xs">
-            <span className="text-[#86868b] font-medium">Bandingkan Rata-rata 26 Tahun dengan Anomali Tahun:</span>
+            <span className="text-[#86868b] font-medium">
+              {language === 'id' ? 'Bandingkan Rata-rata 26 Tahun dengan Anomali Tahun:' : 'Compare 26-Yr Average against Specific Year:'}
+            </span>
             <div className="flex items-center gap-1.5 overflow-x-auto">
               {[2015, 2019, 2021, 2023, 2026].map((yr) => (
                 <button
                   key={yr}
                   onClick={() => setOverlayYear(yr)}
-                  className={`px-3 py-1 rounded-lg font-medium transition-all cursor-pointer ${
+                  className={`px-3 py-1 rounded-lg font-medium transition-all cursor-pointer min-h-[32px] ${
                     overlayYear === yr
                       ? 'bg-[#1d1d1f] text-white font-bold shadow-xs'
                       : 'bg-[#f5f5f7] text-[#6e6e73] hover:text-[#1d1d1f]'
                   }`}
                 >
-                  Tahun {yr}
+                  {language === 'id' ? `Tahun ${yr}` : `Year ${yr}`}
                 </button>
               ))}
             </div>
@@ -359,13 +354,13 @@ export const VisualAnalytics: React.FC<VisualAnalyticsProps> = ({
                   <XAxis dataKey="month" stroke="#1d1d1f" fontSize={11} fontWeight={600} tickLine={false} />
                   <YAxis stroke="#86868b" fontSize={11} tickLine={false} axisLine={false} />
                   
-                  <Tooltip content={<CustomChartTooltip unit="klaster" />} />
+                  <Tooltip content={<CustomChartTooltip unit={language === 'id' ? 'klaster' : 'clusters'} />} />
                   <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
 
                   {/* 26-Year Climatology Baseline */}
                   <Area
                     type="monotone"
-                    dataKey="Rata-rata Klimatologi 26 Thn"
+                    dataKey={climatologySeriesName}
                     stroke="#64748b"
                     strokeWidth={2}
                     strokeDasharray="4 4"
@@ -377,7 +372,7 @@ export const VisualAnalytics: React.FC<VisualAnalyticsProps> = ({
                   {/* Overlay Year Curve */}
                   <Area
                     type="monotone"
-                    dataKey={`Aktivitas Tahun ${overlayYear}`}
+                    dataKey={overlaySeriesName}
                     stroke="#dc2626"
                     strokeWidth={3}
                     fill="url(#overlayAreaColor)"
@@ -414,12 +409,12 @@ export const VisualAnalytics: React.FC<VisualAnalyticsProps> = ({
                     width={150}
                   />
                   
-                  <Tooltip content={<CustomChartTooltip unit="MW (Daya Termal)" />} />
+                  <Tooltip content={<CustomChartTooltip unit={language === 'id' ? 'MW (Daya Termal)' : 'MW (Thermal FRP)'} />} />
                   <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
 
                   <Bar
                     dataKey="frpMW"
-                    name="Daya Radiasi Termal Api (MW)"
+                    name={t.thermalPowerLegend}
                     radius={[0, 8, 8, 0]}
                     isAnimationActive={true}
                     animationDuration={1200}
@@ -469,23 +464,35 @@ export const VisualAnalytics: React.FC<VisualAnalyticsProps> = ({
           {/* Physics Explanation Cards */}
           <div className="lg:col-span-6 space-y-3 text-xs">
             <div className="p-3.5 bg-[#f5f5f7] border border-[#e5e5e7] rounded-xl space-y-1">
-              <div className="font-bold text-[#1d1d1f] text-sm">MODIS (1.000m x 1.000m = 100 Hektar)</div>
+              <div className="font-bold text-[#1d1d1f] text-sm">
+                MODIS (1,000m × 1,000m = 100 Ha)
+              </div>
               <p className="text-[#6e6e73] leading-relaxed">
-                Sensor sinoptik NASA pada satelit Terra & Aqua. Merekam front api dalam skala bentang lahan makro sejak tahun 2000.
+                {language === 'id'
+                  ? 'Sensor sinoptik NASA pada satelit Terra & Aqua. Merekam front api dalam skala bentang lahan makro sejak tahun 2000.'
+                  : 'NASA synoptic sensor onboard Terra & Aqua satellites. Records fire perimeters at landscape scale since 2000.'}
               </p>
             </div>
 
             <div className="p-3.5 bg-[#f5f5f7] border border-[#e5e5e7] rounded-xl space-y-1">
-              <div className="font-bold text-amber-700 text-sm">VIIRS (375m x 375m = 14 Hektar)</div>
+              <div className="font-bold text-amber-700 text-sm">
+                VIIRS (375m × 375m = 14 Ha)
+              </div>
               <p className="text-[#6e6e73] leading-relaxed">
-                Sensor resolusi tinggi pada satelit Suomi-NPP & NOAA-20. Mendeteksi titik api kecil dan menghasilkan 3–5 deteksi terpisah per front kebakaran.
+                {language === 'id'
+                  ? 'Sensor resolusi tinggi pada satelit Suomi-NPP & NOAA-20. Mendeteksi titik api kecil dan menghasilkan 3–5 deteksi terpisah per front kebakaran.'
+                  : 'High-resolution sensor onboard Suomi-NPP & NOAA satellites. Detects small fire fronts and produces 3–5 split detections per event.'}
               </p>
             </div>
 
             <div className="p-3.5 bg-blue-50 border border-blue-200 rounded-xl space-y-1">
-              <div className="font-bold text-[#0071e3] text-sm">Solusi Grid Harmonisasi 5.5 km</div>
+              <div className="font-bold text-[#0071e3] text-sm">
+                {language === 'id' ? 'Solusi Grid Harmonisasi 5.5 km' : '5.5 km Harmonization Grid Solution'}
+              </div>
               <p className="text-blue-900 leading-relaxed">
-                Terra Harmonia merekonsiliasi perbedaan resolusi kedua sensor ke dalam sel spasial 5.5 km sehingga menghasilkan linimasa 26 tahun yang konsisten secara ilmiah.
+                {language === 'id'
+                  ? 'Terra Harmonia merekonsiliasi perbedaan resolusi kedua sensor ke dalam sel spasial 5.5 km sehingga menghasilkan linimasa 26 tahun yang konsisten secara ilmiah.'
+                  : 'Terra Harmonia reconciles multi-sensor resolution discrepancies into 5.5 km spatial cells for an un-biased 26-year time series.'}
               </p>
             </div>
           </div>

@@ -4,16 +4,11 @@ import { Language, translations } from '../data/translations';
 import {
   Play,
   Pause,
-  RotateCcw,
-  Sparkles,
   Calendar as CalendarIcon,
   BarChart3,
-  Flame,
-  Wind,
-  Info,
   ChevronLeft,
   ChevronRight,
-  TrendingUp,
+  Info,
 } from 'lucide-react';
 
 interface BurningCalendarProps {
@@ -96,10 +91,10 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
       : item.burningActivityIndex;
 
     if (value <= 0) return 'bg-[#f2f2f7] hover:bg-[#e5e5ea]';
-    if (value < 15) return 'bg-[#fef08a] hover:bg-[#fde047]'; // Level 1 (Rendah)
-    if (value < 35) return 'bg-[#fed7aa] hover:bg-[#fdba74]'; // Level 2 (Sedang)
-    if (value < 65) return 'bg-[#fb923c] hover:bg-[#f97316]'; // Level 3 (Tinggi)
-    return 'bg-[#dc2626] hover:bg-[#b91c1c] text-white';      // Level 4 (Ekstrem)
+    if (value < 15) return 'bg-[#fef08a] hover:bg-[#fde047]'; // Level 1 (Low)
+    if (value < 35) return 'bg-[#fed7aa] hover:bg-[#fdba74]'; // Level 2 (Moderate)
+    if (value < 65) return 'bg-[#fb923c] hover:bg-[#f97316]'; // Level 3 (High)
+    return 'bg-[#dc2626] hover:bg-[#b91c1c] text-white';      // Level 4 (Severe)
   };
 
   const activeInspection = hoveredData || pinnedData || (selectedKey ? calendarMatrix[selectedKey] : null);
@@ -163,10 +158,10 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
               {t.calendarTitle}
             </h2>
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#f5f5f7] text-[#6e6e73] border border-[#e5e5e7] num">
-              2000 – 2026 (26 Tahun)
+              {t.calendarSpan}
             </span>
           </div>
-          <p className="text-xs text-[#6e6e73] mt-1 leading-relaxed">
+          <p className="text-xs text-[#6e6e73] mt-1 leading-relaxed max-w-3xl">
             {rawMode ? t.calendarSubRaw : t.calendarSubHarmonized}
           </p>
         </div>
@@ -178,25 +173,25 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
           <div className="flex items-center bg-[#f5f5f7] rounded-xl p-0.5 text-xs font-medium border border-[#e5e5e7]">
             <button
               onClick={() => setViewMode('matrix')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer min-h-[36px] ${
                 viewMode === 'matrix'
                   ? 'bg-white text-[#1d1d1f] shadow-xs font-semibold'
                   : 'text-[#6e6e73] hover:text-[#1d1d1f]'
               }`}
             >
               <CalendarIcon className="w-3.5 h-3.5" />
-              <span>Matriks 52-Minggu</span>
+              <span>{t.matrix52Weeks}</span>
             </button>
             <button
               onClick={() => setViewMode('monthly')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer min-h-[36px] ${
                 viewMode === 'monthly'
                   ? 'bg-white text-[#1d1d1f] shadow-xs font-semibold'
                   : 'text-[#6e6e73] hover:text-[#1d1d1f]'
               }`}
             >
               <BarChart3 className="w-3.5 h-3.5" />
-              <span>Kartu Bulanan</span>
+              <span>{t.monthlyCards}</span>
             </button>
           </div>
 
@@ -204,14 +199,14 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
           <div className="flex items-center bg-[#f5f5f7] border border-[#e5e5e7] rounded-xl p-0.5 text-xs">
             <button
               onClick={() => setIsPlaying(!isPlaying)}
-              className="flex items-center gap-1.5 px-3 py-1.5 font-bold text-[#1d1d1f] hover:text-black transition cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 font-bold text-[#1d1d1f] hover:text-black transition cursor-pointer min-h-[36px]"
             >
               {isPlaying ? (
                 <Pause className="w-3.5 h-3.5 fill-current text-red-600" />
               ) : (
                 <Play className="w-3.5 h-3.5 fill-current text-[#0071e3]" />
               )}
-              <span>{isPlaying ? 'Jeda Simulasi' : 'Putar 2000–2026'}</span>
+              <span>{isPlaying ? t.pauseSimulation : t.play20002026}</span>
             </button>
             {playbackYear && (
               <span className="px-2 py-0.5 text-xs font-bold num text-[#0071e3] bg-white rounded-lg shadow-2xs border border-[#e5e5e7]">
@@ -226,14 +221,14 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-1.5 overflow-x-auto py-1 max-w-full">
           <span className="text-[#86868b] font-medium mr-1 text-[11px] uppercase tracking-wider hidden sm:inline">
-            Anomali Iklim:
+            {t.climateAnomaly}
           </span>
           {[
-            { key: 'all', label: 'Semua (26 Tahun)' },
-            { key: '2015', label: 'El Niño 2015 (Puncak Ekstrem)' },
-            { key: '2019', label: 'El Niño 2019 (IOD Positif)' },
-            { key: '2023', label: 'El Niño 2023' },
-            { key: 'lanina', label: 'La Niña (Periode Basah)' },
+            { key: 'all', label: t.all26Years },
+            { key: '2015', label: t.elNino2015 },
+            { key: '2019', label: t.elNino2019 },
+            { key: '2023', label: t.elNino2023 },
+            { key: 'lanina', label: t.laNinaWet },
           ].map(({ key, label }) => (
             <button
               key={key}
@@ -241,7 +236,7 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
                 setActiveClimateFilter(key as any);
                 setIsPlaying(false);
               }}
-              className={`px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap cursor-pointer min-h-[34px] ${
                 activeClimateFilter === key
                   ? 'bg-[#1d1d1f] text-white font-semibold shadow-xs'
                   : 'bg-[#f5f5f7] text-[#6e6e73] hover:text-[#1d1d1f] hover:bg-[#e5e5ea]'
@@ -255,7 +250,7 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
         {/* Dynamic Dry Season Peak Badge */}
         <div className="flex items-center gap-2 text-[11px] text-[#86868b]">
           <span className="inline-block w-2 h-2 rounded-full bg-red-500" />
-          <span>Musim Kemarau Utama: <b>Agustus – Oktober</b></span>
+          <span>{t.primaryDrySeason} <b>{t.primaryDrySeasonMonths}</b></span>
         </div>
       </div>
 
@@ -312,7 +307,7 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
                           setViewMode('monthly');
                         }}
                         className="text-[11px] font-bold text-[#1d1d1f] flex items-center justify-between pr-2.5 num cursor-pointer hover:text-[#0071e3]"
-                        title={`Klik untuk melihat rincian bulanan tahun ${year}`}
+                        title={language === 'id' ? `Klik untuk melihat rincian bulanan tahun ${year}` : `Click to view monthly details for ${year}`}
                       >
                         <span className={isCurrentPlayback ? 'text-[#0071e3]' : ''}>{year}</span>
                         <span className="text-[9px] text-[#86868b] font-normal">
@@ -346,7 +341,7 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
                                 ? 'ring-2 ring-[#1d1d1f] scale-110 z-10 relative shadow-xs'
                                 : ''
                             }`}
-                            aria-label={`${t.year} ${year}, Week ${week}`}
+                            aria-label={`${t.year} ${year}, ${t.weekLabel} ${week}`}
                           />
                         );
                       })}
@@ -368,7 +363,8 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
             <button
               onClick={() => setFocusYear((prev) => Math.max(2000, prev - 1))}
               disabled={focusYear <= 2000}
-              className="p-1.5 rounded-lg hover:bg-white text-[#1d1d1f] disabled:opacity-30 transition cursor-pointer"
+              className="p-2 rounded-lg hover:bg-white text-[#1d1d1f] disabled:opacity-30 transition cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center"
+              aria-label="Previous Year"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
@@ -376,14 +372,17 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
             <div className="text-center">
               <div className="text-xl font-bold text-[#1d1d1f] num">{focusYear}</div>
               <p className="text-[11px] text-[#86868b]">
-                {focusYear >= 2012 ? 'Era Sensor Ganda (MODIS + VIIRS)' : 'Era Sensor Tunggal (MODIS 1km)'}
+                {focusYear >= 2012
+                  ? (language === 'id' ? 'Era Sensor Ganda (MODIS + VIIRS)' : 'Dual Sensor Era (MODIS + VIIRS)')
+                  : (language === 'id' ? 'Era Sensor Tunggal (MODIS 1km)' : 'Single Sensor Era (MODIS 1km)')}
               </p>
             </div>
 
             <button
               onClick={() => setFocusYear((prev) => Math.min(2026, prev + 1))}
               disabled={focusYear >= 2026}
-              className="p-1.5 rounded-lg hover:bg-white text-[#1d1d1f] disabled:opacity-30 transition cursor-pointer"
+              className="p-2 rounded-lg hover:bg-white text-[#1d1d1f] disabled:opacity-30 transition cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center"
+              aria-label="Next Year"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
@@ -392,9 +391,6 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
           {/* 12-Month Responsive Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {monthlyDataForFocusYear.map((m) => {
-              const hasExtreme = m.maxIndex > 50;
-              const hasModerate = m.maxIndex > 20;
-
               return (
                 <div
                   key={m.monthIndex}
@@ -408,7 +404,7 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
                     <span className="font-bold text-sm text-[#1d1d1f]">{m.monthName}</span>
                     {m.isPeakDry && (
                       <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider bg-red-100 px-1.5 py-0.5 rounded">
-                        Puncak Kering
+                        {language === 'id' ? 'Puncak Kering' : 'Peak Dry'}
                       </span>
                     )}
                   </div>
@@ -428,7 +424,7 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
                           className={`h-6 rounded-md transition-transform hover:scale-105 cursor-pointer ${getCellColor(
                             w
                           )} ${isSelected ? 'ring-2 ring-[#1d1d1f]' : ''}`}
-                          title={`W${w.week}: Indeks ${w.burningActivityIndex}`}
+                          title={`${t.weekLabel} ${w.week}: ${t.baiScore} ${w.burningActivityIndex}`}
                         />
                       );
                     })}
@@ -436,12 +432,12 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
 
                   <div className="text-[11px] text-[#6e6e73] space-y-0.5 pt-2 border-t border-[#e5e5e7]">
                     <div className="flex justify-between">
-                      <span>Daya Panas (FRP):</span>
+                      <span>{language === 'id' ? 'Daya Panas (FRP):' : 'Thermal (FRP):'}</span>
                       <strong className="text-[#1d1d1f] num">{m.totalFRP} MW</strong>
                     </div>
                     <div className="flex justify-between">
-                      <span>Klaster Gambut:</span>
-                      <strong className="text-[#1d1d1f] num">{m.harmonizedCount} klaster</strong>
+                      <span>{language === 'id' ? 'Klaster Gambut:' : 'Peat Clusters:'}</span>
+                      <strong className="text-[#1d1d1f] num">{m.harmonizedCount}</strong>
                     </div>
                   </div>
                 </div>
@@ -462,22 +458,22 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
                 </span>
                 {activeInspection.isUnusualCondition && (
                   <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded-md">
-                    Lonjakan Anomali (+{activeInspection.zScore.toFixed(1)}σ)
+                    {language === 'id' ? `Lonjakan Anomali (+${activeInspection.zScore.toFixed(1)}σ)` : `Anomaly Spike (+${activeInspection.zScore.toFixed(1)}σ)`}
                   </span>
                 )}
                 {activeInspection.isCriticalPeriod && !activeInspection.isUnusualCondition && (
                   <span className="text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-md">
-                    Periode Rawan Kering
+                    {language === 'id' ? 'Periode Rawan Kering' : 'Critical Dry Window'}
                   </span>
                 )}
               </div>
 
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[#6e6e73] text-xs">
-                <span>Indeks Harmonisasi: <strong className="text-[#1d1d1f] num text-sm">{activeInspection.burningActivityIndex} / 100</strong></span>
+                <span>{language === 'id' ? 'Indeks Harmonisasi:' : 'Harmonized Index:'} <strong className="text-[#1d1d1f] num text-sm">{activeInspection.burningActivityIndex} / 100</strong></span>
                 <span>&bull;</span>
-                <span>Daya Panas Termal: <strong className="text-[#1d1d1f] num text-sm">{activeInspection.totalFrpCalibrated} MW</strong></span>
+                <span>{language === 'id' ? 'Daya Panas Termal:' : 'Thermal FRP:'} <strong className="text-[#1d1d1f] num text-sm">{activeInspection.totalFrpCalibrated} MW</strong></span>
                 <span>&bull;</span>
-                <span>Klaster 5.5 km: <strong className="text-[#1d1d1f] num text-sm">{activeInspection.harmonizedClusterCount}</strong></span>
+                <span>{language === 'id' ? 'Klaster 5.5 km:' : '5.5 km Clusters:'} <strong className="text-[#1d1d1f] num text-sm">{activeInspection.harmonizedClusterCount}</strong></span>
               </div>
             </div>
 
@@ -492,7 +488,7 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
                 <span className="font-bold text-[#1d1d1f] num text-xs sm:text-sm">{activeInspection.rawViirsCount}</span>
               </div>
               <div className="bg-white p-2 rounded-xl border border-[#e5e5e7] text-center min-w-[70px]">
-                <span className="text-[10px] block text-[#86868b]">Total Deteksi</span>
+                <span className="text-[10px] block text-[#86868b]">{language === 'id' ? 'Total Deteksi' : 'Total Raw'}</span>
                 <span className="font-bold text-[#1d1d1f] num text-xs sm:text-sm">{activeInspection.rawTotalCount}</span>
               </div>
             </div>
@@ -500,34 +496,36 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
         ) : (
           <div className="flex items-center gap-2 text-[#86868b] text-xs py-1">
             <Info className="w-4 h-4 text-[#0071e3] shrink-0" />
-            <span>{t.selectPrompt} atau klik salah satu sel kalender di atas untuk memeriksa data mingguan.</span>
+            <span>{t.selectPrompt}</span>
           </div>
         )}
       </div>
 
       {/* Heat Scale Legend */}
       <div className="flex flex-wrap items-center justify-between gap-3 pt-2 text-[11px] text-[#86868b]">
-        <span className="font-medium text-[#1d1d1f]">Skala Intensitas Kebakaran & Emisi:</span>
+        <span className="font-medium text-[#1d1d1f]">
+          {language === 'id' ? 'Skala Intensitas Kebakaran & Emisi:' : 'Fire & Emission Intensity Scale:'}
+        </span>
         <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center gap-1.5">
             <span className="w-3.5 h-3.5 rounded-[2px] bg-[#f2f2f7] border border-[#e5e5ea]" />
-            <span>Aman (0)</span>
+            <span>{t.zero} (0)</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-3.5 h-3.5 rounded-[2px] bg-[#fef08a] border border-[#fde047]" />
-            <span>Rendah (1–15)</span>
+            <span>{t.low} (1–15)</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-3.5 h-3.5 rounded-[2px] bg-[#fed7aa] border border-[#fdba74]" />
-            <span>Sedang (15–35)</span>
+            <span>{t.moderate} (15–35)</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-3.5 h-3.5 rounded-[2px] bg-[#fb923c] border border-[#f97316]" />
-            <span>Tinggi (35–65)</span>
+            <span>{t.high} (35–65)</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-3.5 h-3.5 rounded-[2px] bg-[#dc2626] border border-[#b91c1c]" />
-            <span>Ekstrem (&gt;65)</span>
+            <span>{t.severe} (&gt;65)</span>
           </div>
         </div>
       </div>
