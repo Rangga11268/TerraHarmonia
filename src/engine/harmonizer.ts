@@ -41,10 +41,20 @@ export interface AOIRegion {
 }
 
 /**
- * Indonesia-only AOIs focused on major peatland and fire-prone regions.
- * Coordinates validated against NASA FIRMS historical fire maps.
+ * Indonesia AOIs: National Overview + 5 Major Peatland & Fire-Prone Provinces.
+ * Coordinates verified against NASA FIRMS satellite archives.
  */
 export const PRESET_AOIS: AOIRegion[] = [
+  {
+    id: 'indonesia',
+    name: 'Seluruh Indonesia (National Peatlands & Forests)',
+    country: 'Indonesia',
+    bbox: [-11.0, 95.0, 6.0, 141.0],
+    center: [-2.2, 115.5],
+    zoom: 5,
+    description: 'Pemantauan komposit nasional mencakup seluruh ekosistem gambut dan hutan rawan kebakaran di Sumatera, Kalimantan, Papua, dan Sulawesi.',
+    biome: 'National Peatland & Forest Ecosystems (14.9 Mha)'
+  },
   {
     id: 'riau',
     name: 'Riau & Sumatra Peatlands',
@@ -52,178 +62,199 @@ export const PRESET_AOIS: AOIRegion[] = [
     bbox: [-0.8, 100.5, 2.1, 103.2],
     center: [0.6, 101.8],
     zoom: 8,
-    description: 'High peatland vulnerability zone prone to intense smoldering fires and transboundary haze.',
+    description: 'Zona kerentanan gambut dalam (Semenanjung Kampar, Siak, Pelalawan) rawan kebakaran bawah tanah dan kabut asap lintas batas.',
     biome: 'Tropical Peat Swamp Forest'
   },
   {
     id: 'kalteng',
-    name: 'Central Kalimantan',
+    name: 'Kalimantan Tengah (Ex-PLG Mega Rice)',
     country: 'Indonesia',
     bbox: [-3.5, 111.0, -0.5, 115.0],
     center: [-2.0, 113.0],
     zoom: 7,
-    description: 'Mega Rice Project legacy area with recurrent severe dry-season underground peat fires.',
+    description: 'Wilayah eks-Proyek Lahan Gambut (PLG) 1 Juta Hektar dan TN Sebangau dengan frekuensi kebakaran gambut berulang tertinggi di dunia.',
     biome: 'Degraded Peat & Tropical Forest'
   },
   {
-    id: 'kalsel',
-    name: 'South Kalimantan',
-    country: 'Indonesia',
-    bbox: [-4.2, 114.5, -1.8, 116.8],
-    center: [-3.0, 115.5],
-    zoom: 8,
-    description: 'Lowland peat and dryland forest area subject to recurrent dry-season fires.',
-    biome: 'Lowland Dipterocarp & Peat Forest'
-  },
-  {
     id: 'sumsel',
-    name: 'South Sumatra (OKI & Musi)',
+    name: 'Sumatera Selatan (OKI & Musi Banyuasin)',
     country: 'Indonesia',
     bbox: [-4.5, 104.0, -2.0, 107.5],
     center: [-3.2, 105.8],
     zoom: 8,
-    description: 'Ogan Komering Ilir and Musi Banyuasin peatlands — among the highest fire-frequency zones in Southeast Asia.',
+    description: 'Kubah gambut Ogan Komering Ilir (OKI) dan Musi Banyuasin dengan titik api intensitas tinggi saat anomali El Niño.',
     biome: 'Tropical Peat Swamp Forest'
   },
   {
+    id: 'kalsel',
+    name: 'Kalimantan Selatan (Banjar & Barito)',
+    country: 'Indonesia',
+    bbox: [-4.2, 114.5, -1.8, 116.8],
+    center: [-3.0, 115.5],
+    zoom: 8,
+    description: 'Kawasan gambut dataran rendah dan hutan sekunder rentan kebakaran musim kemarau di koridor Banjar dan Barito Kuala.',
+    biome: 'Lowland Dipterocarp & Peat Forest'
+  },
+  {
     id: 'kaltim',
-    name: 'East Kalimantan',
+    name: 'Kalimantan Timur (Hutan Kering & Transisi)',
     country: 'Indonesia',
     bbox: [-2.5, 115.0, 1.5, 118.5],
     center: [-0.5, 116.8],
     zoom: 7,
-    description: 'Dryland tropical forest with drought-driven fire outbreaks linked to ENSO events.',
+    description: 'Hutan tropis daratan kering dengan lonjakan kebakaran tajam dipicu kemarau panjang El Niño (Kutai dan Berau).',
     biome: 'Mixed Dipterocarp Forest'
   },
 ];
 
 /**
- * Grid resolution for spatial binning (~0.05 degrees ~ 5.5 km)
+ * ISO 8601 Week Number Calculator
  */
-const SPATIAL_BIN_SIZE = 0.05;
+export function getWeekNumber(d: Date): [number, number] {
+  const target = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const dayNr = (target.getUTCDay() + 6) % 7;
+  target.setUTCDate(target.getUTCDate() - dayNr + 3);
+  const firstThursday = target.getTime();
+  target.setUTCMonth(0, 1);
+  if (target.getUTCDay() !== 4) {
+    target.setUTCMonth(0, 1 + ((4 - target.getUTCDay()) + 7) % 7);
+  }
+  const week = 1 + Math.ceil((firstThursday - target.getTime()) / 604800000);
+  return [target.getUTCFullYear(), Math.min(52, Math.max(1, week))];
+}
 
 /**
- * Cross-sensor calibration weights derived from NASA FIRMS inter-sensor validation
+ * Spatial Grid Resolution: 0.05 degrees (~5.5 km at equator).
  */
-const SENSOR_CALIBRATION = {
+const GRID_SIZE_DEG = 0.05;
+
+function getSpatialGridKey(lat: number, lon: number): string {
+  const latBin = Math.floor(lat / GRID_SIZE_DEG);
+  const lonBin = Math.floor(lon / GRID_SIZE_DEG);
+  return `${latBin}_${lonBin}`;
+}
+
+/**
+ * Cross-Sensor Calibration Weights for FRP.
+ */
+const SENSOR_FRP_CALIBRATION: Record<'MODIS' | 'VIIRS', number> = {
   MODIS: 1.04,
   VIIRS: 0.88,
 };
 
-/**
- * Harmonizes raw satellite active fire records into equal-area clusters and calibrated metrics
- */
-export function harmonizeHotspots(rawHotspots: RawHotspot[]): {
+export interface HarmonizationOutput {
   calendarMatrix: Record<string, HarmonizedWeekData>;
   yearlyAverages: Record<number, { raw: number; harmonized: number; frp: number }>;
   weeklyBaselines: Record<number, { mean: number; stdDev: number; isCritical: boolean }>;
-} {
-  // 1. Group raw hotspots by Year and Week
-  const weekBuckets: Record<string, RawHotspot[]> = {};
+}
 
-  for (const h of rawHotspots) {
-    const date = new Date(h.date);
-    const year = date.getUTCFullYear();
-    const dayOfYear = Math.floor((date.getTime() - new Date(Date.UTC(year, 0, 0)).getTime()) / 86400000);
-    const week = Math.min(52, Math.ceil(dayOfYear / 7));
-    const key = `${year}-${week}`;
-    if (!weekBuckets[key]) weekBuckets[key] = [];
-    weekBuckets[key].push(h);
-  }
+export function harmonizeHotspots(rawHotspots: RawHotspot[]): HarmonizationOutput {
+  const weeklyBuckets: Record<string, RawHotspot[]> = {};
 
-  // 2. For each bucket, compute harmonized metrics
-  const calendarMatrix: Record<string, HarmonizedWeekData> = {};
-
-  for (const [key, spots] of Object.entries(weekBuckets)) {
-    const [yearStr, weekStr] = key.split('-');
-    const year = parseInt(yearStr, 10);
-    const week = parseInt(weekStr, 10);
-    const month = Math.min(12, Math.ceil(week / 4.33));
-
-    const modisSpots = spots.filter((s) => s.instrument === 'MODIS');
-    const viirsSpots = spots.filter((s) => s.instrument === 'VIIRS');
-
-    // Spatial binning: deduplicate within 5.5 km grid
-    const bins = new Set<string>();
-    for (const s of spots) {
-      const binLat = Math.floor(s.lat / SPATIAL_BIN_SIZE);
-      const binLon = Math.floor(s.lon / SPATIAL_BIN_SIZE);
-      bins.add(`${binLat}:${binLon}`);
+  for (let y = 2000; y <= 2026; y++) {
+    for (let w = 1; w <= 52; w++) {
+      weeklyBuckets[`${y}-${w}`] = [];
     }
-
-    const rawFrpSum = spots.reduce((acc, s) => acc + s.frp, 0);
-    const calibratedFrpSum =
-      modisSpots.reduce((acc, s) => acc + s.frp * SENSOR_CALIBRATION.MODIS, 0) +
-      viirsSpots.reduce((acc, s) => acc + s.frp * SENSOR_CALIBRATION.VIIRS, 0);
-
-    const harmonizedCount = bins.size;
-    const normalizedIndex = Math.min(
-      100,
-      Math.round((harmonizedCount / 20) * 40 + (calibratedFrpSum / 2000) * 60)
-    );
-
-    const dominantSensor: 'MODIS' | 'VIIRS' | 'Blended' =
-      modisSpots.length === 0 ? 'VIIRS'
-      : viirsSpots.length === 0 ? 'MODIS'
-      : 'Blended';
-
-    calendarMatrix[key] = {
-      year,
-      week,
-      month,
-      rawModisCount: modisSpots.length,
-      rawViirsCount: viirsSpots.length,
-      rawTotalCount: spots.length,
-      harmonizedClusterCount: harmonizedCount,
-      totalFrpRaw: Math.round(rawFrpSum),
-      totalFrpCalibrated: Math.round(calibratedFrpSum),
-      burningActivityIndex: normalizedIndex,
-      zScore: 0, // computed below
-      isCriticalPeriod: false, // computed below
-      isUnusualCondition: false, // computed below
-      dominantSensor,
-    };
   }
 
-  // 3. Compute weekly baselines (mean / stdDev per calendar week, across years)
-  const weeklyGroups: Record<number, number[]> = {};
-  for (const data of Object.values(calendarMatrix)) {
-    if (!weeklyGroups[data.week]) weeklyGroups[data.week] = [];
-    weeklyGroups[data.week].push(data.burningActivityIndex);
+  for (const spot of rawHotspots) {
+    const d = new Date(spot.date);
+    if (isNaN(d.getTime())) continue;
+    const [year, week] = getWeekNumber(d);
+    if (year >= 2000 && year <= 2026 && week >= 1 && week <= 52) {
+      const key = `${year}-${week}`;
+      if (!weeklyBuckets[key]) weeklyBuckets[key] = [];
+      weeklyBuckets[key].push(spot);
+    }
+  }
+
+  const calendarMatrix: Record<string, HarmonizedWeekData> = {};
+  const yearlyAverages: Record<number, { raw: number; harmonized: number; frp: number }> = {};
+  const weekHistory: Record<number, number[]> = {};
+
+  for (let w = 1; w <= 52; w++) weekHistory[w] = [];
+
+  for (let year = 2000; year <= 2026; year++) {
+    yearlyAverages[year] = { raw: 0, harmonized: 0, frp: 0 };
+
+    for (let week = 1; week <= 52; week++) {
+      const key = `${year}-${week}`;
+      const spots = weeklyBuckets[key] || [];
+
+      let rawModis = 0;
+      let rawViirs = 0;
+      let totalFrpRaw = 0;
+      let totalFrpCalibrated = 0;
+
+      const activeSpatialGrids = new Set<string>();
+
+      for (const spot of spots) {
+        if (spot.instrument === 'MODIS') rawModis++;
+        else rawViirs++;
+
+        totalFrpRaw += spot.frp;
+        const weight = SENSOR_FRP_CALIBRATION[spot.instrument] || 1.0;
+        totalFrpCalibrated += spot.frp * weight;
+
+        activeSpatialGrids.add(getSpatialGridKey(spot.lat, spot.lon));
+      }
+
+      const rawTotal = rawModis + rawViirs;
+      const harmonizedClusterCount = activeSpatialGrids.size;
+
+      const spatialComponent = Math.min(60, harmonizedClusterCount * 1.85);
+      const energyComponent = Math.min(40, (totalFrpCalibrated / 1500) * 40);
+      const burningActivityIndex = Math.min(100, Math.round(spatialComponent + energyComponent));
+
+      let dominantSensor: 'MODIS' | 'VIIRS' | 'Blended' = 'MODIS';
+      if (rawModis > 0 && rawViirs > 0) dominantSensor = 'Blended';
+      else if (rawViirs > 0) dominantSensor = 'VIIRS';
+
+      const month = Math.min(12, Math.max(1, Math.floor((week - 1) / 4.33) + 1));
+
+      calendarMatrix[key] = {
+        year,
+        week,
+        month,
+        rawModisCount: rawModis,
+        rawViirsCount: rawViirs,
+        rawTotalCount: rawTotal,
+        harmonizedClusterCount,
+        totalFrpRaw: Math.round(totalFrpRaw),
+        totalFrpCalibrated: Math.round(totalFrpCalibrated),
+        burningActivityIndex,
+        zScore: 0,
+        isCriticalPeriod: false,
+        isUnusualCondition: false,
+        dominantSensor,
+      };
+
+      weekHistory[week].push(burningActivityIndex);
+      yearlyAverages[year].raw += rawTotal;
+      yearlyAverages[year].harmonized += harmonizedClusterCount;
+      yearlyAverages[year].frp += totalFrpCalibrated;
+    }
   }
 
   const weeklyBaselines: Record<number, { mean: number; stdDev: number; isCritical: boolean }> = {};
-  for (const [wk, vals] of Object.entries(weeklyGroups)) {
-    const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
-    const variance = vals.reduce((acc, v) => acc + Math.pow(v - mean, 2), 0) / vals.length;
-    const stdDev = Math.sqrt(variance);
-    weeklyBaselines[parseInt(wk, 10)] = { mean, stdDev, isCritical: mean > 12 };
+
+  for (let w = 1; w <= 52; w++) {
+    const scores = weekHistory[w];
+    const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
+    const variance = scores.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / scores.length;
+    const stdDev = Math.sqrt(variance) || 1.0;
+
+    const isCritical = mean > 20 || (w >= 30 && w <= 42);
+    weeklyBaselines[w] = { mean, stdDev, isCritical };
   }
 
-  // 4. Assign z-scores and anomaly flags
   for (const data of Object.values(calendarMatrix)) {
     const baseline = weeklyBaselines[data.week];
-    if (baseline && baseline.stdDev > 0) {
-      data.zScore = parseFloat(((data.burningActivityIndex - baseline.mean) / baseline.stdDev).toFixed(2));
-      data.isUnusualCondition = data.zScore > 2.0;
+    if (baseline) {
+      data.zScore = (data.burningActivityIndex - baseline.mean) / baseline.stdDev;
+      data.isCriticalPeriod = baseline.isCritical;
+      data.isUnusualCondition = data.zScore >= 2.0 && data.burningActivityIndex > 25;
     }
-    data.isCriticalPeriod = weeklyBaselines[data.week]?.isCritical ?? false;
-  }
-
-  // 5. Yearly averages
-  const yearlyGroups: Record<number, HarmonizedWeekData[]> = {};
-  for (const data of Object.values(calendarMatrix)) {
-    if (!yearlyGroups[data.year]) yearlyGroups[data.year] = [];
-    yearlyGroups[data.year].push(data);
-  }
-
-  const yearlyAverages: Record<number, { raw: number; harmonized: number; frp: number }> = {};
-  for (const [yr, weeks] of Object.entries(yearlyGroups)) {
-    yearlyAverages[parseInt(yr, 10)] = {
-      raw: Math.round(weeks.reduce((acc, w) => acc + w.rawTotalCount, 0) / weeks.length),
-      harmonized: Math.round(weeks.reduce((acc, w) => acc + w.harmonizedClusterCount, 0) / weeks.length),
-      frp: Math.round(weeks.reduce((acc, w) => acc + w.totalFrpCalibrated, 0) / weeks.length),
-    };
   }
 
   return { calendarMatrix, yearlyAverages, weeklyBaselines };
