@@ -1,44 +1,51 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
   <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0f172a" />
-      <stop offset="100%" stop-color="#020617" />
-    </linearGradient>
-    <linearGradient id="orbitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <!-- Earth Gradient (Vibrant Cyan / Turquoise) -->
+    <linearGradient id="earthGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#38bdf8" />
       <stop offset="50%" stop-color="#0284c7" />
-      <stop offset="100%" stop-color="#0369a1" />
+      <stop offset="100%" stop-color="#0f766e" />
     </linearGradient>
-    <linearGradient id="fireGrad" x1="0%" y1="100%" x2="0%" y2="0%">
-      <stop offset="0%" stop-color="#ef4444" />
-      <stop offset="60%" stop-color="#f97316" />
-      <stop offset="100%" stop-color="#fde047" />
+
+    <!-- Flame Gradient (Warm Gold, Vivid Orange, Vermilion) -->
+    <linearGradient id="flameGrad" x1="20%" y1="100%" x2="80%" y2="0%">
+      <stop offset="0%" stop-color="#dc2626" />
+      <stop offset="45%" stop-color="#ea580c" />
+      <stop offset="80%" stop-color="#f97316" />
+      <stop offset="100%" stop-color="#fbbf24" />
     </linearGradient>
-    <linearGradient id="earthGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#34d399" />
-      <stop offset="100%" stop-color="#059669" />
+
+    <!-- Orbit Ring Color -->
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#94a3b8" />
+      <stop offset="100%" stop-color="#cbd5e1" />
     </linearGradient>
   </defs>
 
-  <!-- Squircle Base -->
-  <rect width="64" height="64" rx="14" fill="url(#bgGrad)" />
-  <rect width="62" height="62" x="1" y="1" rx="13" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-opacity="0.3" />
+  <!-- Clean Light Squircle Container -->
+  <rect width="64" height="64" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
 
-  <!-- Earth Peatland Curve (Bottom Left) -->
-  <path d="M 6 46 A 28 28 0 0 1 48 58 L 6 58 Z" fill="url(#earthGrad)" />
+  <!-- Orbit Rings Background -->
+  <circle cx="32" cy="30" r="23" fill="none" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 3" />
+  <circle cx="32" cy="30" r="19" fill="none" stroke="#cbd5e1" stroke-width="1.2" />
 
-  <!-- Dual Satellite Orbital Ring (Harmonization Path) -->
-  <ellipse cx="32" cy="32" rx="23" ry="9" fill="none" stroke="url(#orbitGrad)" stroke-width="2.5" transform="rotate(-30 32 32)" stroke-dasharray="72 8" />
+  <!-- Orbit nodes -->
+  <circle cx="16" cy="18" r="1.8" fill="#38bdf8" />
+  <circle cx="48" cy="42" r="1.8" fill="#f97316" />
 
-  <!-- Satellite Node 1 (MODIS - Terra/Aqua) -->
-  <circle cx="14" cy="22" r="3.5" fill="#38bdf8" stroke="#ffffff" stroke-width="1" />
-
-  <!-- Satellite Node 2 (VIIRS - Suomi NPP) -->
-  <circle cx="50" cy="42" r="3" fill="#f59e0b" stroke="#ffffff" stroke-width="1" />
-
-  <!-- Central Thermal Energy Flame & Peat Core -->
-  <path d="M 32 14 C 36 22 41 27 41 34 C 41 40 37 45 32 45 C 27 45 23 40 23 34 C 23 27 28 22 32 14 Z" fill="url(#fireGrad)" />
+  <!-- Left: Crescent Earth Globe (Blue / Turquoise) -->
+  <path d="M 32 11 A 19 19 0 0 0 32 49 C 39 49 46 41 46 33 C 41 43 27 41 23 33 C 20 27 25 17 32 11 Z" fill="url(#earthGrad)" />
   
-  <!-- Inner Flame Hearth -->
-  <path d="M 32 26 C 34.5 30 36.5 33 36.5 36.5 C 36.5 39.5 34.5 42 32 42 C 29.5 42 27.5 39.5 27.5 36.5 C 27.5 33 29.5 30 32 26 Z" fill="#fef08a" />
+  <!-- Earth Continents Texture -->
+  <path d="M 23 20 C 26 19 28 22 26 25 C 23 26 21 23 23 20 Z" fill="#ffffff" fill-opacity="0.6" />
+  <path d="M 20 28 C 22 27 24 30 22 34 C 19 33 19 29 20 28 Z" fill="#ffffff" fill-opacity="0.5" />
+
+  <!-- Center-Right: Vivid Thermal Flame -->
+  <path d="M 33 11 C 36 19 44 23 44 32 C 44 41 37 46 30 46 C 37 44 41 38 39 31 C 37 26 33 22 33 11 Z" fill="url(#flameGrad)" />
+  
+  <!-- Main Inner Flame Heart -->
+  <path d="M 35 18 C 39 24 45 28 45 35 C 45 42 39 47 33 47 C 27 47 24 41 27 35 C 29 30 35 25 35 18 Z" fill="url(#flameGrad)" />
+
+  <!-- Flame Core Highlight -->
+  <path d="M 35 27 C 37 31 40 34 40 38 C 40 42 37 44 34 44 C 31 44 30 41 31 38 C 32 35 35 32 35 27 Z" fill="#fef08a" />
 </svg>
