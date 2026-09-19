@@ -10,12 +10,10 @@ import { RiskForecast } from './components/RiskForecast';
 import { HarmonizationLab } from './components/HarmonizationLab';
 import { MitigationHub } from './components/MitigationHub';
 import { DataHub } from './components/DataHub';
-import { TeamModal } from './components/TeamModal';
 import { TeamPage } from './components/TeamPage';
 import { NasaApiKeyModal } from './components/NasaApiKeyModal';
 import { DualMapComparison } from './components/DualMapComparison';
-import { ExecutiveReportModal } from './components/ExecutiveReportModal';
-import { PolygonInspectorModal } from './components/PolygonInspectorModal';
+import { PolygonInspector } from './components/PolygonInspector';
 import { PRESET_AOIS, AOIRegion, RawHotspot, HarmonizedWeekData, harmonizeHotspots } from './engine/harmonizer';
 import { generateHistoricalFireData } from './data/generator';
 import { fetchLiveNASAHotspots, LiveSyncResult } from './services/nasaFirmsApi';
@@ -29,11 +27,7 @@ export function App() {
   const [rawMode, setRawMode] = useState<boolean>(false);
   const [selectedKey, setSelectedKey] = useState<string | null>('2015-38');
   const [selectedWeekData, setSelectedWeekData] = useState<HarmonizedWeekData | null>(null);
-  const [isTeamModalOpen, setIsTeamModalOpen] = useState<boolean>(false);
   const [isNasaModalOpen, setIsNasaModalOpen] = useState<boolean>(false);
-  const [isDualMapOpen, setIsDualMapOpen] = useState<boolean>(false);
-  const [isExecutiveReportOpen, setIsExecutiveReportOpen] = useState<boolean>(false);
-  const [isPolygonInspectorOpen, setIsPolygonInspectorOpen] = useState<boolean>(false);
 
   const [isLiveSync, setIsLiveSync] = useState<boolean>(false);
   const [isLoadingLive, setIsLoadingLive] = useState<boolean>(false);
@@ -102,6 +96,35 @@ export function App() {
   const peakYear = highestYear ? highestYear[0] : '2015';
   const peakFRP = highestYear ? Math.round(highestYear[1].frp).toLocaleString() : '0';
 
+  const handleScrollToDualMap = () => {
+    if (activeTab !== 'overview') {
+      setActiveTab('overview');
+      setTimeout(() => {
+        document.getElementById('dual-map-section')?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      document.getElementById('dual-map-section')?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleScrollToPolygon = () => {
+    if (activeTab !== 'overview') {
+      setActiveTab('overview');
+      setTimeout(() => {
+        document.getElementById('polygon-inspector-section')?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      document.getElementById('polygon-inspector-section')?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleNavigateToSitRep = () => {
+    setActiveTab('mitigation');
+    setTimeout(() => {
+      document.getElementById('executive-report-section')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
+
   return (
     <div className="min-h-screen bg-[#f5f5f7] text-[#1d1d1f] flex flex-col font-sans">
       
@@ -137,9 +160,9 @@ export function App() {
               onToggleLiveSync={handleToggleLiveSync}
               isLoadingLive={isLoadingLive}
               onOpenApiKeyModal={() => setIsNasaModalOpen(true)}
-              onOpenDualMap={() => setIsDualMapOpen(true)}
-              onOpenExecutiveReport={() => setIsExecutiveReportOpen(true)}
-              onOpenPolygonInspector={() => setIsPolygonInspectorOpen(true)}
+              onOpenDualMap={handleScrollToDualMap}
+              onOpenExecutiveReport={handleNavigateToSitRep}
+              onOpenPolygonInspector={handleScrollToPolygon}
               totalHotspots={totalEvents}
               anomalyCount={anomalyCount}
             />
@@ -160,7 +183,7 @@ export function App() {
                 <button
                   onClick={() => loadLiveFeed(selectedAOI, userMapKey)}
                   disabled={isLoadingLive}
-                  className="p-1.5 text-[#0071e3] hover:underline transition-colors flex items-center gap-1 font-medium"
+                  className="p-1.5 text-[#0071e3] hover:underline transition-colors flex items-center gap-1 font-medium cursor-pointer"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${isLoadingLive ? 'animate-spin' : ''}`} />
                   <span>{language === 'id' ? 'Segarkan' : 'Refresh'}</span>
@@ -229,7 +252,7 @@ export function App() {
               />
             </section>
 
-            {/* Geospatial & Prognosis Section (Balanced Proportions) */}
+            {/* Geospatial & Prognosis Section */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               
               {/* Map Viewer */}
@@ -266,6 +289,24 @@ export function App() {
               </div>
             </div>
 
+            {/* Embedded Native Feature 1: Dual Map Side-by-Side Comparison */}
+            <section id="dual-map-section">
+              <DualMapComparison
+                language={language}
+                selectedAOI={selectedAOI}
+                allHotspots={displayedHotspots}
+              />
+            </section>
+
+            {/* Embedded Native Feature 2: Custom Polygon & Concession Area Inspector */}
+            <section id="polygon-inspector-section">
+              <PolygonInspector
+                language={language}
+                selectedAOI={selectedAOI}
+                allHotspots={displayedHotspots}
+              />
+            </section>
+
             {/* Scientific Visual Analytics & Charts Suite */}
             <section>
               <VisualAnalytics
@@ -294,13 +335,15 @@ export function App() {
           </div>
         )}
 
-        {/* Tab 3: Mitigation Hub */}
+        {/* Tab 3: Mitigation Hub & Executive SitRep */}
         {activeTab === 'mitigation' && (
           <div className="animate-in fade-in duration-200">
             <MitigationHub
               language={language}
               selectedAOI={selectedAOI}
               onSelectAOI={setSelectedAOI}
+              calendarMatrix={calendarMatrix}
+              totalHotspots={totalEvents}
             />
           </div>
         )}
@@ -334,8 +377,7 @@ export function App() {
         <p>{t.footerCourtesy}</p>
       </footer>
 
-      {/* Modals */}
-      <TeamModal language={language} isOpen={isTeamModalOpen} onClose={() => setIsTeamModalOpen(false)} />
+      {/* Only Technical Configuration Modal for MAP_KEY if requested */}
       <NasaApiKeyModal
         language={language}
         isOpen={isNasaModalOpen}
@@ -351,28 +393,6 @@ export function App() {
             ? (language === 'id' ? 'Terhubung: NASA FIRMS API Resmi' : 'Connected: NASA FIRMS Authorized API')
             : undefined
         }
-      />
-      <DualMapComparison
-        language={language}
-        isOpen={isDualMapOpen}
-        onClose={() => setIsDualMapOpen(false)}
-        selectedAOI={selectedAOI}
-        allHotspots={displayedHotspots}
-      />
-      <ExecutiveReportModal
-        language={language}
-        isOpen={isExecutiveReportOpen}
-        onClose={() => setIsExecutiveReportOpen(false)}
-        selectedAOI={selectedAOI}
-        calendarMatrix={calendarMatrix}
-        totalHotspots={totalEvents}
-      />
-      <PolygonInspectorModal
-        language={language}
-        isOpen={isPolygonInspectorOpen}
-        onClose={() => setIsPolygonInspectorOpen(false)}
-        selectedAOI={selectedAOI}
-        allHotspots={displayedHotspots}
       />
     </div>
   );

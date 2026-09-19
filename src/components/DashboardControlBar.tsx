@@ -161,12 +161,12 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
           <span className="hidden sm:inline text-[#86868b]">{selectedAOI.description}</span>
         </div>
 
-        {/* Right: Analytical Tools Launcher */}
+        {/* Right: Analytical Tools Quick Navigation */}
         <div className="flex items-center gap-2 flex-wrap">
           {onOpenDualMap && (
             <button
               onClick={onOpenDualMap}
-              className="px-2.5 py-1 rounded-lg border border-[#e5e5e7] bg-white hover:border-[#1d1d1f] text-[#1d1d1f] font-medium transition flex items-center gap-1.5 text-xs"
+              className="px-2.5 py-1 rounded-lg border border-[#e5e5e7] bg-white hover:border-[#1d1d1f] text-[#1d1d1f] font-medium transition flex items-center gap-1.5 text-xs cursor-pointer"
             >
               <Split className="w-3.5 h-3.5 text-[#6e6e73]" />
               <span>{language === 'id' ? 'Komparasi 2 Tahun' : 'Dual Map Comparison'}</span>
@@ -176,7 +176,7 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
           {onOpenPolygonInspector && (
             <button
               onClick={onOpenPolygonInspector}
-              className="px-2.5 py-1 rounded-lg border border-[#e5e5e7] bg-white hover:border-[#1d1d1f] text-[#1d1d1f] font-medium transition flex items-center gap-1.5 text-xs"
+              className="px-2.5 py-1 rounded-lg border border-[#e5e5e7] bg-white hover:border-[#1d1d1f] text-[#1d1d1f] font-medium transition flex items-center gap-1.5 text-xs cursor-pointer"
             >
               <MapPin className="w-3.5 h-3.5 text-[#6e6e73]" />
               <span>{language === 'id' ? 'Inspektur Poligon' : 'Polygon Inspector'}</span>
@@ -186,7 +186,7 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
           {onOpenExecutiveReport && (
             <button
               onClick={onOpenExecutiveReport}
-              className="px-2.5 py-1 rounded-lg border border-[#e5e5e7] bg-white hover:border-[#1d1d1f] text-[#1d1d1f] font-medium transition flex items-center gap-1.5 text-xs"
+              className="px-2.5 py-1 rounded-lg border border-[#e5e5e7] bg-white hover:border-[#1d1d1f] text-[#1d1d1f] font-medium transition flex items-center gap-1.5 text-xs cursor-pointer"
             >
               <FileText className="w-3.5 h-3.5 text-[#6e6e73]" />
               <span>{language === 'id' ? 'Dossier SitRep A4' : 'Executive SitRep'}</span>

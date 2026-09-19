@@ -3,17 +3,23 @@ import { Download, FileText } from 'lucide-react';
 import { PRESET_AOIS, AOIRegion } from '../engine/harmonizer';
 import { Language } from '../data/translations';
 import { PeatlandSimulator } from './PeatlandSimulator';
+import { ExecutiveReport } from './ExecutiveReport';
+import { HarmonizedWeekData } from '../engine/harmonizer';
 
 interface MitigationHubProps {
   language: Language;
   selectedAOI: AOIRegion;
   onSelectAOI: (aoi: AOIRegion) => void;
+  calendarMatrix?: Record<string, HarmonizedWeekData>;
+  totalHotspots?: number;
 }
 
 export const MitigationHub: React.FC<MitigationHubProps> = ({
   language,
   selectedAOI,
   onSelectAOI,
+  calendarMatrix = {},
+  totalHotspots = 0,
 }) => {
   const [selectedTeamUnit, setSelectedTeamUnit] = useState<'manggala_agni' | 'mpa' | 'bpbd'>('manggala_agni');
   const [patrolDate, setPatrolDate] = useState<string>(() => new Date().toISOString().split('T')[0]);
@@ -221,6 +227,16 @@ Data acuan satelit: NASA FIRMS (MODIS/VIIRS Harmonized Grid 5.5 km)
         <PeatlandSimulator
           language={language}
           selectedAOI={selectedAOI}
+        />
+      </section>
+
+      {/* Official Executive SitRep Dossier (A4 Print-Ready) */}
+      <section id="executive-report-section" className="pt-2">
+        <ExecutiveReport
+          language={language}
+          selectedAOI={selectedAOI}
+          calendarMatrix={calendarMatrix}
+          totalHotspots={totalHotspots}
         />
       </section>
     </div>

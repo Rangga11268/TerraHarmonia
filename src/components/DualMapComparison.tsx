@@ -1,22 +1,18 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { AOIRegion, RawHotspot, PRESET_AOIS, harmonizeHotspots } from '../engine/harmonizer';
+import { AOIRegion, RawHotspot, PRESET_AOIS } from '../engine/harmonizer';
 import { Language } from '../data/translations';
-import { X, Layers, Split, Calendar, Info, RefreshCw, ZoomIn, ZoomOut } from 'lucide-react';
+import { Split, RefreshCw, Layers } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 interface DualMapComparisonProps {
   language: Language;
-  isOpen: boolean;
-  onClose: () => void;
   selectedAOI: AOIRegion;
   allHotspots: RawHotspot[];
 }
 
 export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
   language,
-  isOpen,
-  onClose,
   selectedAOI,
   allHotspots,
 }) => {
@@ -59,8 +55,6 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
 
   // Initialize Maps
   useEffect(() => {
-    if (!isOpen) return;
-
     const timer = setTimeout(() => {
       if (mapARef.current && !leafletMapA.current) {
         const mapA = L.map(mapARef.current, {
@@ -115,16 +109,18 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
 
     return () => {
       clearTimeout(timer);
-      if (leafletMapA.current) {
-        leafletMapA.current.remove();
-        leafletMapA.current = null;
-      }
-      if (leafletMapB.current) {
-        leafletMapB.current.remove();
-        leafletMapB.current = null;
-      }
     };
-  }, [isOpen, selectedAOI, isSyncMove]);
+  }, [selectedAOI, isSyncMove]);
+
+  // Re-center when AOI changes
+  useEffect(() => {
+    if (leafletMapA.current) {
+      leafletMapA.current.setView(selectedAOI.center, selectedAOI.zoom);
+    }
+    if (leafletMapB.current) {
+      leafletMapB.current.setView(selectedAOI.center, selectedAOI.zoom);
+    }
+  }, [selectedAOI]);
 
   // Update Map Markers
   useEffect(() => {
@@ -181,154 +177,142 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
     });
   }, [hotspotsB]);
 
-  if (!isOpen) return null;
-
   const years = Array.from({ length: 27 }, (_, i) => 2000 + i);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-[#f5f5f7] w-full max-w-7xl h-[92vh] rounded-2xl border border-[#e5e5e7] shadow-2xl flex flex-col overflow-hidden">
+    <div className="bg-white border border-[#e5e5e7] rounded-2xl shadow-xs overflow-hidden space-y-0 transition-all">
+      
+      {/* Section Header */}
+      <div className="px-5 py-4 border-b border-[#e5e5e7] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#fbfbfd]">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-white rounded-xl border border-[#e5e5e7] text-[#1d1d1f]">
+            <Split className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-[11px] font-bold uppercase tracking-wider text-[#86868b]">
+              {language === 'id' ? 'Komparasi Spasial Lintas Waktu' : 'Cross-Temporal Spatial Comparison'}
+            </div>
+            <h2 className="text-base sm:text-lg font-bold text-[#1d1d1f] tracking-tight">
+              {language === 'id' ? 'Komparasi Spasial Dua Tahun Berdampingan' : 'Side-by-Side Dual-Year Spatial Comparison'}
+            </h2>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsSyncMove(!isSyncMove)}
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition flex items-center gap-1.5 ${
+              isSyncMove
+                ? 'bg-[#1d1d1f] text-white border-[#1d1d1f]'
+                : 'bg-white text-[#6e6e73] border-[#e5e5e7] hover:border-[#1d1d1f]'
+            }`}
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            <span>
+              {isSyncMove
+                ? language === 'id' ? 'Sinkron Gerak Aktif' : 'Sync Move Locked'
+                : language === 'id' ? 'Sinkron Lepas' : 'Independent Move'}
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* Dual Viewport Area */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 border-b border-[#e5e5e7]">
         
-        {/* Header Bar */}
-        <div className="bg-white border-b border-[#e5e5e7] px-4 sm:px-6 py-3.5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-[#f5f5f7] rounded-xl border border-[#e5e5e7]">
-              <Split className="w-5 h-5 text-[#1d1d1f]" />
+        {/* Pane A */}
+        <div className="border-b lg:border-b-0 lg:border-r border-[#e5e5e7] flex flex-col min-h-[380px] sm:min-h-[440px]">
+          {/* Controls Bar A */}
+          <div className="bg-white px-4 py-3 border-b border-[#e5e5e7] flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-[#86868b] uppercase">Tahun A:</span>
+              <select
+                value={yearA}
+                onChange={(e) => setYearA(Number(e.target.value))}
+                className="bg-[#f5f5f7] border border-[#e5e5e7] rounded-lg px-3 py-1.5 text-xs font-bold text-[#1d1d1f] focus:outline-none focus:border-[#1d1d1f] cursor-pointer"
+              >
+                {years.map((y) => (
+                  <option key={y} value={y}>
+                    {y} {y === 2015 ? '(El Niño Super)' : y === 2019 ? '(El Niño Moderat)' : y === 2021 ? '(La Niña Basah)' : ''}
+                  </option>
+                ))}
+              </select>
             </div>
-            <div>
-              <h2 className="text-sm sm:text-base font-bold text-[#1d1d1f] tracking-tight">
-                {language === 'id' ? 'Komparasi Spasial Dua Tahun Berdampingan' : 'Side-by-Side Dual-Year Spatial Comparison'}
-              </h2>
-              <p className="text-xs text-[#86868b]">
-                {selectedAOI.name} &bull; {language === 'id' ? 'Sinkronisasi peta waktu nyata' : 'Real-time synchronized dual viewport'}
-              </p>
+
+            <div className="flex items-center gap-3 text-xs">
+              <div>
+                <span className="text-[#86868b]">Titik: </span>
+                <strong className="num text-[#1d1d1f]">{statsA.count.toLocaleString()}</strong>
+              </div>
+              <div>
+                <span className="text-[#86868b]">FRP: </span>
+                <strong className="num text-orange-600">{statsA.totalFrp.toLocaleString()} MW</strong>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setIsSyncMove(!isSyncMove)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition flex items-center gap-1.5 ${
-                isSyncMove
-                  ? 'bg-[#1d1d1f] text-white border-[#1d1d1f]'
-                  : 'bg-white text-[#6e6e73] border-[#e5e5e7] hover:border-[#1d1d1f]'
-              }`}
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">
-                {isSyncMove
-                  ? language === 'id' ? 'Sinkron Aktif' : 'Sync Locked'
-                  : language === 'id' ? 'Sinkron Lepas' : 'Sync Unlocked'}
-              </span>
-            </button>
-            <button
-              onClick={onClose}
-              className="p-2 rounded-lg text-[#86868b] hover:text-[#1d1d1f] hover:bg-[#f5f5f7] transition"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+          {/* Map Container A */}
+          <div ref={mapARef} className="flex-1 w-full h-full min-h-[320px]" />
         </div>
 
-        {/* Dual Viewport Area */}
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-2 p-2 sm:p-3 overflow-hidden">
-          
-          {/* Pane A */}
-          <div className="bg-white rounded-xl border border-[#e5e5e7] flex flex-col overflow-hidden relative shadow-xs">
-            {/* Control Strip A */}
-            <div className="bg-white/95 backdrop-blur-xs border-b border-[#e5e5e7] px-4 py-2.5 flex items-center justify-between z-10">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-[#86868b] uppercase">Tahun A:</span>
-                <select
-                  value={yearA}
-                  onChange={(e) => setYearA(Number(e.target.value))}
-                  className="bg-[#f5f5f7] border border-[#e5e5e7] rounded-lg px-2.5 py-1 text-xs font-bold text-[#1d1d1f] focus:outline-none focus:border-[#1d1d1f] cursor-pointer"
-                >
-                  {years.map((y) => (
-                    <option key={y} value={y}>
-                      {y} {y === 2015 ? '(El Niño Super)' : y === 2019 ? '(El Niño Moderat)' : y === 2021 ? '(La Niña Basah)' : ''}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Mini Stats */}
-              <div className="flex items-center gap-3 text-xs">
-                <div className="flex items-baseline gap-1">
-                  <span className="text-[#86868b]">Hotspot:</span>
-                  <strong className="num text-[#1d1d1f]">{statsA.count.toLocaleString()}</strong>
-                </div>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-[#86868b]">Energi:</span>
-                  <strong className="num text-orange-600">{statsA.totalFrp.toLocaleString()} MW</strong>
-                </div>
-              </div>
+        {/* Pane B */}
+        <div className="flex flex-col min-h-[380px] sm:min-h-[440px]">
+          {/* Controls Bar B */}
+          <div className="bg-white px-4 py-3 border-b border-[#e5e5e7] flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-[#86868b] uppercase">Tahun B:</span>
+              <select
+                value={yearB}
+                onChange={(e) => setYearB(Number(e.target.value))}
+                className="bg-[#f5f5f7] border border-[#e5e5e7] rounded-lg px-3 py-1.5 text-xs font-bold text-[#1d1d1f] focus:outline-none focus:border-[#1d1d1f] cursor-pointer"
+              >
+                {years.map((y) => (
+                  <option key={y} value={y}>
+                    {y} {y === 2015 ? '(El Niño Super)' : y === 2019 ? '(El Niño Moderat)' : y === 2021 ? '(La Niña Basah)' : ''}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            {/* Map Container A */}
-            <div ref={mapARef} className="flex-1 w-full h-full min-h-[220px]" />
-          </div>
-
-          {/* Pane B */}
-          <div className="bg-white rounded-xl border border-[#e5e5e7] flex flex-col overflow-hidden relative shadow-xs">
-            {/* Control Strip B */}
-            <div className="bg-white/95 backdrop-blur-xs border-b border-[#e5e5e7] px-4 py-2.5 flex items-center justify-between z-10">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-[#86868b] uppercase">Tahun B:</span>
-                <select
-                  value={yearB}
-                  onChange={(e) => setYearB(Number(e.target.value))}
-                  className="bg-[#f5f5f7] border border-[#e5e5e7] rounded-lg px-2.5 py-1 text-xs font-bold text-[#1d1d1f] focus:outline-none focus:border-[#1d1d1f] cursor-pointer"
-                >
-                  {years.map((y) => (
-                    <option key={y} value={y}>
-                      {y} {y === 2015 ? '(El Niño Super)' : y === 2019 ? '(El Niño Moderat)' : y === 2021 ? '(La Niña Basah)' : ''}
-                    </option>
-                  ))}
-                </select>
+            <div className="flex items-center gap-3 text-xs">
+              <div>
+                <span className="text-[#86868b]">Titik: </span>
+                <strong className="num text-[#1d1d1f]">{statsB.count.toLocaleString()}</strong>
               </div>
-
-              {/* Mini Stats */}
-              <div className="flex items-center gap-3 text-xs">
-                <div className="flex items-baseline gap-1">
-                  <span className="text-[#86868b]">Hotspot:</span>
-                  <strong className="num text-[#1d1d1f]">{statsB.count.toLocaleString()}</strong>
-                </div>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-[#86868b]">Energi:</span>
-                  <strong className="num text-orange-600">{statsB.totalFrp.toLocaleString()} MW</strong>
-                </div>
+              <div>
+                <span className="text-[#86868b]">FRP: </span>
+                <strong className="num text-orange-600">{statsB.totalFrp.toLocaleString()} MW</strong>
               </div>
             </div>
-
-            {/* Map Container B */}
-            <div ref={mapBRef} className="flex-1 w-full h-full min-h-[220px]" />
           </div>
 
-        </div>
-
-        {/* Bottom Comparative Insight Bar */}
-        <div className="bg-white border-t border-[#e5e5e7] px-4 sm:px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-          <div className="text-[#6e6e73]">
-            <strong>{language === 'id' ? 'Analisis Delta' : 'Delta Analysis'}: </strong>
-            {statsA.count > statsB.count ? (
-              <span>
-                Tahun <strong>{yearA}</strong> memiliki <strong>{(statsA.count - statsB.count).toLocaleString()}</strong> lebih banyak titik panas dibanding {yearB} (+{Math.round(((statsA.count - statsB.count) / Math.max(1, statsB.count)) * 100)}%).
-              </span>
-            ) : (
-              <span>
-                Tahun <strong>{yearB}</strong> memiliki <strong>{(statsB.count - statsA.count).toLocaleString()}</strong> lebih banyak titik panas dibanding {yearA} (+{Math.round(((statsB.count - statsA.count) / Math.max(1, statsA.count)) * 100)}%).
-              </span>
-            )}
-          </div>
-
-          <div className="flex items-center gap-4 text-[#86868b]">
-            <span>Sensors: MODIS + VIIRS Harmonized</span>
-            <span>Grid: 5.5 km</span>
-          </div>
+          {/* Map Container B */}
+          <div ref={mapBRef} className="flex-1 w-full h-full min-h-[320px]" />
         </div>
 
       </div>
+
+      {/* Comparative Analytical Summary Footer */}
+      <div className="px-5 py-3.5 bg-[#fbfbfd] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+        <div className="text-[#3a3a3c] leading-relaxed">
+          <strong className="font-semibold text-[#1d1d1f]">{language === 'id' ? 'Kesimpulan Analisis Spasial' : 'Spatial Synthesis'}: </strong>
+          {statsA.count > statsB.count ? (
+            <span>
+              Tahun <strong>{yearA}</strong> mengalami aktivitas pembakaran <strong>{(statsA.count - statsB.count).toLocaleString()}</strong> titik lebih banyak dibandingkan {yearB} (+{Math.round(((statsA.count - statsB.count) / Math.max(1, statsB.count)) * 100)}%).
+            </span>
+          ) : (
+            <span>
+              Tahun <strong>{yearB}</strong> mengalami aktivitas pembakaran <strong>{(statsB.count - statsA.count).toLocaleString()}</strong> titik lebih banyak dibandingkan {yearA} (+{Math.round(((statsB.count - statsA.count) / Math.max(1, statsA.count)) * 100)}%).
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center gap-4 text-[#86868b] text-[11px] shrink-0">
+          <span>Grid: 5.5 km Harmonized</span>
+          <span>MODIS + VIIRS Data Sync</span>
+        </div>
+      </div>
+
     </div>
   );
 };
