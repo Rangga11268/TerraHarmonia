@@ -14,9 +14,7 @@ interface NavbarProps {
   onOpenTeam?: () => void;
   isLiveSync?: boolean;
   theme?: 'light' | 'dark';
-  themeMode?: ThemeMode;
   onToggleTheme?: () => void;
-  onSetThemeMode?: (mode: ThemeMode) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -27,9 +25,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenTeam,
   isLiveSync = false,
   theme = 'light',
-  themeMode = 'system',
   onToggleTheme,
-  onSetThemeMode,
 }) => {
   const t = translations[language];
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -42,21 +38,9 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'team' as NavTab, label: t.navTeam },
   ];
 
-  const getThemeTitle = () => {
-    if (themeMode === 'system') {
-      return language === 'id'
-        ? `Tema: Sistem Otomatis (${theme === 'dark' ? 'Gelap' : 'Terang'}) — Klik untuk Mode Terang`
-        : `Theme: Auto System (${theme === 'dark' ? 'Dark' : 'Light'}) — Click for Light Mode`;
-    }
-    if (themeMode === 'light') {
-      return language === 'id'
-        ? 'Tema: Mode Terang — Klik untuk Mode Gelap'
-        : 'Theme: Light Mode — Click for Dark Mode';
-    }
-    return language === 'id'
-      ? 'Tema: Mode Gelap — Klik untuk Mode Sistem (Auto)'
-      : 'Theme: Dark Mode — Click for Auto System';
-  };
+  const themeLabel = theme === 'dark'
+    ? (language === 'id' ? 'Ganti ke Mode Terang' : 'Switch to Light Mode')
+    : (language === 'id' ? 'Ganti ke Mode Gelap' : 'Switch to Dark Mode');
 
   return (
     <>
@@ -103,23 +87,18 @@ export const Navbar: React.FC<NavbarProps> = ({
               </span>
             )}
 
-            {/* Dark / Light / System Theme Toggle Button */}
+            {/* Direct Dark / Light Theme Toggle Button */}
             {onToggleTheme && (
               <button
                 onClick={onToggleTheme}
-                aria-label={getThemeTitle()}
-                title={getThemeTitle()}
-                className="p-1.5 sm:p-2 rounded-full text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white hover:bg-[#f5f5f7] dark:hover:bg-[#1f2937] transition border border-[#e5e5e7] dark:border-[#374151] flex items-center justify-center min-w-[36px] min-h-[36px] cursor-pointer group relative"
+                aria-label={themeLabel}
+                title={themeLabel}
+                className="p-1.5 sm:p-2 rounded-full text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white hover:bg-[#f5f5f7] dark:hover:bg-[#1f2937] transition border border-[#e5e5e7] dark:border-[#374151] flex items-center justify-center min-w-[36px] min-h-[36px] cursor-pointer group"
               >
-                {themeMode === 'system' ? (
-                  <div className="relative flex items-center justify-center">
-                    <Monitor className="w-4 h-4 text-[#0071e3] dark:text-sky-400 group-hover:scale-110 transition-transform" />
-                    <span className="absolute -top-1 -right-1 w-1.5 h-1.5 rounded-full bg-emerald-500 ring-1 ring-white dark:ring-[#111827]" />
-                  </div>
-                ) : themeMode === 'light' ? (
-                  <Sun className="w-4 h-4 text-amber-500 group-hover:rotate-45 transition-transform" />
+                {theme === 'dark' ? (
+                  <Sun className="w-4 h-4 text-amber-400 group-hover:rotate-45 transition-transform" />
                 ) : (
-                  <Moon className="w-4 h-4 text-indigo-400 group-hover:-rotate-12 transition-transform" />
+                  <Moon className="w-4 h-4 text-[#515154] group-hover:-rotate-12 transition-transform" />
                 )}
               </button>
             )}
@@ -199,48 +178,29 @@ export const Navbar: React.FC<NavbarProps> = ({
               })}
             </div>
 
-            {/* Mobile Theme & Quick Action Bar */}
+            {/* Mobile Theme & Language Bar */}
             <div className="pt-3 border-t border-[#e5e5e7] dark:border-[#1f2937] flex items-center justify-between gap-2">
               <span className="text-xs font-medium text-[#86868b] dark:text-[#9ca3af]">
-                {language === 'id' ? 'Tampilan:' : 'Theme:'}
+                {language === 'id' ? 'Tema Tampilan:' : 'Theme Mode:'}
               </span>
 
-              {onSetThemeMode && (
-                <div className="flex items-center bg-[#f5f5f7] dark:bg-[#1f2937] p-1 rounded-xl gap-1">
-                  <button
-                    onClick={() => onSetThemeMode('system')}
-                    className={`px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1 cursor-pointer transition ${
-                      themeMode === 'system'
-                        ? 'bg-white dark:bg-[#374151] text-[#0071e3] dark:text-sky-400 shadow-xs font-semibold'
-                        : 'text-[#86868b] dark:text-[#9ca3af]'
-                    }`}
-                  >
-                    <Monitor className="w-3.5 h-3.5" />
-                    <span>Auto</span>
-                  </button>
-                  <button
-                    onClick={() => onSetThemeMode('light')}
-                    className={`px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1 cursor-pointer transition ${
-                      themeMode === 'light'
-                        ? 'bg-white dark:bg-[#374151] text-amber-500 shadow-xs font-semibold'
-                        : 'text-[#86868b] dark:text-[#9ca3af]'
-                    }`}
-                  >
-                    <Sun className="w-3.5 h-3.5" />
-                    <span>Light</span>
-                  </button>
-                  <button
-                    onClick={() => onSetThemeMode('dark')}
-                    className={`px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1 cursor-pointer transition ${
-                      themeMode === 'dark'
-                        ? 'bg-white dark:bg-[#374151] text-indigo-400 shadow-xs font-semibold'
-                        : 'text-[#86868b] dark:text-[#9ca3af]'
-                    }`}
-                  >
-                    <Moon className="w-3.5 h-3.5" />
-                    <span>Dark</span>
-                  </button>
-                </div>
+              {onToggleTheme && (
+                <button
+                  onClick={onToggleTheme}
+                  className="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition border border-[#e5e5e7] dark:border-[#374151] bg-[#f5f5f7] dark:bg-[#1f2937] text-[#1d1d1f] dark:text-white"
+                >
+                  {theme === 'dark' ? (
+                    <>
+                      <Sun className="w-3.5 h-3.5 text-amber-400" />
+                      <span>{language === 'id' ? 'Mode Gelap (Aktif)' : 'Dark (Active)'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="w-3.5 h-3.5 text-indigo-500" />
+                      <span>{language === 'id' ? 'Mode Terang (Aktif)' : 'Light (Active)'}</span>
+                    </>
+                  )}
+                </button>
               )}
             </div>
           </div>

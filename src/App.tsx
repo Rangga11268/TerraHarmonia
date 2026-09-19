@@ -24,54 +24,61 @@ import { RefreshCw } from 'lucide-react';
 export function App() {
   const [language, setLanguage] = useState<Language>('en');
   
-  // Theme Mode: 'system' (default/automatic) | 'light' | 'dark'
-  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
-    const saved = localStorage.getItem('terra_harmonia_theme') as ThemeMode | null;
-    if (saved === 'dark' || saved === 'light' || saved === 'system') return saved;
-    return 'system';
+  // Theme state: initialized from localStorage or browser media query
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    try {
+      const saved = localStorage.getItem('terra_harmonia_theme');
+      if (saved === 'dark' || saved === 'light') return saved;
+      if (typeof window !== 'undefined' && window.matchMedia) {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+    } catch (e) {}
+    return 'light';
   });
 
-  // Track system preference in real-time
-  const [systemPrefersDark, setSystemPrefersDark] = useState<boolean>(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return false;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  // Track if user explicitly chose a theme
+  const [hasUserOverride, setHasUserOverride] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('terra_harmonia_theme');
+      return saved === 'dark' || saved === 'light';
+    } catch (e) {
+      return false;
+    }
   });
 
-  // Listen to browser/OS prefers-color-scheme media query changes
+  // Live listener for OS / browser prefers-color-scheme changes
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return;
     const mql = window.matchMedia('(prefers-color-scheme: dark)');
     const handler = (e: MediaQueryListEvent) => {
-      setSystemPrefersDark(e.matches);
+      // Auto-update if the user hasn't explicitly set a preference
+      if (!hasUserOverride) {
+        setTheme(e.matches ? 'dark' : 'light');
+      }
     };
     mql.addEventListener('change', handler);
     return () => mql.removeEventListener('change', handler);
-  }, []);
+  }, [hasUserOverride]);
 
-  // Compute resolved active theme ('light' | 'dark')
-  const resolvedTheme: 'light' | 'dark' = useMemo(() => {
-    if (themeMode === 'system') {
-      return systemPrefersDark ? 'dark' : 'light';
-    }
-    return themeMode;
-  }, [themeMode, systemPrefersDark]);
-
-  // Apply dark class to <html> and persist preference
+  // Synchronize 'dark' class on <html> documentElement
   useEffect(() => {
     const root = document.documentElement;
-    if (resolvedTheme === 'dark') {
+    if (theme === 'dark') {
       root.classList.add('dark');
     } else {
       root.classList.remove('dark');
     }
-    localStorage.setItem('terra_harmonia_theme', themeMode);
-  }, [resolvedTheme, themeMode]);
+  }, [theme]);
 
+  // 1-Click Direct Toggle between Light & Dark
   const toggleTheme = () => {
-    setThemeMode((prev) => {
-      if (prev === 'system') return resolvedTheme === 'dark' ? 'light' : 'dark';
-      if (prev === 'light') return 'dark';
-      return 'system';
+    setTheme((prev) => {
+      const next = prev === 'light' ? 'dark' : 'light';
+      try {
+        localStorage.setItem('terra_harmonia_theme', next);
+      } catch (e) {}
+      setHasUserOverride(true);
+      return next;
     });
   };
 
@@ -157,10 +164,8 @@ export function App() {
       <Navbar
         language={language}
         onToggleLanguage={setLanguage}
-        theme={resolvedTheme}
-        themeMode={themeMode}
+        theme={theme}
         onToggleTheme={toggleTheme}
-        onSetThemeMode={setThemeMode}
         activeTab={activeTab}
         onSelectTab={setActiveTab}
         onOpenTeam={() => setActiveTab('team')}

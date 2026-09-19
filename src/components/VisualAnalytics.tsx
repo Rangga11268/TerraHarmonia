@@ -176,15 +176,22 @@ export const VisualAnalytics: React.FC<VisualAnalyticsProps> = ({
   }, [language]);
 
   return (
-    <div className="bg-white border border-[#e5e5e7] rounded-2xl p-4 sm:p-6 shadow-xs space-y-5 transition-all">
+    <div className="bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl p-4 sm:p-6 shadow-xs space-y-5 transition-all">
       
       {/* Header & Question Navigation */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-[#e5e5e7]">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-[#e5e5e7] dark:border-[#1f2937]">
         <div>
-          <div className="text-xs font-semibold text-[#86868b] uppercase tracking-wider">
+          <div className="text-xs font-semibold text-[#86868b] dark:text-[#9ca3af] uppercase tracking-wider">
             {t.analyticsTitle}
           </div>
-          <h2 className="text-lg sm:text-xl font-bold text-[#1d1d1f] tracking-tight mt-0.5">
+          <h2 className="text-lg sm:text-xl font-bold text-[#1d1d1f] dark:text-white tracking-tight mt-0.5">
+            {activeTab === 'trend'
+              ? t.trendChartTitle
+              : activeTab === 'seasonality'
+              ? t.seasonalityChartTitle
+              : activeTab === 'provincial'
+              ? t.provincialChartTitle
+              : t.physicsChartTitle}
           </h2>
           <p className="text-xs text-[#6e6e73] dark:text-[#9ca3af] mt-1 leading-relaxed max-w-2xl">
             {activeTab === 'trend'
