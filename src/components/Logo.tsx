@@ -12,26 +12,26 @@ export const Logo: React.FC<LogoProps> = ({
   showSubtitle = true,
 }) => {
   const sizeMap = {
-    sm: { img: 'w-7 h-7 rounded-lg', title: 'text-sm font-bold', sub: 'text-[9px]' },
-    md: { img: 'w-9 h-9 rounded-xl', title: 'text-base font-bold', sub: 'text-[10px]' },
-    lg: { img: 'w-11 h-11 rounded-2xl', title: 'text-lg font-extrabold', sub: 'text-xs' },
+    sm: { img: 'w-7 h-7', title: 'text-sm font-bold', sub: 'text-[9px]' },
+    md: { img: 'w-8.5 h-8.5 sm:w-9 sm:h-9', title: 'text-base font-bold', sub: 'text-[10px]' },
+    lg: { img: 'w-11 h-11', title: 'text-lg font-extrabold', sub: 'text-xs' },
   };
 
   const { img, title, sub } = sizeMap[size];
 
   return (
     <div className={`inline-flex items-center gap-2.5 select-none ${className}`}>
-      {/* Original Terra Harmonia Logo with Crisp Frame & Enhanced Brightness */}
-      <div className={`overflow-hidden shrink-0 shadow-sm ring-1 ring-black/10 bg-white ${img}`}>
+      {/* Pure Transparent Logo Emblem (No Background Box) */}
+      <div className={`shrink-0 flex items-center justify-center ${img}`}>
         <img
-          src="/terra_harmonia_logo.jpg"
-          alt="Terra Harmonia"
-          className="w-full h-full object-cover"
+          src="/terra_harmonia_transparent.svg"
+          alt="Terra Harmonia Emblem"
+          className="w-full h-full object-contain filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
           loading="eager"
         />
       </div>
 
-      {/* Apple-style Typography */}
+      {/* Apple-style Clean Typography */}
       <div className="flex flex-col justify-center min-w-0 leading-tight">
         <div className={`tracking-tight text-[#1d1d1f] font-bold ${title}`}>
           Terra Harmonia
