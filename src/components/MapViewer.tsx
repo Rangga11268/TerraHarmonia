@@ -15,7 +15,7 @@ interface MapViewerProps {
   isLoading?: boolean;
 }
 
-// ponytail: marker FRP bins — good enough for visual scale, no fancy normalization needed
+// ponytail: marker FRP bins for visual scale
 function getMarkerRadius(frp: number): number {
   if (frp < 15) return 5;
   if (frp < 40) return 7;
@@ -91,17 +91,17 @@ export const MapViewer: React.FC<MapViewerProps> = ({
 
     // AOI bounding box outline
     L.rectangle([[minLat, minLon], [maxLat, maxLon]], {
-      color: '#f97316',
+      color: '#d97706',
       weight: 1.5,
       dashArray: '6 4',
-      fillColor: '#f97316',
+      fillColor: '#d97706',
       fillOpacity: 0.04,
     }).addTo(layerGroup);
 
     // Filter and slice hotspots
     let display = hotspots.filter((h) => h.aoiId === selectedAOI.id);
 
-    // Confidence filter — only show reliable detections (skip low-confidence noise)
+    // Confidence filter - only show reliable detections (skip low-confidence noise)
     if (isLiveSync) {
       display = display.filter((h) => h.confidence >= 70);
     }
@@ -113,15 +113,15 @@ export const MapViewer: React.FC<MapViewerProps> = ({
       display = display.slice(-300);
     }
 
-    display.forEach((spot, idx) => {
+    display.forEach((spot) => {
       const isVIIRS = spot.instrument === 'VIIRS';
       const radius = rawMode
         ? (isVIIRS ? 4 : 7)
         : getMarkerRadius(spot.frp);
 
-      // Bright, high-contrast colors visible on both satellite and light basemap
-      const color = isVIIRS ? '#f97316' : '#ef4444';   // orange vs red
-      const strokeColor = isVIIRS ? '#fff7ed' : '#fef2f2';
+      // Distinct, clean colors
+      const color = isVIIRS ? '#f59e0b' : '#ef4444'; // Amber-500 for VIIRS, Red-500 for MODIS
+      const strokeColor = '#ffffff';
 
       const intensity =
         spot.frp < 15 ? (language === 'id' ? 'Rendah' : 'Low')
@@ -131,20 +131,20 @@ export const MapViewer: React.FC<MapViewerProps> = ({
 
       const popupHtml = language === 'id'
         ? `<div style="font-family:system-ui,sans-serif;font-size:12px;min-width:180px;padding:2px">
-            <div style="font-weight:700;color:#b45309;font-size:13px;margin-bottom:4px">Titik Api Terdeteksi</div>
+            <div style="font-weight:700;color:#d97706;font-size:13px;margin-bottom:4px">Titik Api Terdeteksi</div>
             <div><b>Sensor:</b> ${spot.instrument} (${spot.satellite})</div>
-            <div><b>Tanggal:</b> ${spot.date} pukul ${spot.time.slice(0,2)}:${spot.time.slice(2)} UTC</div>
-            <div><b>Kekuatan Panas:</b> ${spot.frp} MW &mdash; <span style="color:${spot.frp>100?'#dc2626':'#d97706'}">${intensity}</span></div>
-            <div><b>Keyakinan Deteksi:</b> ${spot.confidence}%</div>
-            <div style="color:#6b7280;margin-top:3px;font-size:10px">${spot.lat.toFixed(4)}&deg;, ${spot.lon.toFixed(4)}&deg;</div>
+            <div><b>Tanggal:</b> ${spot.date} (${spot.time.slice(0,2)}:${spot.time.slice(2)} UTC)</div>
+            <div><b>Kekuatan Panas:</b> ${spot.frp} MW (${intensity})</div>
+            <div><b>Tingkat Keyakinan:</b> ${spot.confidence}%</div>
+            <div style="color:#71717a;margin-top:3px;font-size:10px">${spot.lat.toFixed(4)}&deg;, ${spot.lon.toFixed(4)}&deg;</div>
           </div>`
         : `<div style="font-family:system-ui,sans-serif;font-size:12px;min-width:180px;padding:2px">
-            <div style="font-weight:700;color:#b45309;font-size:13px;margin-bottom:4px">Active Fire Detected</div>
+            <div style="font-weight:700;color:#d97706;font-size:13px;margin-bottom:4px">Active Fire Detected</div>
             <div><b>Sensor:</b> ${spot.instrument} (${spot.satellite})</div>
-            <div><b>Date:</b> ${spot.date} at ${spot.time.slice(0,2)}:${spot.time.slice(2)} UTC</div>
-            <div><b>Heat Power:</b> ${spot.frp} MW &mdash; <span style="color:${spot.frp>100?'#dc2626':'#d97706'}">${intensity}</span></div>
+            <div><b>Date:</b> ${spot.date} (${spot.time.slice(0,2)}:${spot.time.slice(2)} UTC)</div>
+            <div><b>Heat Power:</b> ${spot.frp} MW (${intensity})</div>
             <div><b>Detection Confidence:</b> ${spot.confidence}%</div>
-            <div style="color:#6b7280;margin-top:3px;font-size:10px">${spot.lat.toFixed(4)}&deg;, ${spot.lon.toFixed(4)}&deg;</div>
+            <div style="color:#71717a;margin-top:3px;font-size:10px">${spot.lat.toFixed(4)}&deg;, ${spot.lon.toFixed(4)}&deg;</div>
           </div>`;
 
       const circle = L.circleMarker([spot.lat, spot.lon], {
@@ -166,7 +166,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({
       L.marker(center, {
         icon: L.divIcon({
           className: '',
-          html: `<div style="background:white;border:1.5px solid #e2e8f0;border-radius:8px;padding:8px 12px;font-size:12px;font-family:system-ui,sans-serif;color:#475569;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.12)">
+          html: `<div style="background:white;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:12px;font-family:system-ui,sans-serif;color:#52525b;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.08)">
             ${language === 'id' ? 'Tidak ada titik api aktif di area ini' : 'No active fire detections in this area'}
           </div>`,
           iconAnchor: [100, 20],
@@ -181,29 +181,28 @@ export const MapViewer: React.FC<MapViewerProps> = ({
     .length;
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col">
+    <div className="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-sm flex flex-col">
       {/* Map header */}
-      <div className="px-4 py-2.5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 bg-white">
-        <div className="flex items-center gap-2">
-          <MapPin className="w-4 h-4 text-orange-500 shrink-0" />
-          <span className="font-semibold text-slate-900 text-sm">{selectedAOI.name}</span>
-          <span className="text-xs text-slate-400">({selectedAOI.biome})</span>
+      <div className="px-4 py-2.5 border-b border-zinc-100 flex flex-wrap items-center justify-between gap-2 bg-white">
+        <div className="section-title-bar flex items-center gap-2">
+          <span className="font-bold text-slate-900 text-sm">{selectedAOI.name}</span>
+          <span className="text-xs text-zinc-400">({selectedAOI.biome})</span>
           {markerCount > 0 && (
-            <span className="text-[11px] bg-orange-50 text-orange-600 border border-orange-200 rounded-full px-2 py-0.5 font-mono">
+            <span className="text-[11px] bg-amber-50 text-amber-700 border border-amber-200 rounded px-2 py-0.5 num font-semibold">
               {markerCount.toLocaleString()} {language === 'id' ? 'titik' : 'pts'}
             </span>
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {/* Basemap toggle */}
-          <div className="flex items-center bg-slate-50 rounded-lg p-0.5 border border-slate-200 text-xs">
+          <div className="flex items-center bg-zinc-50 rounded-lg p-0.5 border border-zinc-200 text-xs">
             <button
               onClick={() => setBasemap('dark')}
-              className={`px-2 py-1 rounded font-medium transition-colors flex items-center gap-1 ${
+              className={`px-2.5 py-1 rounded font-medium transition-colors flex items-center gap-1 min-h-[30px] ${
                 basemap === 'dark'
-                  ? 'bg-slate-700 text-white'
-                  : 'text-slate-500 hover:text-slate-900'
+                  ? 'bg-slate-800 text-white'
+                  : 'text-zinc-600 hover:text-slate-900'
               }`}
               title={t.darkMap}
             >
@@ -212,10 +211,10 @@ export const MapViewer: React.FC<MapViewerProps> = ({
             </button>
             <button
               onClick={() => setBasemap('satellite')}
-              className={`px-2 py-1 rounded font-medium transition-colors ${
+              className={`px-2.5 py-1 rounded font-medium transition-colors min-h-[30px] ${
                 basemap === 'satellite'
-                  ? 'bg-cyan-600 text-white'
-                  : 'text-slate-500 hover:text-slate-900'
+                  ? 'bg-amber-600 text-white'
+                  : 'text-zinc-600 hover:text-slate-900'
               }`}
               title={t.satelliteMap}
             >
@@ -224,13 +223,13 @@ export const MapViewer: React.FC<MapViewerProps> = ({
           </div>
 
           {/* Legend */}
-          <div className="hidden sm:flex items-center gap-2 text-[11px] font-mono text-slate-500">
+          <div className="hidden sm:flex items-center gap-2.5 text-[11px] text-zinc-500">
             <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block border border-red-200" />
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block border border-white shadow-xs" />
               MODIS
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block border border-orange-200" />
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block border border-white shadow-xs" />
               VIIRS
             </span>
           </div>
@@ -243,29 +242,29 @@ export const MapViewer: React.FC<MapViewerProps> = ({
 
         {/* Loading overlay */}
         {isLoading && (
-          <div className="absolute inset-0 bg-white/70 flex items-center justify-center z-20">
-            <div className="bg-white border border-slate-200 rounded-xl px-5 py-4 shadow-md flex items-center gap-3 text-sm text-slate-700">
-              <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
-              {language === 'id' ? 'Memuat titik api dari NASA...' : 'Loading fire data from NASA...'}
+          <div className="absolute inset-0 bg-white/75 flex items-center justify-center z-20">
+            <div className="bg-white border border-zinc-200 rounded-xl px-5 py-4 shadow-md flex items-center gap-3 text-sm text-slate-700">
+              <div className="w-4 h-4 border-2 border-amber-600 border-t-transparent rounded-full animate-spin" />
+              {language === 'id' ? 'Memuat titik api dari satelit NASA...' : 'Loading fire data from NASA satellites...'}
             </div>
           </div>
         )}
       </div>
 
       {/* Map footer legend */}
-      <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+      <div className="px-4 py-2 border-t border-zinc-100 bg-zinc-50 flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-500">
         <div className="flex items-center gap-1.5">
-          <Flame className="w-3.5 h-3.5 text-orange-500" />
+          <Flame className="w-3.5 h-3.5 text-amber-600 shrink-0" />
           <span>
             {language === 'id'
-              ? 'Ukuran lingkaran = kekuatan panas (FRP dalam Megawatt). Merah = MODIS, Oranye = VIIRS.'
-              : 'Circle size = heat power (FRP in Megawatts). Red = MODIS, Orange = VIIRS.'}
+              ? 'Ukuran lingkaran = daya panas radiatif (FRP dalam Megawatt). Merah = MODIS (1km), Kuning/Oranye = VIIRS (375m).'
+              : 'Circle size = fire radiative power (FRP in Megawatts). Red = MODIS (1km), Amber = VIIRS (375m).'}
           </span>
         </div>
         {isLiveSync && (
-          <div className="flex items-center gap-1 text-cyan-600">
+          <div className="flex items-center gap-1 text-teal-700 font-medium">
             <AlertCircle className="w-3 h-3" />
-            <span>{language === 'id' ? 'Hanya titik keyakinan >=70% ditampilkan' : 'Only confidence >=70% shown'}</span>
+            <span>{language === 'id' ? 'Titik terverifikasi (keyakinan >= 70%)' : 'Verified points (confidence >= 70%)'}</span>
           </div>
         )}
       </div>

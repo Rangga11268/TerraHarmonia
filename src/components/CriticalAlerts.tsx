@@ -49,17 +49,17 @@ export const CriticalAlerts: React.FC<CriticalAlertsProps> = ({
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col justify-between">
+    <div className="bg-white border border-zinc-200 rounded-xl p-4 shadow-sm flex flex-col justify-between">
       <div>
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-          <div className="flex items-center gap-2">
-            <ShieldAlert className="w-5 h-5 text-orange-500" />
+        <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
+          <div className="section-title-bar">
+            <ShieldAlert className="w-4 h-4 text-orange-500" />
             <h3 className="font-bold text-sm text-slate-900">{t.earlyWarningTitle}</h3>
           </div>
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 min-h-[36px] rounded-lg bg-slate-50 hover:bg-slate-100 text-cyan-600 text-xs font-semibold border border-slate-200 transition focus-visible:ring-2 focus-visible:ring-cyan-400"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 min-h-[36px] rounded-lg bg-zinc-50 hover:bg-zinc-100 text-slate-600 hover:text-slate-900 text-xs font-semibold border border-zinc-200 transition"
             title={language === 'id' ? 'Unduh data lengkap sebagai file CSV' : 'Download full dataset as CSV'}
           >
             <Download className="w-3.5 h-3.5" />
@@ -67,61 +67,60 @@ export const CriticalAlerts: React.FC<CriticalAlertsProps> = ({
           </button>
         </div>
 
-        {/* Peak season banner */}
-        <div className="mt-3 p-3.5 bg-orange-50 border border-orange-200 rounded-lg">
-          <div className="flex items-center gap-2 text-orange-700 font-semibold text-xs mb-1">
-            <Compass className="w-4 h-4 text-orange-500 shrink-0" />
-            <span>{t.annualPeakSeason}</span>
+        {/* Peak season banner — amber strip, not a soft orange box */}
+        <div className="mt-3 p-3.5 bg-amber-600 rounded-lg">
+          <div className="text-amber-100 text-xs font-semibold mb-1 flex items-center gap-1.5">
+            <Compass className="w-3.5 h-3.5" />
+            {t.annualPeakSeason}
           </div>
-          <div className="text-lg font-bold font-mono text-slate-900">
-            {language === 'id' ? 'Minggu' : 'Weeks'} {startWeek} &ndash; {endWeek}{' '}
-            <span className="text-sm text-orange-500 font-normal">({Math.round((endWeek - startWeek + 1))} {t.weeksDuration})</span>
+          <div className="text-2xl font-bold text-white num">
+            {language === 'id' ? 'Minggu' : 'Weeks'} {startWeek} – {endWeek}
+            <span className="text-base font-normal text-amber-200 ml-2">({Math.round((endWeek - startWeek + 1))} {t.weeksDuration})</span>
           </div>
-          <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
+          <p className="text-xs text-amber-100 mt-1.5 leading-relaxed">
             {language === 'id'
-              ? <>Data historis 20 tahun membuktikan bahwa sebagian besar kebakaran di <strong className="text-slate-800">{selectedAOI.name}</strong> terjadi pada periode kemarau ini.</>
-              : <>The 20-year baseline shows the majority of intense fires in <strong className="text-slate-800">{selectedAOI.name}</strong> concentrate in this dry-season window.</>}
+              ? <><strong className="text-white">{selectedAOI.name}</strong>: 20 tahun data NASA membuktikan kebakaran terhebat terpusat di periode ini.</>
+              : <>20 years of NASA data confirm that the most intense fires in <strong className="text-white">{selectedAOI.name}</strong> cluster in this window.</>}
           </p>
         </div>
 
         {/* Top anomalies */}
         <div className="mt-4">
-          <div className="text-xs font-semibold text-slate-700 mb-2 flex items-center gap-1.5">
-            <BellRing className="w-4 h-4 text-red-500" />
-            {t.highestAnomalies}
+          <div className="section-title-bar mb-2">
+            <span className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+              <BellRing className="w-3.5 h-3.5 text-red-500" />
+              {t.highestAnomalies}
+            </span>
           </div>
           <div className="space-y-1.5">
             {anomalies.map((anom, idx) => (
               <div
                 key={`${anom.year}-${anom.week}`}
-                className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs font-mono"
+                className="flex items-center justify-between p-2 rounded-lg bg-zinc-50 border border-zinc-200 text-xs"
               >
                 <div className="flex items-center gap-2">
-                  <span className="w-5 h-5 rounded bg-red-500 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
+                  <span className="w-5 h-5 rounded bg-red-500 text-white flex items-center justify-center text-[10px] font-bold shrink-0 num">
                     {idx + 1}
                   </span>
                   <div>
                     <strong className="text-slate-800">{t.year} {anom.year}, {language === 'id' ? 'Minggu' : 'Week'} {anom.week}</strong>
-                    <span className="text-slate-400 ml-2">({anom.dominantSensor})</span>
+                    <span className="text-zinc-400 ml-2">({anom.dominantSensor})</span>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-red-500 font-bold">+{anom.zScore.toFixed(1)}x</span>
-                  <span className="text-slate-300 mx-1.5">|</span>
-                  <span className="text-orange-600 font-semibold">{anom.totalFrpCalibrated} MW</span>
+                  <span className="text-red-500 font-bold num">+{anom.zScore.toFixed(1)}x</span>
+                  <span className="text-zinc-200 mx-1.5">|</span>
+                  <span className="text-amber-600 font-semibold num">{anom.totalFrpCalibrated} MW</span>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Directives */}
-        <div className="mt-4 p-3 bg-sky-50 border border-sky-200 rounded-lg text-xs text-sky-800">
-          <div className="font-semibold mb-1.5 flex items-center gap-1.5">
-            <Flame className="w-3.5 h-3.5 text-orange-500" />
-            {t.directivesTitle}
-          </div>
-          <ul className="list-disc list-inside space-y-1 text-slate-700">
+        {/* Directives — slate-blue, not sky (sky was too close to cyan/teal already used) */}
+        <div className="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-700">
+          <div className="font-semibold mb-1.5 text-slate-600">{t.directivesTitle}</div>
+          <ul className="list-disc list-inside space-y-1">
             <li>{language === 'id' ? `Mulai patroli lapangan dua minggu sebelum Minggu ${startWeek}.` : `Begin ground patrols two weeks before Week ${startWeek}.`}</li>
             <li>{t.directive2}</li>
             <li>{t.directive3}</li>

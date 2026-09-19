@@ -4,38 +4,49 @@
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900;
-    font-family: 'Inter', 'system-ui', -apple-system, sans-serif;
+    @apply bg-zinc-50 text-slate-900;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  h1, h2, h3 {
+    font-feature-settings: 'cv01', 'cv03', 'ss01';
+  }
+
+  /* Tabular numbers for data values only */
+  .num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
   }
 }
 
-/* Custom Scrollbar - light mode */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
+/* Tight scrollbar — not distracting */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #f4f4f5; }
+::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
 
-/* Map container — override leaflet default white flash */
-.leaflet-container {
-  background: #e5e7eb;
-}
+/* Leaflet background override */
+.leaflet-container { background: #e4e4e7; }
 
-/* Smooth cell transitions in calendar */
+/* Calendar heat cell — quick pop on hover */
 .heat-cell {
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  transition: transform 80ms ease, box-shadow 80ms ease;
 }
 .heat-cell:hover {
-  transform: scale(1.15);
+  transform: scale(1.18);
   z-index: 10;
   position: relative;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* Amber accent bar — identity motif used on section titles */
+.section-title-bar {
+  border-left: 3px solid #d97706;
+  padding-left: 10px;
+}
+
+/* Smooth focus ring — all interactive elements */
+*:focus-visible {
+  outline: 2px solid #d97706;
+  outline-offset: 2px;
 }

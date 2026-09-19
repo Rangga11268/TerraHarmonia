@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Globe2, Flame, Satellite, Radio, Settings2, RefreshCw } from 'lucide-react';
-import { PRESET_AOIS, AOIRegion } from '../engine/harmonizer';
+import React from 'react';
 import { Language, translations } from '../data/translations';
+import { AOIRegion, PRESET_AOIS } from '../engine/harmonizer';
+import { Flame, Radio, RefreshCw, Satellite, Settings2, ChevronDown } from 'lucide-react';
 
 interface DashboardControlBarProps {
   language: Language;
@@ -24,109 +24,108 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
   isLiveSync,
   onToggleLiveSync,
   isLoadingLive,
-  onOpenApiKeyModal
+  onOpenApiKeyModal,
 }) => {
   const t = translations[language];
-  const [utcTime, setUtcTime] = useState<string>('');
-
-  useEffect(() => {
-    const tick = () => setUtcTime(new Date().toUTCString().replace('GMT', 'UTC'));
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, []);
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 shadow-sm">
-      {/* Region Selector */}
-      <div className="flex items-center gap-2.5 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200 flex-1 max-w-md">
-        <Globe2 className="w-4 h-4 text-orange-500 shrink-0" />
-        <label htmlFor="aoi-selector" className="text-xs text-slate-500 font-semibold whitespace-nowrap">
-          {t.region}:
-        </label>
-        <select
-          id="aoi-selector"
-          value={selectedAOI.id}
-          onChange={(e) => {
-            const aoi = PRESET_AOIS.find((a) => a.id === e.target.value);
-            if (aoi) onSelectAOI(aoi);
-          }}
-          className="bg-transparent text-slate-900 font-medium focus:outline-none focus:ring-1 focus:ring-orange-400 cursor-pointer text-xs sm:text-sm w-full"
-        >
-          {PRESET_AOIS.map((aoi) => (
-            <option key={aoi.id} value={aoi.id}>
-              {aoi.name} ({aoi.country})
-            </option>
-          ))}
-        </select>
+    <div className="bg-white border border-zinc-200 rounded-xl shadow-sm">
+      <div className="px-4 py-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+
+        {/* Region selector — takes most space */}
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <span className="text-xs font-semibold text-zinc-400 shrink-0 uppercase tracking-wider">
+            {t.region}
+          </span>
+          <div className="relative flex-1 min-w-0">
+            <select
+              value={selectedAOI.id}
+              onChange={(e) => {
+                const aoi = PRESET_AOIS.find((a) => a.id === e.target.value);
+                if (aoi) onSelectAOI(aoi);
+              }}
+              className="w-full appearance-none bg-zinc-50 border border-zinc-200 rounded-lg pl-3 pr-8 py-2 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent cursor-pointer"
+            >
+              {PRESET_AOIS.map((aoi) => (
+                <option key={aoi.id} value={aoi.id}>
+                  {aoi.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
+          </div>
+        </div>
+
+        <div className="w-px bg-zinc-200 hidden sm:block self-stretch" />
+
+        {/* Controls row */}
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+          {/* Data mode toggle */}
+          <div className="flex rounded-lg overflow-hidden border border-zinc-200 text-xs font-semibold">
+            <button
+              onClick={() => setRawMode(false)}
+              className={`flex items-center gap-1.5 px-3 py-2 min-h-[36px] transition-colors ${
+                !rawMode
+                  ? 'bg-amber-600 text-white'
+                  : 'bg-white text-zinc-500 hover:bg-zinc-50'
+              }`}
+            >
+              <Flame className="w-3.5 h-3.5" />
+              {t.harmonized}
+            </button>
+            <button
+              onClick={() => setRawMode(true)}
+              className={`flex items-center gap-1.5 px-3 py-2 min-h-[36px] transition-colors ${
+                rawMode
+                  ? 'bg-slate-700 text-white'
+                  : 'bg-white text-zinc-500 hover:bg-zinc-50'
+              }`}
+            >
+              <Satellite className="w-3.5 h-3.5" />
+              {t.rawSensors}
+            </button>
+          </div>
+
+          {/* Live NASA feed */}
+          <div className="flex rounded-lg overflow-hidden border border-zinc-200 text-xs font-semibold">
+            <button
+              onClick={onToggleLiveSync}
+              className={`flex items-center gap-1.5 px-3 py-2 min-h-[36px] transition-colors ${
+                isLiveSync
+                  ? 'bg-teal-600 text-white'
+                  : 'bg-white text-zinc-500 hover:bg-zinc-50'
+              }`}
+              title={isLiveSync ? 'Kembali ke data arsip' : 'Aktifkan data titik api terkini dari NASA'}
+            >
+              {isLoadingLive ? (
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+              ) : isLiveSync ? (
+                <span className="relative flex h-2 w-2 shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-300 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-200" />
+                </span>
+              ) : (
+                <Radio className="w-3.5 h-3.5" />
+              )}
+              {isLiveSync ? t.liveSyncActive : t.liveSync}
+            </button>
+            <button
+              onClick={onOpenApiKeyModal}
+              className="px-2.5 py-2 min-h-[36px] bg-white text-zinc-400 hover:text-zinc-700 hover:bg-zinc-50 transition-colors border-l border-zinc-200"
+              aria-label="Pengaturan API NASA"
+              title="Pengaturan koneksi NASA FIRMS"
+            >
+              <Settings2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Right Controls */}
-      <div className="flex flex-wrap items-center justify-between lg:justify-end gap-2">
-        {/* Live NASA Feed */}
-        <div className="flex items-center bg-slate-50 p-0.5 rounded-lg border border-slate-200 gap-0.5">
-          <button
-            onClick={onToggleLiveSync}
-            className={`px-3 py-1.5 min-h-[36px] text-xs rounded-md font-semibold transition-all flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-cyan-400 ${
-              isLiveSync
-                ? 'bg-cyan-600 text-white shadow-sm'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-            }`}
-            title={isLiveSync ? 'Klik untuk kembali ke data arsip' : 'Aktifkan data titik api terkini dari NASA'}
-          >
-            {isLoadingLive ? (
-              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-            ) : isLiveSync ? (
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-              </span>
-            ) : (
-              <Radio className="w-3.5 h-3.5" />
-            )}
-            <span>{isLiveSync ? t.liveSyncActive : t.liveSync}</span>
-          </button>
-          <button
-            onClick={onOpenApiKeyModal}
-            className="p-2 text-slate-400 hover:text-cyan-600 hover:bg-slate-100 rounded-md transition-colors"
-            title="Pengaturan koneksi NASA FIRMS"
-            aria-label="Pengaturan API NASA"
-          >
-            <Settings2 className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        {/* Data Mode */}
-        <div className="flex items-center bg-slate-50 p-0.5 rounded-lg border border-slate-200">
-          <button
-            onClick={() => setRawMode(false)}
-            className={`px-3 py-1.5 min-h-[36px] text-xs rounded-md font-semibold transition-colors flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-orange-400 ${
-              !rawMode
-                ? 'bg-orange-500 text-white shadow-sm'
-                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
-            }`}
-          >
-            <Flame className="w-3.5 h-3.5" />
-            {t.harmonized}
-          </button>
-          <button
-            onClick={() => setRawMode(true)}
-            className={`px-3 py-1.5 min-h-[36px] text-xs rounded-md font-semibold transition-colors flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-red-400 ${
-              rawMode
-                ? 'bg-red-500 text-white shadow-sm'
-                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
-            }`}
-            title="Tampilkan jumlah deteksi asli dari tiap sensor, tanpa koreksi"
-          >
-            <Satellite className="w-3.5 h-3.5" />
-            {t.rawSensors}
-          </button>
-        </div>
-
-        {/* UTC Clock */}
-        <div className="text-[11px] font-mono text-slate-400 bg-slate-50 border border-slate-200 px-2.5 py-2 rounded-lg hidden md:block whitespace-nowrap">
-          {utcTime || 'UTC'}
-        </div>
+      {/* Region description strip */}
+      <div className="border-t border-zinc-100 px-4 py-2 text-xs text-zinc-400">
+        <span className="text-amber-600 font-semibold">{selectedAOI.biome}</span>
+        <span className="mx-1.5">·</span>
+        {selectedAOI.description}
       </div>
     </div>
   );

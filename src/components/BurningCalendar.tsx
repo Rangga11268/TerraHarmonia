@@ -43,22 +43,17 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+    <div className="bg-white border border-zinc-200 rounded-xl p-4 shadow-sm">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
-        <div className="flex items-center gap-2.5">
-          <CalendarIcon className="w-5 h-5 text-orange-500 shrink-0" />
-          <div>
-            <h2 className="font-bold text-sm text-slate-900 flex items-center gap-2">
-              {t.calendarTitle}
-              <span className="text-[11px] px-2 py-0.5 rounded-full bg-orange-50 text-orange-600 border border-orange-200 font-mono">
-                {t.calendarSpan}
-              </span>
-            </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
-              {rawMode ? t.calendarSubRaw : t.calendarSubHarmonized}
-            </p>
-          </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100">
+        <div className="section-title-bar">
+          <h2 className="font-bold text-sm text-slate-900">
+            {t.calendarTitle}
+            <span className="ml-2 text-xs text-zinc-400 font-normal">{t.calendarSpan}</span>
+          </h2>
+          <p className="text-xs text-zinc-500 mt-0.5">
+            {rawMode ? t.calendarSubRaw : t.calendarSubHarmonized}
+          </p>
         </div>
 
         {/* Legend + view switch */}
@@ -73,11 +68,11 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
             <span className="text-slate-500 font-semibold ml-0.5">{t.severe}</span>
           </div>
 
-          <div className="flex md:hidden bg-slate-50 p-0.5 rounded-lg border border-slate-200 text-xs">
+          <div className="flex md:hidden bg-zinc-50 p-0.5 rounded-lg border border-zinc-200 text-xs">
             <button
               onClick={() => setViewMode('matrix')}
               className={`px-2 py-1 rounded flex items-center gap-1 min-h-[36px] font-medium ${
-                viewMode === 'matrix' ? 'bg-orange-500 text-white' : 'text-slate-500'
+                viewMode === 'matrix' ? 'bg-amber-600 text-white' : 'text-zinc-500'
               }`}
             >
               <Grid className="w-3.5 h-3.5" />
@@ -86,7 +81,7 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
             <button
               onClick={() => setViewMode('focused')}
               className={`px-2 py-1 rounded flex items-center gap-1 min-h-[36px] font-medium ${
-                viewMode === 'focused' ? 'bg-orange-500 text-white' : 'text-slate-500'
+                viewMode === 'focused' ? 'bg-amber-600 text-white' : 'text-zinc-500'
               }`}
             >
               <ListFilter className="w-3.5 h-3.5" />
@@ -148,10 +143,10 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
                         onMouseLeave={() => setHoveredData(null)}
                         onFocus={() => item && setHoveredData(item)}
                         className={`h-4 w-full rounded-[2px] border heat-cell ${getCellColor(item)} ${
-                          isSelected ? 'ring-2 ring-orange-500 z-10 relative' : ''
+                          isSelected ? 'ring-2 ring-amber-600 z-10 relative' : ''
                         } ${
                           item?.isUnusualCondition ? 'ring-1 ring-red-400' : ''
-                        } focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:outline-none`}
+                        } focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none`}
                         aria-label={`${t.year} ${year}, ${language === 'id' ? 'Minggu' : 'Week'} ${week}, ${item?.burningActivityIndex || 0}/100`}
                       />
                     );
@@ -221,12 +216,12 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
       </div>
 
       {/* Detail Panel */}
-      <div className="mt-4 p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-xs flex flex-wrap items-center justify-between gap-4">
+      <div className="mt-4 p-3.5 rounded-lg bg-zinc-50 border border-zinc-200 text-xs flex flex-wrap items-center justify-between gap-4">
         {hoveredData ? (
           <>
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-orange-50 border border-orange-200 shrink-0">
-                <Flame className={`w-5 h-5 ${hoveredData.burningActivityIndex > 40 ? 'text-orange-500' : 'text-amber-500'}`} />
+              <div className="p-2 rounded-lg bg-amber-50 border border-amber-200 shrink-0">
+                <Flame className={`w-5 h-5 ${hoveredData.burningActivityIndex > 40 ? 'text-amber-600' : 'text-amber-500'}`} />
               </div>
               <div>
                 <div className="font-bold text-sm text-slate-900 flex items-center gap-2 flex-wrap">
