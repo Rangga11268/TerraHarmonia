@@ -11,6 +11,7 @@ import { HarmonizationLab } from './components/HarmonizationLab';
 import { MitigationHub } from './components/MitigationHub';
 import { DataHub } from './components/DataHub';
 import { TeamPage } from './components/TeamPage';
+import { PersonaGuideBar, UserPersona } from './components/PersonaGuideBar';
 import { NasaApiKeyModal } from './components/NasaApiKeyModal';
 import { DualMapComparison } from './components/DualMapComparison';
 import { PolygonInspector } from './components/PolygonInspector';
@@ -23,6 +24,7 @@ import { RefreshCw } from 'lucide-react';
 export function App() {
   const [language, setLanguage] = useState<Language>('en');
   const [activeTab, setActiveTab] = useState<NavTab>('overview');
+  const [activePersona, setActivePersona] = useState<UserPersona>('all');
   const [overviewView, setOverviewView] = useState<OverviewViewMode>('main');
   const [selectedAOI, setSelectedAOI] = useState<AOIRegion>(PRESET_AOIS[0]);
   const [rawMode, setRawMode] = useState<boolean>(false);
@@ -111,7 +113,16 @@ export function App() {
       />
 
       {/* Main Canvas */}
-      <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 py-6">
+      <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        {/* Persona & Operational Role Guide Bar */}
+        <PersonaGuideBar
+          language={language}
+          activePersona={activePersona}
+          onSelectPersona={setActivePersona}
+          onNavigateTab={setActiveTab}
+          onSelectOverviewView={setOverviewView}
+        />
 
         {/* Tab 1: Live Intelligence & Harmonized Calendar (Overview) */}
         {activeTab === 'overview' && (
