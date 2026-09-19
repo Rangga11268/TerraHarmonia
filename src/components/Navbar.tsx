@@ -34,8 +34,8 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <>
-      <header className="sticky top-0 z-[1000] bg-white/85 backdrop-blur-xl border-b border-[#e5e5e7] transition-all">
-        <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 h-13 sm:h-14 flex items-center justify-between gap-4">
+      <header className="sticky top-0 z-[1000] bg-white/85 backdrop-blur-xl border-b border-[#e5e5e7] transition-all w-full">
+        <div className="w-full px-4 sm:px-6 lg:px-8 h-13 sm:h-14 flex items-center justify-between gap-4">
           
           {/* Brand */}
           <div className="flex items-center cursor-pointer shrink-0" onClick={() => onSelectTab('overview')}>

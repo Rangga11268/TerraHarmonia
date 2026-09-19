@@ -62,7 +62,7 @@ Data acuan satelit: NASA FIRMS (MODIS/VIIRS Harmonized Grid 5.5 km)
   };
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
+    <div className="w-full space-y-6">
       
       {/* Editorial Header (No capsule pills) */}
       <div className="space-y-2 pt-2 pb-4 border-b border-[#e5e5e7]">
