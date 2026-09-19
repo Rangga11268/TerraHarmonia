@@ -21,12 +21,12 @@ export const Logo: React.FC<LogoProps> = ({
 
   return (
     <div className={`inline-flex items-center gap-2.5 select-none ${className}`}>
-      {/* Original Terra Harmonia Logo with Crisp Frame */}
+      {/* Original Terra Harmonia Logo with Crisp Frame & Enhanced Brightness */}
       <div className={`overflow-hidden shrink-0 shadow-sm ring-1 ring-black/10 bg-white ${img}`}>
         <img
           src="/terra_harmonia_logo.jpg"
           alt="Terra Harmonia"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover filter brightness-125 contrast-110 saturate-110"
           loading="eager"
         />
       </div>
