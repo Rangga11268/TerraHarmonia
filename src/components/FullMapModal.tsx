@@ -431,17 +431,17 @@ STATUS RISIKO & REKOMENDASI:
   return (
     <div className="fixed inset-0 z-[2000] bg-[#1d1d1f] flex flex-col font-sans select-none overflow-hidden animate-in fade-in duration-200">
       
-      {/* Top Glass Navigation Header */}
-      <header className="h-14 bg-white/90 backdrop-blur-xl border-b border-[#e5e5e7] px-4 sm:px-6 flex items-center justify-between gap-3 z-10 shrink-0">
+      {/* Top Navigation Header with ultra-high z-index */}
+      <header className="relative z-[3000] h-14 bg-white border-b border-[#e5e5e7] px-4 sm:px-6 flex items-center justify-between gap-3 shrink-0 shadow-xs">
         
         {/* Left: Back / Return Button & Title */}
         <div className="flex items-center gap-3 min-w-0">
           <button
             onClick={onClose}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#f5f5f7] hover:bg-[#e5e5ea] text-[#1d1d1f] font-semibold text-xs rounded-xl border border-[#e5e5e7] transition-all shadow-xs shrink-0 cursor-pointer"
+            className="flex items-center gap-2 px-3.5 py-2 bg-[#1d1d1f] hover:bg-black text-white font-bold text-xs rounded-xl transition-all shadow-md shrink-0 cursor-pointer"
             title="Kembali ke Dashboard (Esc)"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
+            <ArrowLeft className="w-4 h-4" />
             <span>{language === 'id' ? 'Kembali' : 'Back'}</span>
           </button>
 
@@ -507,20 +507,20 @@ STATUS RISIKO & REKOMENDASI:
             </button>
           </div>
 
-          {/* Primary Close Button */}
+          {/* Primary Red/Dark Close Button */}
           <button
             onClick={onClose}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#1d1d1f] hover:bg-black text-white font-semibold text-xs rounded-xl transition-all shadow-xs shrink-0 cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl transition-all shadow-md shrink-0 cursor-pointer"
             title="Tutup Peta Penuh (Esc)"
           >
-            <X className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{language === 'id' ? 'Tutup Peta' : 'Close Map'}</span>
+            <X className="w-4 h-4" />
+            <span>{language === 'id' ? 'Tutup Peta' : 'Close Map'}</span>
           </button>
         </div>
       </header>
 
       {/* Main Map Canvas Area */}
-      <div className="relative flex-1 w-full h-full bg-[#1d1d1f]">
+      <div className="relative flex-1 w-full h-full bg-[#1d1d1f] [isolation:isolate] z-0">
         
         {/* Leaflet DOM Node */}
         <div ref={mapContainerRef} className="absolute inset-0 w-full h-full z-0" />
@@ -768,11 +768,20 @@ STATUS RISIKO & REKOMENDASI:
 
                 <button
                   onClick={handleExportSitRep}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1d1d1f] text-white hover:bg-black rounded-xl font-medium transition-all shadow-xs"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e5e5ea] rounded-xl font-medium transition-all"
                   title="Unduh ringkasan memorandum situasi operasional lapangan"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  <span>Laporan SitRep</span>
+                  <span>SitRep</span>
+                </button>
+
+                <button
+                  onClick={onClose}
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold transition-all shadow-xs cursor-pointer"
+                  title="Tutup Peta Penuh dan Kembali (Esc)"
+                >
+                  <X className="w-3.5 h-3.5" />
+                  <span>Tutup</span>
                 </button>
               </div>
             </div>
