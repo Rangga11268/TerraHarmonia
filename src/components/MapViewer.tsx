@@ -1,8 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { AOIRegion, RawHotspot, HarmonizedWeekData } from '../engine/harmonizer';
-import { MapPin, Flame } from 'lucide-react';
+import { MapPin, Flame, Layers } from 'lucide-react';
 import { Language, translations } from '../data/translations';
 
 interface MapViewerProps {
@@ -24,6 +24,8 @@ export const MapViewer: React.FC<MapViewerProps> = ({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const layerGroupRef = useRef<L.LayerGroup | null>(null);
+  const tileLayerRef = useRef<L.TileLayer | null>(null);
+  const [basemap, setBasemap] = useState<'dark' | 'satellite'>('dark');
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -36,7 +38,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({
         attributionControl: false
       });
 
-      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+      tileLayerRef.current = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
         maxZoom: 16,
         attribution: 'Basemap: Esri World Dark Gray | NASA FIRMS'
       }).addTo(map);
@@ -47,6 +49,28 @@ export const MapViewer: React.FC<MapViewerProps> = ({
       mapInstanceRef.current = map;
     }
   }, []);
+
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    if (tileLayerRef.current) {
+      map.removeLayer(tileLayerRef.current);
+    }
+
+    const url = basemap === 'satellite'
+      ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+      : 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+
+    const attribution = basemap === 'satellite'
+      ? 'Esri World Imagery | NASA FIRMS'
+      : 'Esri World Dark Gray | NASA FIRMS';
+
+    tileLayerRef.current = L.tileLayer(url, {
+      maxZoom: 16,
+      attribution
+    }).addTo(map);
+  }, [basemap]);
 
   useEffect(() => {
     const map = mapInstanceRef.current;
@@ -122,21 +146,51 @@ export const MapViewer: React.FC<MapViewerProps> = ({
 
   return (
     <div className="relative bg-slate-800/90 border border-slate-700/80 rounded-xl overflow-hidden shadow-md flex flex-col h-[480px]">
-      <div className="bg-slate-900 border-b border-slate-700/80 px-3.5 py-2.5 flex items-center justify-between z-10">
+      <div className="bg-slate-900 border-b border-slate-700/80 px-3.5 py-2 flex flex-wrap items-center justify-between gap-2 z-10">
         <div className="flex items-center gap-2 text-xs">
           <MapPin className="w-4 h-4 text-cyan-400 shrink-0" />
           <span className="font-semibold text-white">{selectedAOI.name}</span>
           <span className="text-slate-400">({selectedAOI.biome})</span>
         </div>
 
-        <div className="flex items-center gap-3 text-xs font-mono">
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-full bg-red-500 inline-block" />
-            <span className="text-slate-300">{t.modisLabel}</span>
+        <div className="flex items-center gap-3">
+          {/* Basemap Switcher */}
+          <div className="flex items-center bg-slate-800 rounded-md p-0.5 border border-slate-700">
+            <button
+              onClick={() => setBasemap('dark')}
+              className={`px-2 py-1 text-[11px] font-medium rounded transition-colors flex items-center gap-1 ${
+                basemap === 'dark'
+                  ? 'bg-slate-700 text-cyan-300 font-semibold shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+              title={t.darkMap}
+            >
+              <Layers className="w-3 h-3" />
+              {t.darkMap}
+            </button>
+            <button
+              onClick={() => setBasemap('satellite')}
+              className={`px-2 py-1 text-[11px] font-medium rounded transition-colors flex items-center gap-1 ${
+                basemap === 'satellite'
+                  ? 'bg-cyan-700 text-white font-semibold shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+              title={t.satelliteMap}
+            >
+              {t.satelliteMap}
+            </button>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-full bg-orange-500 inline-block" />
-            <span className="text-slate-300">{t.viirsLabel}</span>
+
+          {/* Sensor Legend */}
+          <div className="flex items-center gap-2.5 text-xs font-mono">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block shadow-sm" />
+              <span className="text-slate-300 text-[11px]">{t.modisLabel}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block shadow-sm" />
+              <span className="text-slate-300 text-[11px]">{t.viirsLabel}</span>
+            </div>
           </div>
         </div>
       </div>

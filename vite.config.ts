@@ -1,4 +1,4 @@
-﻿import { defineConfig } from 'vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
@@ -6,6 +6,18 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    open: true
+    open: true,
+    proxy: {
+      '/firms-data': {
+        target: 'https://firms.modaps.eosdis.nasa.gov',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/firms-data/, '/data')
+      },
+      '/firms-api': {
+        target: 'https://firms.modaps.eosdis.nasa.gov',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/firms-api/, '/api')
+      }
+    }
   }
 })
