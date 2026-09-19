@@ -35,12 +35,299 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
   }, []);
 
   return (
-    <footer className="w-full bg-[#fbfbfd] border-t border-[#e5e5e7] text-[#1d1d1f] transition-all">
+    <footer className="relative overflow-hidden w-full bg-[#fbfbfd] border-t border-[#e5e5e7] text-[#1d1d1f] transition-all">
       
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-10">
+      {/* Dynamic Animated NASA Terra Satellite (EOS AM-1) Orbital Trajectory Canvas in Background */}
+      <div className="pointer-events-none absolute inset-0 w-full h-full overflow-hidden select-none z-0">
+        <svg
+          viewBox="0 0 1440 650"
+          preserveAspectRatio="xMidYMid slice"
+          className="w-full h-full opacity-95"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            {/* Solar Array Sapphire Blue Gradient */}
+            <linearGradient id="terraSolarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#1e3a8a" />
+              <stop offset="40%" stopColor="#2563eb" />
+              <stop offset="75%" stopColor="#1d4ed8" />
+              <stop offset="100%" stopColor="#172554" />
+            </linearGradient>
+
+            {/* NASA Multi-Layer Insulation (MLI) Gold Foil Gradient */}
+            <linearGradient id="terraGoldFoil" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#fef08a" />
+              <stop offset="25%" stopColor="#f59e0b" />
+              <stop offset="65%" stopColor="#d97706" />
+              <stop offset="100%" stopColor="#92400e" />
+            </linearGradient>
+
+            {/* Active MODIS Thermal Sensor Swath Beam Gradient */}
+            <linearGradient id="modisSwathGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+              <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.4" />
+              <stop offset="35%" stopColor="#10b981" stopOpacity="0.22" />
+              <stop offset="85%" stopColor="#059669" stopOpacity="0.06" />
+              <stop offset="100%" stopColor="#047857" stopOpacity="0" />
+            </linearGradient>
+
+            {/* Glowing Orbit Line Trajectory Gradient */}
+            <linearGradient id="orbitTrajectoryGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#0071e3" stopOpacity="0.04" />
+              <stop offset="15%" stopColor="#0071e3" stopOpacity="0.3" />
+              <stop offset="50%" stopColor="#10b981" stopOpacity="0.45" />
+              <stop offset="85%" stopColor="#0071e3" stopOpacity="0.3" />
+              <stop offset="100%" stopColor="#0071e3" stopOpacity="0.04" />
+            </linearGradient>
+
+            {/* Earth Limb Atmosphere Glow */}
+            <radialGradient id="earthLimbGlow" cx="50%" cy="100%" r="60%">
+              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.08" />
+              <stop offset="60%" stopColor="#10b981" stopOpacity="0.03" />
+              <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+            </radialGradient>
+
+            {/* Master Curved Orbit Trajectory Path across the Entire Footer */}
+            <path
+              id="terraOrbitTrack"
+              d="M -140 140 C 280 -15, 960 270, 1580 100"
+            />
+          </defs>
+
+          {/* Faint Earth Horizon Atmosphere Arc at Bottom */}
+          <ellipse cx="720" cy="740" rx="980" ry="240" fill="url(#earthLimbGlow)" />
+
+          {/* Faint Grid & Constellation Coordinate Reference Lines */}
+          <g opacity="0.25" stroke="#cbd5e1" strokeWidth="0.5" strokeDasharray="3 6">
+            <line x1="0" y1="120" x2="1440" y2="120" />
+            <line x1="0" y1="280" x2="1440" y2="280" />
+            <line x1="0" y1="440" x2="1440" y2="440" />
+            <line x1="360" y1="0" x2="360" y2="650" />
+            <line x1="720" y1="0" x2="720" y2="650" />
+            <line x1="1080" y1="0" x2="1080" y2="650" />
+          </g>
+
+          {/* Star Field Micro-Points */}
+          <g fill="#94a3b8" opacity="0.4">
+            <circle cx="120" cy="80" r="1" />
+            <circle cx="280" cy="210" r="1.2" />
+            <circle cx="450" cy="65" r="0.8" />
+            <circle cx="620" cy="190" r="1.2" />
+            <circle cx="790" cy="75" r="1" />
+            <circle cx="950" cy="220" r="1.4" />
+            <circle cx="1120" cy="95" r="0.9" />
+            <circle cx="1310" cy="240" r="1.1" />
+            <circle cx="1400" cy="60" r="1.3" />
+          </g>
+
+          {/* Glowing Curved Orbit Trajectory Ground Track (Dashed) */}
+          <use
+            href="#terraOrbitTrack"
+            fill="none"
+            stroke="url(#orbitTrajectoryGrad)"
+            strokeWidth="2"
+            strokeDasharray="8 8"
+          />
+
+          {/* Secondary Swath Ground Coverage Footprint Envelope */}
+          <path
+            d="M -140 220 C 280 65, 960 350, 1580 180"
+            fill="none"
+            stroke="#10b981"
+            strokeOpacity="0.12"
+            strokeWidth="32"
+            strokeLinecap="round"
+          />
+
+          {/* ORBITING NASA TERRA SATELLITE (EOS AM-1) VEHICLE */}
+          <g>
+            <animateMotion
+              dur="28s"
+              repeatCount="indefinite"
+              rotate="auto"
+              calcMode="linear"
+            >
+              <mpath href="#terraOrbitTrack" />
+            </animateMotion>
+
+            {/* 1. Active MODIS Downward Sensor Swath Beam */}
+            <polygon
+              points="0,6 -75,210 75,210"
+              fill="url(#modisSwathGrad)"
+            />
+            {/* Ground swath footprint indicator */}
+            <ellipse
+              cx="0"
+              cy="210"
+              rx="75"
+              ry="14"
+              fill="#10b981"
+              fillOpacity="0.15"
+              stroke="#10b981"
+              strokeOpacity="0.4"
+              strokeWidth="1"
+              strokeDasharray="4 4"
+            />
+            {/* Ground sensor scan pulse */}
+            <line
+              x1="-70"
+              y1="210"
+              x2="70"
+              y2="210"
+              stroke="#06b6d4"
+              strokeWidth="1.5"
+              strokeOpacity="0.7"
+            >
+              <animate
+                attributeName="stroke-opacity"
+                values="0.2;0.9;0.2"
+                dur="1.8s"
+                repeatCount="indefinite"
+              />
+            </line>
+
+            {/* 2. NASA Terra Satellite Detailed 3D-Look Vector Craft */}
+            <g transform="scale(0.9) translate(-10, -10)">
+              {/* RCS Thruster Ion Glow */}
+              <circle cx="-28" cy="0" r="4" fill="#38bdf8" opacity="0.6">
+                <animate
+                  attributeName="r"
+                  values="3;6;3"
+                  dur="0.8s"
+                  repeatCount="indefinite"
+                />
+                <animate
+                  attributeName="opacity"
+                  values="0.4;0.9;0.4"
+                  dur="0.8s"
+                  repeatCount="indefinite"
+                />
+              </circle>
+
+              {/* Solar Array Boom Mast */}
+              <rect x="14" y="-3" width="18" height="6" fill="#64748b" rx="1" />
+              <line x1="14" y1="0" x2="32" y2="0" stroke="#cbd5e1" strokeWidth="1.5" />
+
+              {/* Large NASA Terra Solar Array Wing (5 Segments with Photovoltaic Cells) */}
+              <g transform="translate(32, -26)">
+                {/* Array Shadow & Frame */}
+                <rect
+                  x="0"
+                  y="0"
+                  width="64"
+                  height="52"
+                  rx="3"
+                  fill="#0f172a"
+                  stroke="#475569"
+                  strokeWidth="1"
+                />
+                {/* Solar Cells Grid */}
+                <rect x="2" y="2" width="58" height="48" rx="2" fill="url(#terraSolarGrad)" />
+                {/* Solar Panel Division Lines */}
+                <line x1="14" y1="2" x2="14" y2="50" stroke="#93c5fd" strokeWidth="0.75" strokeOpacity="0.7" />
+                <line x1="26" y1="2" x2="26" y2="50" stroke="#93c5fd" strokeWidth="0.75" strokeOpacity="0.7" />
+                <line x1="38" y1="2" x2="38" y2="50" stroke="#93c5fd" strokeWidth="0.75" strokeOpacity="0.7" />
+                <line x1="50" y1="2" x2="50" y2="50" stroke="#93c5fd" strokeWidth="0.75" strokeOpacity="0.7" />
+                <line x1="2" y1="18" x2="60" y2="18" stroke="#93c5fd" strokeWidth="0.75" strokeOpacity="0.7" />
+                <line x1="2" y1="34" x2="60" y2="34" stroke="#93c5fd" strokeWidth="0.75" strokeOpacity="0.7" />
+                {/* Solar Panel Cell Specular Glint */}
+                <line x1="4" y1="4" x2="58" y2="4" stroke="#ffffff" strokeWidth="0.8" strokeOpacity="0.4" />
+              </g>
+
+              {/* Main Satellite Spacecraft Bus (Gold MLI Thermal Foil) */}
+              <rect
+                x="-24"
+                y="-14"
+                width="38"
+                height="28"
+                rx="4"
+                fill="url(#terraGoldFoil)"
+                stroke="#78350f"
+                strokeWidth="1"
+              />
+              {/* Bus Panel Foil Creases & Texture */}
+              <line x1="-24" y1="0" x2="14" y2="0" stroke="#fef08a" strokeWidth="0.7" strokeOpacity="0.8" />
+              <line x1="-8" y1="-14" x2="-8" y2="14" stroke="#78350f" strokeWidth="0.7" strokeOpacity="0.6" />
+              <line x1="2" y1="-14" x2="2" y2="14" stroke="#78350f" strokeWidth="0.7" strokeOpacity="0.6" />
+
+              {/* High Gain Antenna (HGA) Gimbal Mast & Dish */}
+              <line x1="-12" y1="-14" x2="-20" y2="-24" stroke="#64748b" strokeWidth="1.5" />
+              <ellipse cx="-22" cy="-26" rx="9" ry="4" fill="#e2e8f0" stroke="#475569" strokeWidth="1" transform="rotate(-25, -22, -26)" />
+              <line x1="-22" y1="-26" x2="-25" y2="-31" stroke="#0ea5e9" strokeWidth="1" />
+              <circle cx="-25" cy="-31" r="1.5" fill="#38bdf8" />
+
+              {/* Scientific Payload Instruments */}
+              {/* 1. MODIS Optical Sensor Bay (Nadir facing downwards) */}
+              <rect x="-18" y="14" width="14" height="8" rx="2" fill="#334155" stroke="#0f172a" strokeWidth="0.7" />
+              <circle cx="-11" cy="18" r="3.5" fill="#06b6d4" />
+              <circle cx="-11" cy="18" r="1.5" fill="#ffffff" />
+
+              {/* 2. ASTER Telescope Pod */}
+              <rect x="-2" y="14" width="10" height="7" rx="1.5" fill="#475569" stroke="#1e293b" strokeWidth="0.7" />
+              <circle cx="3" cy="18" r="2.2" fill="#10b981" />
+
+              {/* 3. CERES / MISR Camera Boresights */}
+              <rect x="-22" y="-12" width="6" height="5" rx="1" fill="#1e293b" />
+              <circle cx="-19" cy="-9.5" r="1.2" fill="#e2e8f0" />
+
+              {/* Active Telemetry LED Strobes */}
+              <circle cx="-22" cy="12" r="1.5" fill="#ef4444">
+                <animate attributeName="opacity" values="1;0.1;1" dur="1s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="12" cy="12" r="1.5" fill="#10b981">
+                <animate attributeName="opacity" values="0.2;1;0.2" dur="1.4s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="-22" cy="-12" r="1.5" fill="#3b82f6">
+                <animate attributeName="opacity" values="1;0.3;1" dur="0.8s" repeatCount="indefinite" />
+              </circle>
+            </g>
+
+            {/* High-Tech HUD Label Badge Floating Alongside the Satellite */}
+            <g transform="translate(42, -28)">
+              <rect
+                x="0"
+                y="0"
+                width="136"
+                height="32"
+                rx="6"
+                fill="#ffffff"
+                fillOpacity="0.9"
+                stroke="#cbd5e1"
+                strokeWidth="1"
+                filter="drop-shadow(0 2px 4px rgba(0,0,0,0.06))"
+              />
+              <circle cx="10" cy="12" r="3" fill="#10b981">
+                <animate attributeName="fill-opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite" />
+              </circle>
+              <text
+                x="18"
+                y="14"
+                fill="#1d1d1f"
+                fontSize="9"
+                fontWeight="700"
+                fontFamily="system-ui, -apple-system, sans-serif"
+                letterSpacing="0.02em"
+              >
+                NASA TERRA (EOS AM-1)
+              </text>
+              <text
+                x="18"
+                y="24"
+                fill="#0071e3"
+                fontSize="7.5"
+                fontWeight="600"
+                fontFamily="ui-monospace, monospace"
+              >
+                705 KM LEO &bull; MODIS ACTIVE
+              </text>
+            </g>
+          </g>
+        </svg>
+      </div>
+      
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-10">
         
         {/* 1. Seamless NASA Terra Satellite (EOS AM-1) Orbital Telemetry Ribbon (No Heavy Dark Cards) */}
-        <div className="w-full bg-white border border-[#e5e5e7] rounded-3xl p-6 sm:p-8 shadow-xs overflow-hidden">
+        <div className="w-full bg-white/95 backdrop-blur-sm border border-[#e5e5e7] rounded-3xl p-6 sm:p-8 shadow-xs overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
             {/* Left Column: Mission Description & Telemetry */}
