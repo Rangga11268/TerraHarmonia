@@ -12,13 +12,14 @@ import {
   Code2,
   Sparkles,
   MapPin,
-  Compass,
   CheckCircle2,
   Layers,
-  Heart,
   FileText,
-  Target,
   Trees,
+  Orbit,
+  Binary,
+  Compass,
+  Zap,
 } from 'lucide-react';
 
 interface TeamPageProps {
@@ -39,224 +40,252 @@ const TEAM_MEMBERS: TeamMember[] = [
     name: 'Rangga & Engineering Lead',
     roleId: 'Pemimpin Tim & Arsitek Geospasial',
     roleEn: 'Team Lead & Geospatial Architect',
-    focusId: 'Perancangan algoritma harmonisasi spasial 5.5 km, pipeline kalibrasi FRP, dan arsitektur web client-side berkinerja tinggi.',
-    focusEn: 'Spatial 5.5 km binning algorithm design, FRP cross-sensor calibration pipeline, and high-performance client architecture.',
+    focusId: 'Perancangan arsitektur harmonisasi spasial 5.5 km, pipeline kalibrasi FRP multi-satelit, dan rekayasa antarmuka web client-side berkinerja tinggi.',
+    focusEn: 'Spatial 5.5 km binning architecture design, FRP cross-sensor calibration pipeline, and high-performance client-side web engineering.',
     tags: ['MODIS & VIIRS', 'GIS / Leaflet', 'React / TypeScript'],
   },
   {
     name: 'Remote Sensing & Data Scientist',
     roleId: 'Spesialis Penginderaan Jauh & Data Satelit',
     roleEn: 'Remote Sensing & Satellite Data Scientist',
-    focusId: 'Analisis deret waktu 26 tahun (2000–2026), normalisasi degradasi sensor Terra/Aqua, dan validasi dataset NASA FIRMS.',
-    focusEn: '26-year time-series analysis (2000–2026), sensor degradation normalization, and NASA FIRMS dataset validation.',
+    focusId: 'Analisis statistik deret waktu 26 tahun (2000–2026), normalisasi degradasi sensor Terra/Aqua, dan kurasi dataset NASA FIRMS.',
+    focusEn: '26-year time-series statistical analysis (2000–2026), sensor degradation normalization, and NASA FIRMS dataset curation.',
     tags: ['NASA FIRMS', 'Python / GeoPandas', 'Statistical Modeling'],
   },
   {
     name: 'Peatland Hydrology & Ecology Specialist',
     roleId: 'Peneliti Ekologi Gambut & Mitigasi',
     roleEn: 'Peatland Hydrologist & Fire Ecology Researcher',
-    focusId: 'Pemodelan dinamika muka air tanah (TMAG < -40 cm), estimasi emisi karbon CO2e gambut, dan integrasi standar restorasi BRGM.',
-    focusEn: 'Groundwater table (TMAG < -40 cm) dynamics modeling, peat CO2e carbon emission metrics, and BRGM regulatory compliance.',
+    focusId: 'Pemodelan dinamika muka air tanah gambut (TMAG < -40 cm), perhitungan emisi karbon CO2e gambut, dan integrasi standar restorasi hidrologis BRGM.',
+    focusEn: 'Groundwater table (TMAG < -40 cm) dynamics modeling, peat CO2e carbon accounting, and BRGM hydrological restoration integration.',
     tags: ['TMAG -40cm', 'Canal Blocking', 'Carbon Accounting'],
   },
   {
     name: 'UI/UX & Human-Centered Interface Designer',
     roleId: 'Desainer Antarmuka & Aksesibilitas',
     roleEn: 'UI/UX & Accessibility Interface Designer',
-    focusId: 'Prinsip desain Apple-clean antislop, hierarki visual data ilmiah tanpa distraksi, dan responsivitas bagi komandan lapangan.',
-    focusEn: 'Apple-clean antislop design principles, distraction-free scientific data hierarchy, and field responsive layouts.',
+    focusId: 'Penerapan estetika Apple-clean tanpa AI-slop, hierarki visual data ilmiah berkecepatan tinggi, dan responsivitas penuh bagi komandan lapangan.',
+    focusEn: 'Apple-clean aesthetic without AI slop, high-acuity scientific visual hierarchy, and full mobile field responsiveness.',
     tags: ['Antislop UI', 'Design Systems', 'Responsive GIS'],
   },
 ];
 
 export const TeamPage: React.FC<TeamPageProps> = ({ language }) => {
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-10 animate-in fade-in duration-200">
+    <div className="w-full space-y-8 animate-in fade-in duration-200">
       
-      {/* Top Editorial Breadcrumb & Header */}
-      <div className="space-y-2 pt-2 pb-5 border-b border-[#e5e5e7]">
-        <div className="text-xs font-semibold uppercase tracking-wider text-[#86868b] flex items-center gap-2">
-          <Award className="w-4 h-4 text-[#1d1d1f]" />
-          <span>NASA Space Apps Challenge 2026 &bull; Harmonization of MODIS and VIIRS Hot Spots</span>
+      {/* 1. Full-Width Editorial Hero Header */}
+      <div className="w-full bg-white border border-[#e5e5e7] rounded-3xl p-6 sm:p-10 shadow-xs space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#e5e5e7]">
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#86868b] uppercase tracking-wider">
+            <Award className="w-4 h-4 text-[#1d1d1f]" />
+            <span>NASA Space Apps Challenge 2026 &bull; Global Hackathon</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f5f5f7] border border-[#e5e5e7] text-xs font-semibold text-[#1d1d1f]">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+              Tantangan: Harmonization of MODIS &amp; VIIRS Hot Spots
+            </span>
+          </div>
         </div>
-        <h1 className="text-2xl sm:text-4xl font-bold text-[#1d1d1f] tracking-tight">
-          {language === 'id' ? 'Profil Tim, Filosofi & Metodologi' : 'Team Dossier, Philosophy & Methodology'}
-        </h1>
-        <p className="text-sm sm:text-base text-[#6e6e73] max-w-3xl leading-relaxed">
-          {language === 'id'
-            ? 'Dokumentasi komprehensif mengenai visi, filosofi nama & logo, tujuan strategis, target audiens, dan tim di balik platform Terra Harmonia.'
-            : 'Comprehensive documentation of the vision, brand philosophy, strategic goals, target personas, and multidisciplinary team behind Terra Harmonia.'}
-        </p>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pt-2">
+          <div className="lg:col-span-8 space-y-3">
+            <h1 className="text-3xl sm:text-5xl font-bold text-[#1d1d1f] tracking-tight leading-tight">
+              Terra Harmonia
+            </h1>
+            <p className="text-base sm:text-lg text-[#515154] max-w-3xl leading-relaxed">
+              {language === 'id'
+                ? 'Menghubungkan 26 tahun pengamatan satelit NASA Terra, Aqua, Suomi-NPP, dan NOAA-20 menjadi satu deret waktu konsisten tanpa bias sensor untuk perlindungan ekosistem lahan gambut Indonesia.'
+                : 'Unifying 26 years of NASA satellite observations from Terra, Aqua, Suomi-NPP, and NOAA-20 into an un-biased, continuous climatology for Indonesian tropical peatland preservation.'}
+            </p>
+          </div>
+
+          {/* Quick Stats Banner */}
+          <div className="lg:col-span-4 grid grid-cols-2 gap-3">
+            <div className="p-4 rounded-2xl bg-[#fbfbfd] border border-[#e5e5e7]">
+              <span className="text-[10px] font-bold uppercase text-[#86868b] tracking-wider block">Rentang Data</span>
+              <strong className="text-2xl font-bold text-[#1d1d1f] num mt-1 block">26 Tahun</strong>
+              <span className="text-[11px] text-[#6e6e73]">2000 s/d 2026</span>
+            </div>
+            <div className="p-4 rounded-2xl bg-[#fbfbfd] border border-[#e5e5e7]">
+              <span className="text-[10px] font-bold uppercase text-[#86868b] tracking-wider block">Resolusi Grid</span>
+              <strong className="text-2xl font-bold text-[#1d1d1f] num mt-1 block">5.5 km</strong>
+              <span className="text-[11px] text-[#6e6e73]">Equal-Area Binning</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Main Feature: Team Group Showcase & Manifesto */}
-      <div className="bg-white border border-[#e5e5e7] rounded-3xl overflow-hidden shadow-xs grid grid-cols-1 lg:grid-cols-12 gap-0">
+      {/* 2. Full-Width Team Showcase & Manifesto Card */}
+      <div className="w-full bg-white border border-[#e5e5e7] rounded-3xl overflow-hidden shadow-xs grid grid-cols-1 lg:grid-cols-12 gap-0">
         
-        {/* Left: High-Res Photo Container */}
-        <div className="lg:col-span-7 relative min-h-[320px] sm:min-h-[440px] bg-[#1d1d1f] overflow-hidden">
+        {/* Left: High-Res Team Photo */}
+        <div className="lg:col-span-7 relative min-h-[360px] sm:min-h-[480px] bg-[#1d1d1f] overflow-hidden">
           <img
             src="/team_photo.jpg"
             alt="Team Terra Harmonia"
             className="w-full h-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
           
-          <div className="absolute bottom-5 left-5 right-5 text-white">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-semibold mb-2">
+          <div className="absolute bottom-6 left-6 right-6 text-white space-y-2">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-semibold">
               <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              <span>Terra Harmonia Initiative &bull; Indonesia</span>
+              <span>Tim Terra Harmonia &bull; Indonesia</span>
             </div>
-            <h2 className="text-xl sm:text-3xl font-bold tracking-tight">
-              Team Terra Harmonia
+            <h2 className="text-2xl sm:text-4xl font-bold tracking-tight">
+              Kolaborasi Multi-Disiplin
             </h2>
-            <p className="text-xs sm:text-sm text-white/80 mt-1 max-w-lg leading-relaxed">
+            <p className="text-xs sm:text-sm text-white/85 max-w-xl leading-relaxed">
               {language === 'id'
-                ? 'Kolaborasi data sains satelit, penginderaan jauh, dan hidrologi gambut untuk perlindungan iklim tropis Indonesia.'
-                : 'Pioneering unified wildfire climatology and peatland hydrological defense for Indonesian tropical ecosystems.'}
+                ? 'Sinergi data sains antariksa, penginderaan jauh geospasial, hidrologi lahan gambut tropis, dan rekayasa perangkat lunak modern.'
+                : 'A cross-disciplinary synergy of satellite remote sensing, peatland hydrology, and modern geospatial software engineering.'}
             </p>
           </div>
         </div>
 
-        {/* Right: Mission Manifesto & Challenge Background */}
-        <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between space-y-6 bg-white">
+        {/* Right: Problem Statement & Project Mission */}
+        <div className="lg:col-span-5 p-6 sm:p-10 flex flex-col justify-between space-y-6 bg-white">
           <div className="space-y-4">
             <div>
-              <span className="text-[11px] font-bold text-[#86868b] uppercase tracking-wider">Tantangan Resmi NASA</span>
-              <h3 className="text-lg font-bold text-[#1d1d1f] mt-0.5">
-                Harmonization of MODIS and VIIRS Hot Spots
+              <span className="text-[11px] font-bold text-[#86868b] uppercase tracking-wider">Akar Masalah Ilmiah</span>
+              <h3 className="text-lg sm:text-xl font-bold text-[#1d1d1f] mt-0.5">
+                Mengapa Harmonisasi MODIS &amp; VIIRS Sangat Krusial?
               </h3>
             </div>
 
             <p className="text-xs sm:text-sm text-[#515154] leading-relaxed">
               {language === 'id'
-                ? 'Sebelum 2012, pengamatan kebakaran global bergantung pada instrumen MODIS (resolusi 1 km). Peluncuran sensor VIIRS (375 m) menghasilkan lonjakan tajam pada jumlah titik api mentah—bukan karena api meningkat, melainkan karena sensornya jauh lebih tajam. Terra Harmonia hadir untuk menjembatani diskontinuitas struktural ini.'
-                : 'Prior to 2012, global active fire detection relied on MODIS (1 km). The launch of VIIRS (375 m) introduced a sharp artificial jump in raw counts due to higher spatial acuity. Terra Harmonia bridges this structural discontinuity into a seamless 26-year record.'}
+                ? 'Sebelum 2012, pemantauan kebakaran hutan global mengandalkan sensor MODIS (resolusi 1 km). Saat sensor VIIRS (resolusi 375 m) beroperasi pada 2012, jumlah titik api mentah melonjak tajam bukan karena kebakaran bertambah, melainkan karena resolusi sensor yang jauh lebih tajam mampu mendeteksi api kecil yang dulunya luput.'
+                : 'Prior to 2012, active fire detection relied on MODIS (1 km). The addition of VIIRS (375 m) in 2012 introduced an artificial spike in raw fire counts due to superior spatial acuity rather than an actual increase in burning.'}
             </p>
 
-            <div className="p-4 rounded-2xl bg-[#f5f5f7] border border-[#e5e5e7] space-y-2">
-              <div className="text-xs font-bold text-[#1d1d1f] flex items-center gap-1.5">
+            <div className="p-4 rounded-2xl bg-[#fbfbfd] border border-[#e5e5e7] space-y-2">
+              <div className="text-xs font-bold text-[#1d1d1f] flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-emerald-700" />
-                <span>{language === 'id' ? 'Visi Utama Kami' : 'Core Vision'}</span>
+                <span>{language === 'id' ? 'Solusi Terra Harmonia' : 'The Terra Harmonia Solution'}</span>
               </div>
               <p className="text-xs text-[#6e6e73] leading-relaxed">
                 {language === 'id'
-                  ? 'Menyediakan satu sumber kebenaran data historis (single source of truth) tanpa bias sensor agar pembuat kebijakan, satgas pemadam, dan peneliti dapat mengambil keputusan yang presisi demi mencapai target Indonesia FOLU Net Sink 2030.'
-                  : 'Delivering an un-biased 26-year climatology enabling decision-makers, emergency commanders, and researchers to protect peatlands and achieve Net-Zero targets.'}
+                  ? 'Kami menggabungkan deteksi tumpang-tindih ke dalam grid 5.5 km dan mengalibrasi energi radiatif (FRP) dengan model power-law, menghasilkan satu deret waktu 26 tahun yang adil dan dapat dibandingkan secara objektif.'
+                  : 'We merge overlapping detections into unified 5.5 km equal-area grids and calibrate Fire Radiative Power (FRP) with power-law normalization, producing an un-biased 26-year climatology.'}
               </p>
             </div>
           </div>
 
           <div className="pt-4 border-t border-[#e5e5e7] flex items-center justify-between text-xs text-[#86868b]">
-            <span>Lokasi: Jakarta &bull; Indonesia</span>
-            <span>Tahun: 2026</span>
+            <span>Lokasi: Jakarta, Indonesia</span>
+            <span>Kompetisi: NASA Space Apps 2026</span>
           </div>
         </div>
 
       </div>
 
-      {/* SECTION 1: FILOSOFI NAMA & FILOSOFI LOGO */}
-      <div className="bg-white border border-[#e5e5e7] rounded-3xl p-6 sm:p-8 shadow-xs space-y-8">
+      {/* 3. Full-Width Section: Filosofi Nama & Anatomi Logo */}
+      <div className="w-full bg-white border border-[#e5e5e7] rounded-3xl p-6 sm:p-10 shadow-xs space-y-8">
         <div>
           <div className="text-xs font-semibold uppercase tracking-wider text-[#86868b]">
-            {language === 'id' ? 'Identitas & Filosofi' : 'Brand Philosophy & Identity'}
+            {language === 'id' ? 'Identitas & Makna' : 'Identity & Brand Philosophy'}
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-[#1d1d1f] tracking-tight mt-0.5">
-            {language === 'id' ? 'Makna Filosofis Terra Harmonia' : 'The Philosophical Meaning Behind Terra Harmonia'}
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#1d1d1f] tracking-tight mt-0.5">
+            {language === 'id' ? 'Filosofi Nama & Anatomi Lambang Terra Harmonia' : 'Name Philosophy & Logo Emblem Anatomy'}
           </h2>
           <p className="text-xs sm:text-sm text-[#6e6e73] mt-1 max-w-3xl">
             {language === 'id'
-              ? 'Setiap elemen nama dan lambang visual kami dirancang dengan landasan sains geospasial dan komitmen pelestarian bumi.'
-              : 'Every naming element and visual emblem is grounded in satellite geodesy and ecological stewardship.'}
+              ? 'Setiap kata dan garis geometris pada lambang kami memiliki makna ilmiah dan dedikasi ekologis yang mendalam.'
+              : 'Every naming component and geometric contour in our emblem represents satellite science and ecological stewardship.'}
           </p>
         </div>
 
-        {/* Name Philosophy Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Naming Philosophy Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           
-          <div className="p-5 rounded-2xl bg-[#fbfbfd] border border-[#e5e5e7] space-y-3">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 font-bold text-sm">
+          <div className="p-6 rounded-2xl bg-[#fbfbfd] border border-[#e5e5e7] space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="px-3 py-1.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 font-bold text-sm">
                 TERRA
               </div>
               <div>
-                <h3 className="font-bold text-sm text-[#1d1d1f]">Planet Bumi &amp; Satelit NASA Terra</h3>
-                <span className="text-[11px] text-[#86868b]">Akar Kata Latin: Tanah / Bumi</span>
+                <h3 className="font-bold text-base text-[#1d1d1f]">Planet Bumi &amp; Satelit NASA Terra</h3>
+                <span className="text-xs text-[#86868b]">Bahasa Latin: Bumi / Tanah</span>
               </div>
             </div>
-            <p className="text-xs text-[#515154] leading-relaxed">
+            <p className="text-xs sm:text-sm text-[#515154] leading-relaxed">
               {language === 'id'
-                ? 'Merujuk pada Planet Bumi (Terra) sekaligus penghormatan kepada satelit legendaris NASA Terra (EOS AM-1) yang diluncurkan pada 1999 dan mengawali era modern pengamatan titik api global menggunakan instrumen MODIS.'
-                : 'Refers to planet Earth and pays tribute to NASA’s flagship Terra satellite (EOS AM-1) launched in 1999, which pioneered global MODIS fire monitoring.'}
+                ? 'Nama Terra mewakili Planet Bumi sebagai rumah bersama, sekaligus penghormatan kepada satelit legendaris NASA Terra (EOS AM-1) yang diluncurkan pada 18 Desember 1999 dan memulai era modern pengamatan titik api global melalui instrumen MODIS.'
+                : 'Represents planet Earth and pays tribute to NASA’s flagship Terra satellite (EOS AM-1) launched in 1999, which pioneered modern active fire monitoring via the MODIS sensor.'}
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-[#fbfbfd] border border-[#e5e5e7] space-y-3">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-sm">
+          <div className="p-6 rounded-2xl bg-[#fbfbfd] border border-[#e5e5e7] space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-sm">
                 HARMONIA
               </div>
               <div>
-                <h3 className="font-bold text-sm text-[#1d1d1f]">Harmonisasi &amp; Keselarasan Sensor</h3>
-                <span className="text-[11px] text-[#86868b]">Akar Kata Yunani/Latin: Keselarasan Data</span>
+                <h3 className="font-bold text-base text-[#1d1d1f]">Harmonisasi &amp; Keselarasan Sensor</h3>
+                <span className="text-xs text-[#86868b]">Bahasa Latin/Yunani: Keselarasan Data</span>
               </div>
             </div>
-            <p className="text-xs text-[#515154] leading-relaxed">
+            <p className="text-xs sm:text-sm text-[#515154] leading-relaxed">
               {language === 'id'
-                ? 'Melambangkan misi utama kami untuk menyelaraskan dua generasi sensor yang berbeda (MODIS 1 km dan VIIRS 375 m) sehingga menghasilkan data deret waktu yang selaras, adil, dan tidak bias selama 26 tahun.'
-                : 'Symbolizes our core objective: bringing mathematical harmony and continuity between MODIS and VIIRS across 26 years without sensor shifts.'}
+                ? 'Harmonia melambangkan misi utama kami: menyelaraskan dua era sensor yang berbeda (MODIS 1 km dan VIIRS 375 m) sehingga menghasilkan data deret waktu yang selaras, adil, dan berkesinambungan tanpa lonjakan data artifisial.'
+                : 'Harmonia embodies our scientific mission: creating seamless harmony between distinct sensor generations (MODIS and VIIRS) to deliver a cohesive, un-biased 26-year record.'}
             </p>
           </div>
 
         </div>
 
-        {/* Logo Philosophy Breakdown */}
-        <div className="border-t border-[#e5e5e7] pt-6 space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        {/* Logo Breakdown Container */}
+        <div className="border-t border-[#e5e5e7] pt-8 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <span className="text-xs font-bold text-[#1d1d1f] uppercase tracking-wider">
-                {language === 'id' ? 'Anatomi & Filosofi Logo Vektor' : 'Logo Emblem Anatomy'}
+                {language === 'id' ? 'Anatomi Visual Lambang Vektor Murni' : 'Visual Anatomy of the Pure Vector Emblem'}
               </span>
-              <p className="text-xs text-[#86868b]">Simbolisme visual murni tanpa latar belakang box (Isolated Pure Vector)</p>
+              <p className="text-xs text-[#86868b]">Dirancang murni tanpa background kotak untuk integritas transparansi Open Science</p>
             </div>
 
-            <div className="p-3 bg-[#f5f5f7] rounded-2xl border border-[#e5e5e7] flex items-center gap-3 shrink-0">
-              <img src="/favicon.svg" alt="Terra Harmonia Logo" className="w-8 h-8" />
+            <div className="p-4 bg-[#f5f5f7] rounded-2xl border border-[#e5e5e7] flex items-center gap-3 shrink-0">
+              <img src="/favicon.svg" alt="Terra Harmonia Logo" className="w-10 h-10" />
               <div className="text-left text-xs">
-                <span className="font-bold text-[#1d1d1f] block leading-none">Terra Harmonia</span>
-                <span className="text-[10px] text-[#86868b]">Official Vector Emblem</span>
+                <span className="font-bold text-[#1d1d1f] block text-sm">Terra Harmonia</span>
+                <span className="text-[#86868b]">Official NASA Hackathon Emblem</span>
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
             
-            <div className="p-4 rounded-xl border border-[#e5e5e7] bg-white space-y-1.5">
+            <div className="p-5 rounded-2xl border border-[#e5e5e7] bg-[#fbfbfd] space-y-2">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-emerald-500 shrink-0" />
-                <strong className="text-[#1d1d1f]">Bulan Sabit Bumi (Biosfer)</strong>
+                <span className="w-3.5 h-3.5 rounded-full bg-emerald-500 shrink-0" />
+                <strong className="text-sm text-[#1d1d1f]">Bulan Sabit Bumi (Biosfer)</strong>
               </div>
               <p className="text-[#6e6e73] leading-relaxed">
-                Melambangkan ekosistem lahan basah dan gambut tropis Indonesia yang sangat kaya karbon namun rentan terhadap kekeringan.
+                Melambangkan ekosistem lahan gambut dan hutan tropis Indonesia yang sangat kaya karbon namun rentan terhadap pengeringan akibat perubahan iklim.
               </p>
             </div>
 
-            <div className="p-4 rounded-xl border border-[#e5e5e7] bg-white space-y-1.5">
+            <div className="p-5 rounded-2xl border border-[#e5e5e7] bg-[#fbfbfd] space-y-2">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-red-500 shrink-0" />
-                <strong className="text-[#1d1d1f]">Lidah Api Dinamis (FRP)</strong>
+                <span className="w-3.5 h-3.5 rounded-full bg-red-500 shrink-0" />
+                <strong className="text-sm text-[#1d1d1f]">Lidah Api Dinamis (FRP)</strong>
               </div>
               <p className="text-[#6e6e73] leading-relaxed">
-                Merepresentasikan energi panas radiatif api (*Fire Radiative Power*) yang dipantau dari luar angkasa secara real-time.
+                Merepresentasikan energi radiatif api (*Fire Radiative Power*) yang dipantau sensor satelit secara real-time dari orbit luar angkasa.
               </p>
             </div>
 
-            <div className="p-4 rounded-xl border border-[#e5e5e7] bg-white space-y-1.5">
+            <div className="p-5 rounded-2xl border border-[#e5e5e7] bg-[#fbfbfd] space-y-2">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-amber-400 shrink-0" />
-                <strong className="text-[#1d1d1f]">Cincin Orbit Satelit Ganda</strong>
+                <span className="w-3.5 h-3.5 rounded-full bg-amber-400 shrink-0" />
+                <strong className="text-sm text-[#1d1d1f]">Cincin Orbit Satelit Ganda</strong>
               </div>
               <p className="text-[#6e6e73] leading-relaxed">
-                Menggambarkan perpaduan orbit konstelasi MODIS dan VIIRS yang berputar selaras mengelilingi Bumi.
+                Menggambarkan perpaduan orbit konstelasi MODIS dan VIIRS yang mengelilingi Bumi dalam sinkronisasi matematis yang harmonis.
               </p>
             </div>
 
@@ -265,161 +294,51 @@ export const TeamPage: React.FC<TeamPageProps> = ({ language }) => {
 
       </div>
 
-      {/* SECTION 2: TUJUAN, GOALS & TARGET AUDIENS */}
-      <div className="bg-white border border-[#e5e5e7] rounded-3xl p-6 sm:p-8 shadow-xs space-y-8">
-        <div>
-          <div className="text-xs font-semibold uppercase tracking-wider text-[#86868b]">
-            {language === 'id' ? 'Sasaran & Pengguna' : 'Goals & Target Personas'}
-          </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-[#1d1d1f] tracking-tight mt-0.5">
-            {language === 'id' ? 'Tujuan Platform & 4 Kelompok Target Pengguna' : 'Platform Goals & 4 Core Target Personas'}
-          </h2>
-          <p className="text-xs sm:text-sm text-[#6e6e73] mt-1 max-w-3xl">
-            {language === 'id'
-              ? 'Terra Harmonia dibangun untuk memberikan dampak nyata bagi 4 pilar pemangku kepentingan kehutanan dan kebencanaan di Indonesia.'
-              : 'Engineered to deliver high-impact intelligence across 4 primary stakeholder groups.'}
-          </p>
-        </div>
-
-        {/* 4 Persona Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          
-          <div className="p-5 rounded-2xl border border-[#e5e5e7] bg-[#fbfbfd] space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-white border border-[#e5e5e7] text-blue-600">
-                  <ShieldCheck className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-sm text-[#1d1d1f]">1. Komando &amp; Pembuat Kebijakan</h3>
-                  <span className="text-[11px] text-[#86868b]">BNPB, Kementerian LHK, BPBD Provinsi</span>
-                </div>
-              </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full">Strategis</span>
-            </div>
-            <p className="text-xs text-[#515154] leading-relaxed">
-              <strong>Kebutuhan:</strong> Mengesahkan status siaga darurat karhutla, mengevaluasi moratorium sawit/gambut, dan menerbitkan laporan situasi resmi.
-            </p>
-            <div className="p-2.5 rounded-lg bg-white border border-[#e5e5e7] text-[11px] text-[#1d1d1f] font-medium flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              <span>Solusi: Dossier Eksekutif SitRep A4 Siap Cetak &amp; Peringatan Anomali Ekstrem</span>
-            </div>
-          </div>
-
-          <div className="p-5 rounded-2xl border border-[#e5e5e7] bg-[#fbfbfd] space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-white border border-[#e5e5e7] text-red-600">
-                  <Flame className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-sm text-[#1d1d1f]">2. Satgas Patroli &amp; Regu Pemadam</h3>
-                  <span className="text-[11px] text-[#86868b]">Manggala Agni Daops, MPA Desa, Damkar</span>
-                </div>
-              </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 bg-red-100 text-red-800 rounded-full">Operasional</span>
-            </div>
-            <p className="text-xs text-[#515154] leading-relaxed">
-              <strong>Kebutuhan:</strong> Mengetahui tinggi muka air tanah gambut (TMAG &lt; -40 cm), status sekat kanal, dan memo penugasan pendinginan lahan.
-            </p>
-            <div className="p-2.5 rounded-lg bg-white border border-[#e5e5e7] text-[11px] text-[#1d1d1f] font-medium flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              <span>Solusi: Simulator Muka Air Gambut &amp; Generator Nota Briefing Patroli (.TXT)</span>
-            </div>
-          </div>
-
-          <div className="p-5 rounded-2xl border border-[#e5e5e7] bg-[#fbfbfd] space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-white border border-[#e5e5e7] text-purple-600">
-                  <Database className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-sm text-[#1d1d1f]">3. Peneliti Iklim &amp; Sains Geospasial</h3>
-                  <span className="text-[11px] text-[#86868b]">BRIN, BMKG, Akademisi, Komunitas NASA</span>
-                </div>
-              </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full">Akademik</span>
-            </div>
-            <p className="text-xs text-[#515154] leading-relaxed">
-              <strong>Kebutuhan:</strong> Menguji deret waktu 26 tahun bebas bias sensor, membandingkan tahun El Niño, dan menghitung emisi karbon.
-            </p>
-            <div className="p-2.5 rounded-lg bg-white border border-[#e5e5e7] text-[11px] text-[#1d1d1f] font-medium flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              <span>Solusi: Lab Harmonisasi, Komparasi Spasial 2 Tahun, &amp; Kurva Kalibrasi FRP</span>
-            </div>
-          </div>
-
-          <div className="p-5 rounded-2xl border border-[#e5e5e7] bg-[#fbfbfd] space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-white border border-[#e5e5e7] text-emerald-700">
-                  <Trees className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-sm text-[#1d1d1f]">4. Auditor Konsesi &amp; Keberlanjutan ESG</h3>
-                  <span className="text-[11px] text-[#86868b]">Perkebunan Sawit, HTI, Hutan Adat, RSPO/ISPO</span>
-                </div>
-              </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full">Kepatuhan</span>
-            </div>
-            <p className="text-xs text-[#515154] leading-relaxed">
-              <strong>Kebutuhan:</strong> Memeriksa kepatuhan zero-burning dan mendeteksi titik api historis di dalam perimeter izin konsesi.
-            </p>
-            <div className="p-2.5 rounded-lg bg-white border border-[#e5e5e7] text-[11px] text-[#1d1d1f] font-medium flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              <span>Solusi: Inspektur Poligon Custom GeoJSON &amp; Audit Point-in-Polygon</span>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      {/* SECTION 3: KOMPOSISI & PERAN ANGGOTA TIM */}
-      <div className="space-y-4">
+      {/* 4. Full-Width Section: Komposisi & Spesialisasi Anggota Tim */}
+      <div className="w-full bg-white border border-[#e5e5e7] rounded-3xl p-6 sm:p-10 shadow-xs space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-[#1d1d1f] tracking-tight">
-              {language === 'id' ? 'Komposisi & Peran Tim' : 'Team Composition & Specializations'}
+            <div className="text-xs font-semibold uppercase tracking-wider text-[#86868b]">
+              {language === 'id' ? 'Sumber Daya Manusia' : 'Human Capital'}
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#1d1d1f] tracking-tight mt-0.5">
+              {language === 'id' ? 'Komposisi & Peran Anggota Tim' : 'Team Composition & Core Disciplines'}
             </h2>
-            <p className="text-xs text-[#86868b] mt-0.5">
-              {language === 'id' ? 'Keahlian multi-disiplin untuk mengatasi tantangan geospasial yang kompleks' : 'Multidisciplinary expertise tackling complex geospatial challenges'}
-            </p>
           </div>
-          <span className="text-xs font-semibold text-[#86868b] bg-white px-3 py-1 rounded-full border border-[#e5e5e7]">
+          <span className="text-xs font-semibold text-[#86868b] bg-[#f5f5f7] px-3.5 py-1.5 rounded-full border border-[#e5e5e7] shrink-0">
             4 Bidang Keahlian
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {TEAM_MEMBERS.map((member, index) => (
             <div
               key={index}
-              className="bg-white border border-[#e5e5e7] rounded-2xl p-5 sm:p-6 shadow-xs hover:border-[#1d1d1f]/40 transition-all flex flex-col justify-between space-y-4"
+              className="bg-[#fbfbfd] border border-[#e5e5e7] rounded-2xl p-6 shadow-xs hover:border-[#1d1d1f]/40 transition-all flex flex-col justify-between space-y-4"
             >
               <div className="space-y-2">
-                <div className="flex items-start justify-between gap-2">
+                <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h3 className="text-base font-bold text-[#1d1d1f]">{member.name}</h3>
-                    <p className="text-xs font-semibold text-blue-700 mt-0.5">
+                    <h3 className="text-lg font-bold text-[#1d1d1f]">{member.name}</h3>
+                    <p className="text-xs font-bold text-blue-700 mt-0.5">
                       {language === 'id' ? member.roleId : member.roleEn}
                     </p>
                   </div>
-                  <div className="p-2 bg-[#f5f5f7] rounded-xl text-[#1d1d1f] shrink-0">
+                  <div className="p-2.5 bg-white rounded-xl border border-[#e5e5e7] text-[#1d1d1f] shrink-0">
                     <Users className="w-4 h-4" />
                   </div>
                 </div>
 
-                <p className="text-xs text-[#6e6e73] leading-relaxed pt-1">
+                <p className="text-xs text-[#515154] leading-relaxed pt-1">
                   {language === 'id' ? member.focusId : member.focusEn}
                 </p>
               </div>
 
-              <div className="flex flex-wrap gap-1.5 pt-2 border-t border-[#e5e5e7]">
+              <div className="flex flex-wrap gap-1.5 pt-3 border-t border-[#e5e5e7]">
                 {member.tags.map((tag, tIdx) => (
                   <span
                     key={tIdx}
-                    className="text-[11px] font-medium px-2.5 py-0.5 rounded-lg bg-[#f5f5f7] text-[#1d1d1f] border border-[#e5e5e7]"
+                    className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-white text-[#1d1d1f] border border-[#e5e5e7]"
                   >
                     {tag}
                   </span>
@@ -430,71 +349,83 @@ export const TeamPage: React.FC<TeamPageProps> = ({ language }) => {
         </div>
       </div>
 
-      {/* SECTION 4: 4 PILAR METODOLOGI ILMIAH */}
-      <div className="bg-white border border-[#e5e5e7] rounded-3xl p-6 sm:p-8 shadow-xs space-y-6">
+      {/* 5. Full-Width Section: 4 Pilar Metodologi Ilmiah */}
+      <div className="w-full bg-white border border-[#e5e5e7] rounded-3xl p-6 sm:p-10 shadow-xs space-y-6">
         <div>
           <div className="text-xs font-semibold uppercase tracking-wider text-[#86868b]">
-            {language === 'id' ? 'Pilar Metodologi' : 'Methodology Pillars'}
+            {language === 'id' ? 'Arsitektur Metodologi' : 'Scientific Methodology'}
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-[#1d1d1f] tracking-tight mt-0.5">
-            {language === 'id' ? '4 Inovasi Ilmiah Terra Harmonia' : '4 Core Scientific Innovations'}
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#1d1d1f] tracking-tight mt-0.5">
+            {language === 'id' ? '4 Inovasi Ilmiah Utama Terra Harmonia' : '4 Core Scientific Innovations'}
           </h2>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
           
-          <div className="p-4 rounded-2xl bg-[#fbfbfd] border border-[#e5e5e7] space-y-2">
-            <div className="p-2.5 w-fit rounded-xl bg-white border border-[#e5e5e7] text-[#1d1d1f]">
-              <Database className="w-4 h-4" />
+          <div className="p-5 rounded-2xl bg-[#fbfbfd] border border-[#e5e5e7] space-y-2.5 flex flex-col justify-between">
+            <div className="space-y-2">
+              <div className="p-2.5 w-fit rounded-xl bg-white border border-[#e5e5e7] text-[#1d1d1f]">
+                <Database className="w-5 h-5" />
+              </div>
+              <h3 className="font-bold text-[#1d1d1f] text-sm">Spatial Equal-Area Binning (5.5 km)</h3>
+              <p className="text-[#6e6e73] leading-relaxed">
+                Pengelompokan grid equal-area 5.5 km menyatukan beberapa piksel tajam VIIRS ke dalam satu footprint MODIS untuk mengeliminasi double-counting.
+              </p>
             </div>
-            <h3 className="font-bold text-[#1d1d1f] text-sm">Spatial Equal-Area Binning</h3>
-            <p className="text-[#6e6e73] leading-relaxed">
-              Pengelompokan grid 5.5 km menyatukan beberapa piksel VIIRS dalam satu footprint MODIS untuk mencegah double-counting.
-            </p>
+            <span className="text-[10px] font-bold text-[#86868b] uppercase tracking-wider">Metrik Spasial</span>
           </div>
 
-          <div className="p-4 rounded-2xl bg-[#fbfbfd] border border-[#e5e5e7] space-y-2">
-            <div className="p-2.5 w-fit rounded-xl bg-white border border-[#e5e5e7] text-[#1d1d1f]">
-              <Cpu className="w-4 h-4" />
+          <div className="p-5 rounded-2xl bg-[#fbfbfd] border border-[#e5e5e7] space-y-2.5 flex flex-col justify-between">
+            <div className="space-y-2">
+              <div className="p-2.5 w-fit rounded-xl bg-white border border-[#e5e5e7] text-[#1d1d1f]">
+                <Cpu className="w-5 h-5" />
+              </div>
+              <h3 className="font-bold text-[#1d1d1f] text-sm">FRP Power-Law Normalization</h3>
+              <p className="text-[#6e6e73] leading-relaxed">
+                Transformasi daya matematika menstandarkan intensitas energi radiatif (Megawatt) lintas empat platform satelit NASA secara objektif.
+              </p>
             </div>
-            <h3 className="font-bold text-[#1d1d1f] text-sm">FRP Power-Law Calibration</h3>
-            <p className="text-[#6e6e73] leading-relaxed">
-              Transformasi matematis menstandarkan energi panas (MW) antar sensor Terra, Aqua, Suomi-NPP, dan NOAA-20.
-            </p>
+            <span className="text-[10px] font-bold text-[#86868b] uppercase tracking-wider">Fisika Energi</span>
           </div>
 
-          <div className="p-4 rounded-2xl bg-[#fbfbfd] border border-[#e5e5e7] space-y-2">
-            <div className="p-2.5 w-fit rounded-xl bg-white border border-[#e5e5e7] text-[#1d1d1f]">
-              <Flame className="w-4 h-4" />
+          <div className="p-5 rounded-2xl bg-[#fbfbfd] border border-[#e5e5e7] space-y-2.5 flex flex-col justify-between">
+            <div className="space-y-2">
+              <div className="p-2.5 w-fit rounded-xl bg-white border border-[#e5e5e7] text-[#1d1d1f]">
+                <Flame className="w-5 h-5" />
+              </div>
+              <h3 className="font-bold text-[#1d1d1f] text-sm">Peatland TMAG -40 cm Early Warning</h3>
+              <p className="text-[#6e6e73] leading-relaxed">
+                Integrasi ambang batas kritis tinggi muka air tanah gambut (PP No. 71/2014 &amp; BRGM) untuk mencegah bara api bawah tanah (*smoldering*).
+              </p>
             </div>
-            <h3 className="font-bold text-[#1d1d1f] text-sm">Peatland Early Warning (TMAG)</h3>
-            <p className="text-[#6e6e73] leading-relaxed">
-              Integrasi ambang batas kritis muka air tanah gambut -40 cm (PP No. 71/2014 &amp; BRGM) dengan deteksi satelit.
-            </p>
+            <span className="text-[10px] font-bold text-[#86868b] uppercase tracking-wider">Mitigasi Lapangan</span>
           </div>
 
-          <div className="p-4 rounded-2xl bg-[#fbfbfd] border border-[#e5e5e7] space-y-2">
-            <div className="p-2.5 w-fit rounded-xl bg-white border border-[#e5e5e7] text-[#1d1d1f]">
-              <Globe className="w-4 h-4" />
+          <div className="p-5 rounded-2xl bg-[#fbfbfd] border border-[#e5e5e7] space-y-2.5 flex flex-col justify-between">
+            <div className="space-y-2">
+              <div className="p-2.5 w-fit rounded-xl bg-white border border-[#e5e5e7] text-[#1d1d1f]">
+                <Globe className="w-5 h-5" />
+              </div>
+              <h3 className="font-bold text-[#1d1d1f] text-sm">NASA FIRMS 24-Hour Live Feed</h3>
+              <p className="text-[#6e6e73] leading-relaxed">
+                Sinkronisasi data satelit waktu nyata melalui API resmi NASA FIRMS untuk merespons kejadian titik panas darurat dalam waktu 24 jam.
+              </p>
             </div>
-            <h3 className="font-bold text-[#1d1d1f] text-sm">NASA FIRMS Live Ingestion</h3>
-            <p className="text-[#6e6e73] leading-relaxed">
-              Sinkronisasi feed satelit 24 jam waktu nyata melalui API resmi NASA FIRMS untuk respon darurat pemadaman.
-            </p>
+            <span className="text-[10px] font-bold text-[#86868b] uppercase tracking-wider">Respon Waktu Nyata</span>
           </div>
 
         </div>
       </div>
 
-      {/* SECTION 5: OPEN SOURCE & CITATION FOOTER */}
-      <div className="bg-[#f5f5f7] border border-[#e5e5e7] rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-        <div className="space-y-1 text-center sm:text-left">
-          <div className="font-semibold text-[#1d1d1f] flex items-center justify-center sm:justify-start gap-1.5">
+      {/* 6. Full-Width Open Source & Citation Footer */}
+      <div className="w-full bg-[#fbfbfd] border border-[#e5e5e7] rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-5 text-xs">
+        <div className="space-y-1.5 text-center sm:text-left">
+          <div className="font-bold text-sm text-[#1d1d1f] flex items-center justify-center sm:justify-start gap-2">
             <Code2 className="w-4 h-4 text-[#1d1d1f]" />
-            <span>Open Source &amp; Open Science Initiative</span>
+            <span>Open Science &amp; Open Data Initiative</span>
           </div>
-          <p className="text-[#86868b]">
-            Dibuat untuk NASA International Space Apps Challenge 2026. Seluruh algoritma dan kode sumber terbuka di bawah lisensi MIT.
+          <p className="text-[#6e6e73] max-w-2xl leading-relaxed">
+            Dikembangkan untuk NASA International Space Apps Challenge 2026. Seluruh algoritma, dataset, dan kode sumber terbuka di bawah lisensi MIT untuk mendukung riset global.
           </p>
         </div>
 
@@ -502,10 +433,10 @@ export const TeamPage: React.FC<TeamPageProps> = ({ language }) => {
           href="https://github.com/Rangga11268/TerraHarmonia"
           target="_blank"
           rel="noopener noreferrer"
-          className="px-4 py-2 rounded-xl bg-[#1d1d1f] hover:bg-black text-white font-semibold transition flex items-center gap-2 shadow-xs shrink-0 cursor-pointer"
+          className="px-5 py-2.5 rounded-xl bg-[#1d1d1f] hover:bg-black text-white font-semibold transition flex items-center gap-2 shadow-xs shrink-0 cursor-pointer"
         >
           <span>GitHub Repository</span>
-          <ExternalLink className="w-3.5 h-3.5" />
+          <ExternalLink className="w-4 h-4" />
         </a>
       </div>
 
