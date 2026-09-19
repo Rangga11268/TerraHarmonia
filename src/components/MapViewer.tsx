@@ -23,6 +23,30 @@ function getMarkerRadius(frp: number): number {
   return 17;
 }
 
+function sampleEvenly<T>(arr: T[], maxCount: number): T[] {
+  if (arr.length <= maxCount) return arr;
+  const step = arr.length / maxCount;
+  const result: T[] = [];
+  for (let i = 0; i < maxCount; i++) {
+    result.push(arr[Math.floor(i * step)]);
+  }
+  return result;
+}
+
+const REGION_NAMES: Record<string, string> = {
+  riau: 'Riau (Sumatera)',
+  kalteng: 'Kalimantan Tengah',
+  sumsel: 'Sumatera Selatan (OKI)',
+  kalsel: 'Kalimantan Selatan',
+  kaltim: 'Kalimantan Timur',
+  kalbar: 'Kalimantan Barat (Ketapang/Pontianak)',
+  jambi: 'Jambi (Berbak)',
+  sumut_aceh: 'Aceh & Sumut (Rawa Tripa)',
+  papua: 'Papua Selatan (Merauke/Mappi)',
+  sulawesi: 'Sulawesi (Konawe/Morowali)',
+  nusa_tenggara: 'Nusa Tenggara (Sumba/Timor)',
+};
+
 export const MapViewer: React.FC<MapViewerProps> = ({
   language,
   selectedAOI,
@@ -88,14 +112,16 @@ export const MapViewer: React.FC<MapViewerProps> = ({
 
     const [minLat, minLon, maxLat, maxLon] = selectedAOI.bbox;
 
-    // AOI bounding box
-    L.rectangle([[minLat, minLon], [maxLat, maxLon]], {
-      color: '#1d1d1f',
-      weight: 1.5,
-      dashArray: '4 4',
-      fillColor: '#1d1d1f',
-      fillOpacity: 0.03,
-    }).addTo(layerGroup);
+    // AOI bounding box for regional view
+    if (selectedAOI.id !== 'indonesia') {
+      L.rectangle([[minLat, minLon], [maxLat, maxLon]], {
+        color: '#1d1d1f',
+        weight: 1.5,
+        dashArray: '4 4',
+        fillColor: '#1d1d1f',
+        fillOpacity: 0.03,
+      }).addTo(layerGroup);
+    }
 
     let display = hotspots.filter((h) => h.aoiId === selectedAOI.id);
 
@@ -104,10 +130,18 @@ export const MapViewer: React.FC<MapViewerProps> = ({
     }
 
     if (selectedWeekData && !isLiveSync) {
-      display = display.filter((h) => new Date(h.date).getUTCFullYear() === selectedWeekData.year);
-      display = display.slice(0, 500);
+      const yearPoints = display.filter((h) => new Date(h.date).getUTCFullYear() === selectedWeekData.year);
+      if (selectedAOI.id === 'indonesia') {
+        display = sampleEvenly(yearPoints, 1200);
+      } else {
+        display = yearPoints.slice(0, 600);
+      }
     } else {
-      display = display.slice(-300);
+      if (selectedAOI.id === 'indonesia') {
+        display = sampleEvenly(display, 1000);
+      } else {
+        display = display.slice(-400);
+      }
     }
 
     display.forEach((spot) => {
@@ -125,22 +159,33 @@ export const MapViewer: React.FC<MapViewerProps> = ({
         : spot.frp < 150 ? (language === 'id' ? 'Tinggi' : 'High')
         : (language === 'id' ? 'Sangat Tinggi' : 'Extreme');
 
+      // Resolve province/region name from spot ID
+      let locationName = selectedAOI.name;
+      if (spot.id.startsWith('NAT-')) {
+        const parts = spot.id.split('-');
+        if (parts.length >= 2 && REGION_NAMES[parts[1]]) {
+          locationName = REGION_NAMES[parts[1]];
+        }
+      }
+
       const popupHtml = language === 'id'
-        ? `<div style="font-family:system-ui,sans-serif;font-size:12px;min-width:180px;padding:2px">
-            <div style="font-weight:700;color:#1d1d1f;font-size:13px;margin-bottom:4px">Titik Api Terdeteksi</div>
+        ? `<div style="font-family:system-ui,-apple-system,sans-serif;font-size:12px;min-width:200px;padding:2px;line-height:1.4">
+            <div style="font-weight:700;color:#1d1d1f;font-size:13px;margin-bottom:4px">Titik Panas Satelit</div>
+            <div style="color:#0071e3;font-weight:600;margin-bottom:3px">${locationName}</div>
             <div><b>Sensor:</b> ${spot.instrument} (${spot.satellite})</div>
             <div><b>Tanggal:</b> ${spot.date} (${spot.time.slice(0,2)}:${spot.time.slice(2)} UTC)</div>
-            <div><b>Daya Termal:</b> ${spot.frp} MW (${intensity})</div>
-            <div><b>Keyakinan:</b> ${spot.confidence}%</div>
-            <div style="color:#86868b;margin-top:3px;font-size:10px">${spot.lat.toFixed(4)}&deg;, ${spot.lon.toFixed(4)}&deg;</div>
+            <div><b>Daya Termal (FRP):</b> ${spot.frp} MW (${intensity})</div>
+            <div><b>Tingkat Keyakinan:</b> ${spot.confidence}%</div>
+            <div style="color:#86868b;margin-top:4px;font-size:10px">${spot.lat.toFixed(4)}&deg;, ${spot.lon.toFixed(4)}&deg;</div>
           </div>`
-        : `<div style="font-family:system-ui,sans-serif;font-size:12px;min-width:180px;padding:2px">
-            <div style="font-weight:700;color:#1d1d1f;font-size:13px;margin-bottom:4px">Fire Detections</div>
+        : `<div style="font-family:system-ui,-apple-system,sans-serif;font-size:12px;min-width:200px;padding:2px;line-height:1.4">
+            <div style="font-weight:700;color:#1d1d1f;font-size:13px;margin-bottom:4px">Satellite Hotspot Detection</div>
+            <div style="color:#0071e3;font-weight:600;margin-bottom:3px">${locationName}</div>
             <div><b>Sensor:</b> ${spot.instrument} (${spot.satellite})</div>
             <div><b>Date:</b> ${spot.date} (${spot.time.slice(0,2)}:${spot.time.slice(2)} UTC)</div>
-            <div><b>FRP:</b> ${spot.frp} MW (${intensity})</div>
-            <div><b>Confidence:</b> ${spot.confidence}%</div>
-            <div style="color:#86868b;margin-top:3px;font-size:10px">${spot.lat.toFixed(4)}&deg;, ${spot.lon.toFixed(4)}&deg;</div>
+            <div><b>Thermal Radiative Power:</b> ${spot.frp} MW (${intensity})</div>
+            <div><b>Confidence Level:</b> ${spot.confidence}%</div>
+            <div style="color:#86868b;margin-top:4px;font-size:10px">${spot.lat.toFixed(4)}&deg;, ${spot.lon.toFixed(4)}&deg;</div>
           </div>`;
 
       const circle = L.circleMarker([spot.lat, spot.lon], {
@@ -152,7 +197,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({
         fillOpacity: 0.85,
       });
 
-      circle.bindPopup(popupHtml, { maxWidth: 240 });
+      circle.bindPopup(popupHtml, { maxWidth: 260 });
       circle.addTo(layerGroup);
     });
   }, [selectedAOI, hotspots, selectedWeekData, rawMode, isLiveSync, language]);
