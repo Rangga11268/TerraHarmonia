@@ -11,6 +11,7 @@ import { HarmonizationLab } from './components/HarmonizationLab';
 import { MitigationHub } from './components/MitigationHub';
 import { DataHub } from './components/DataHub';
 import { TeamModal } from './components/TeamModal';
+import { TeamPage } from './components/TeamPage';
 import { NasaApiKeyModal } from './components/NasaApiKeyModal';
 import { DualMapComparison } from './components/DualMapComparison';
 import { ExecutiveReportModal } from './components/ExecutiveReportModal';
@@ -110,7 +111,7 @@ export function App() {
         onToggleLanguage={setLanguage}
         activeTab={activeTab}
         onSelectTab={setActiveTab}
-        onOpenTeam={() => setIsTeamModalOpen(true)}
+        onOpenTeam={() => setActiveTab('team')}
         isLiveSync={isLiveSync}
       />
 
@@ -314,6 +315,13 @@ export function App() {
               onOpenApiKeyModal={() => setIsNasaModalOpen(true)}
               userMapKey={userMapKey}
             />
+          </div>
+        )}
+
+        {/* Tab 5: Team Profile & Scientific Dossier */}
+        {activeTab === 'team' && (
+          <div className="animate-in fade-in duration-200">
+            <TeamPage language={language} />
           </div>
         )}
       </main>

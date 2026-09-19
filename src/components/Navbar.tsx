@@ -3,14 +3,14 @@ import { Logo } from './Logo';
 import { Language, translations } from '../data/translations';
 import { Menu, X } from 'lucide-react';
 
-export type NavTab = 'overview' | 'lab' | 'mitigation' | 'data-hub';
+export type NavTab = 'overview' | 'lab' | 'mitigation' | 'data-hub' | 'team';
 
 interface NavbarProps {
   language: Language;
   onToggleLanguage: (lang: Language) => void;
   activeTab: NavTab;
   onSelectTab: (tab: NavTab) => void;
-  onOpenTeam: () => void;
+  onOpenTeam?: () => void;
   isLiveSync?: boolean;
 }
 
@@ -30,6 +30,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'lab' as NavTab, label: t.navLab },
     { id: 'mitigation' as NavTab, label: t.navMitigation },
     { id: 'data-hub' as NavTab, label: t.navData },
+    { id: 'team' as NavTab, label: language === 'id' ? 'Profil Tim' : 'Our Team' },
   ];
 
   return (
@@ -101,12 +102,16 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             </div>
 
-            {/* Team Dossier Text Button */}
+            {/* Team Tab Quick Link */}
             <button
-              onClick={onOpenTeam}
-              className="text-[12px] font-medium text-[#0071e3] hover:underline px-1 py-1"
+              onClick={() => onSelectTab('team')}
+              className={`text-[12px] font-medium px-2.5 py-1 rounded-full transition-all hidden sm:inline-block ${
+                activeTab === 'team'
+                  ? 'bg-[#1d1d1f] text-white font-semibold'
+                  : 'text-[#6e6e73] hover:text-[#1d1d1f] hover:bg-[#f5f5f7]'
+              }`}
             >
-              {t.team}
+              {language === 'id' ? 'Tentang Tim' : 'About Team'}
             </button>
 
             {/* Mobile Menu Toggle */}
