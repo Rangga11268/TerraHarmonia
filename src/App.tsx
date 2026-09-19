@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Navbar, NavTab } from './components/Navbar';
-import { DashboardControlBar } from './components/DashboardControlBar';
+import { DashboardControlBar, OverviewViewMode } from './components/DashboardControlBar';
 import { BurningCalendar } from './components/BurningCalendar';
 import { MapViewer } from './components/MapViewer';
 import { ComparisonMetrics } from './components/ComparisonMetrics';
@@ -23,6 +23,7 @@ import { RefreshCw } from 'lucide-react';
 export function App() {
   const [language, setLanguage] = useState<Language>('en');
   const [activeTab, setActiveTab] = useState<NavTab>('overview');
+  const [overviewView, setOverviewView] = useState<OverviewViewMode>('main');
   const [selectedAOI, setSelectedAOI] = useState<AOIRegion>(PRESET_AOIS[0]);
   const [rawMode, setRawMode] = useState<boolean>(false);
   const [selectedKey, setSelectedKey] = useState<string | null>('2015-38');
@@ -96,35 +97,6 @@ export function App() {
   const peakYear = highestYear ? highestYear[0] : '2015';
   const peakFRP = highestYear ? Math.round(highestYear[1].frp).toLocaleString() : '0';
 
-  const handleScrollToDualMap = () => {
-    if (activeTab !== 'overview') {
-      setActiveTab('overview');
-      setTimeout(() => {
-        document.getElementById('dual-map-section')?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    } else {
-      document.getElementById('dual-map-section')?.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const handleScrollToPolygon = () => {
-    if (activeTab !== 'overview') {
-      setActiveTab('overview');
-      setTimeout(() => {
-        document.getElementById('polygon-inspector-section')?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    } else {
-      document.getElementById('polygon-inspector-section')?.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const handleNavigateToSitRep = () => {
-    setActiveTab('mitigation');
-    setTimeout(() => {
-      document.getElementById('executive-report-section')?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-  };
-
   return (
     <div className="min-h-screen bg-[#f5f5f7] text-[#1d1d1f] flex flex-col font-sans">
       
@@ -138,14 +110,14 @@ export function App() {
         isLiveSync={isLiveSync}
       />
 
-      {/* Expansive Full-Width Main Canvas */}
+      {/* Main Canvas */}
       <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 py-6">
 
         {/* Tab 1: Live Intelligence & Harmonized Calendar (Overview) */}
         {activeTab === 'overview' && (
           <div className="space-y-6 animate-in fade-in duration-200">
             
-            {/* Control bar */}
+            {/* Control bar with Segmented Tool Switcher */}
             <DashboardControlBar
               language={language}
               selectedAOI={selectedAOI}
@@ -160,9 +132,8 @@ export function App() {
               onToggleLiveSync={handleToggleLiveSync}
               isLoadingLive={isLoadingLive}
               onOpenApiKeyModal={() => setIsNasaModalOpen(true)}
-              onOpenDualMap={handleScrollToDualMap}
-              onOpenExecutiveReport={handleNavigateToSitRep}
-              onOpenPolygonInspector={handleScrollToPolygon}
+              activeView={overviewView}
+              onSelectView={setOverviewView}
               totalHotspots={totalEvents}
               anomalyCount={anomalyCount}
             />
@@ -191,140 +162,149 @@ export function App() {
               </div>
             )}
 
-            {/* Metric Strip (Clean Apple Design) */}
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-0 bg-white border border-[#e5e5e7] rounded-2xl shadow-xs overflow-hidden">
-              
-              <div className="sm:col-span-1 px-5 py-5 flex flex-col justify-between border-b sm:border-b-0 sm:border-r border-[#e5e5e7] bg-[#fbfbfd]">
-                <span className="text-xs font-semibold text-[#86868b] tracking-wider uppercase">{t.rawDetections}</span>
-                <div>
-                  <div className="text-3xl sm:text-4xl font-bold text-[#1d1d1f] num tracking-tight leading-none mt-2">
-                    {totalEvents.toLocaleString()}
-                  </div>
-                  <p className="text-xs text-[#86868b] mt-1.5 font-medium">
-                    {isLiveSync ? `${selectedAOI.name} (Live)` : t.rawDetectionsDesc}
-                  </p>
-                </div>
-              </div>
-
-              {[
-                {
-                  label: t.historicPeakYear,
-                  value: peakYear,
-                  sub: `${t.energyTotal}: ${peakFRP} MW`,
-                  valueClass: 'text-[#1d1d1f]',
-                },
-                {
-                  label: t.spatialResolution,
-                  value: '5.5 km',
-                  sub: t.spatialResolutionDesc,
-                  valueClass: 'text-[#1d1d1f]',
-                },
-                {
-                  label: t.unusualAnomalies,
-                  value: `${anomalyCount}`,
-                  sub: t.unusualAnomaliesDesc,
-                  valueClass: anomalyCount > 10 ? 'text-red-600' : 'text-[#1d1d1f]',
-                },
-              ].map((kpi) => (
-                <div
-                  key={kpi.label}
-                  className="px-5 py-5 flex flex-col justify-between border-b sm:border-b-0 sm:border-r last:border-r-0 border-[#e5e5e7]"
-                >
-                  <span className="text-xs font-semibold text-[#86868b] uppercase tracking-wider">{kpi.label}</span>
-                  <div>
-                    <div className={`text-3xl sm:text-4xl font-bold num tracking-tight leading-none mt-2 ${kpi.valueClass}`}>
-                      {kpi.value}
+            {/* VIEW MODE 1: Main Intelligence & 26-Year Matrix */}
+            {overviewView === 'main' && (
+              <div className="space-y-6 animate-in fade-in duration-150">
+                {/* Metric Strip (Clean Apple Design) */}
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-0 bg-white border border-[#e5e5e7] rounded-2xl shadow-xs overflow-hidden">
+                  
+                  <div className="sm:col-span-1 px-5 py-5 flex flex-col justify-between border-b sm:border-b-0 sm:border-r border-[#e5e5e7] bg-[#fbfbfd]">
+                    <span className="text-xs font-semibold text-[#86868b] tracking-wider uppercase">{t.rawDetections}</span>
+                    <div>
+                      <div className="text-3xl sm:text-4xl font-bold text-[#1d1d1f] num tracking-tight leading-none mt-2">
+                        {totalEvents.toLocaleString()}
+                      </div>
+                      <p className="text-xs text-[#86868b] mt-1.5 font-medium">
+                        {isLiveSync ? `${selectedAOI.name} (Live)` : t.rawDetectionsDesc}
+                      </p>
                     </div>
-                    <p className="text-[11px] text-[#86868b] mt-1.5 leading-snug">{kpi.sub}</p>
+                  </div>
+
+                  {[
+                    {
+                      label: t.historicPeakYear,
+                      value: peakYear,
+                      sub: `${t.energyTotal}: ${peakFRP} MW`,
+                      valueClass: 'text-[#1d1d1f]',
+                    },
+                    {
+                      label: t.spatialResolution,
+                      value: '5.5 km',
+                      sub: t.spatialResolutionDesc,
+                      valueClass: 'text-[#1d1d1f]',
+                    },
+                    {
+                      label: t.unusualAnomalies,
+                      value: `${anomalyCount}`,
+                      sub: t.unusualAnomaliesDesc,
+                      valueClass: anomalyCount > 10 ? 'text-red-600' : 'text-[#1d1d1f]',
+                    },
+                  ].map((kpi) => (
+                    <div
+                      key={kpi.label}
+                      className="px-5 py-5 flex flex-col justify-between border-b sm:border-b-0 sm:border-r last:border-r-0 border-[#e5e5e7]"
+                    >
+                      <span className="text-xs font-semibold text-[#86868b] uppercase tracking-wider">{kpi.label}</span>
+                      <div>
+                        <div className={`text-3xl sm:text-4xl font-bold num tracking-tight leading-none mt-2 ${kpi.valueClass}`}>
+                          {kpi.value}
+                        </div>
+                        <p className="text-[11px] text-[#86868b] mt-1.5 leading-snug">{kpi.sub}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Interactive 26-Year Burning Calendar */}
+                <section>
+                  <BurningCalendar
+                    language={language}
+                    calendarMatrix={calendarMatrix}
+                    rawMode={rawMode}
+                    selectedKey={selectedKey}
+                    onSelectCell={handleSelectCell}
+                  />
+                </section>
+
+                {/* Geospatial & Prognosis Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  {/* Map Viewer */}
+                  <div className="lg:col-span-7">
+                    <MapViewer
+                      language={language}
+                      selectedAOI={selectedAOI}
+                      onSelectAOI={setSelectedAOI}
+                      hotspots={displayedHotspots}
+                      selectedWeekData={isLiveSync ? null : selectedWeekData}
+                      rawMode={rawMode}
+                      isLiveSync={isLiveSync}
+                      isLoading={isLoadingLive}
+                    />
+                  </div>
+
+                  {/* Side Prognosis & Directives Column */}
+                  <div className="lg:col-span-5 space-y-5">
+                    <RiskForecast
+                      language={language}
+                      selectedAOI={selectedAOI}
+                      calendarMatrix={calendarMatrix}
+                      weeklyBaselines={weeklyBaselines}
+                      isLiveSync={isLiveSync}
+                      liveHotspotCount={displayedHotspots.length}
+                    />
+                    
+                    <CriticalAlerts
+                      language={language}
+                      selectedAOI={selectedAOI}
+                      calendarMatrix={calendarMatrix}
+                      weeklyBaselines={weeklyBaselines}
+                    />
                   </div>
                 </div>
-              ))}
-            </div>
 
-            {/* Interactive 26-Year Burning Calendar */}
-            <section>
-              <BurningCalendar
-                language={language}
-                calendarMatrix={calendarMatrix}
-                rawMode={rawMode}
-                selectedKey={selectedKey}
-                onSelectCell={handleSelectCell}
-              />
-            </section>
+                {/* Scientific Visual Analytics & Charts Suite */}
+                <section>
+                  <VisualAnalytics
+                    language={language}
+                    selectedAOI={selectedAOI}
+                    calendarMatrix={calendarMatrix}
+                    rawMode={rawMode}
+                  />
+                </section>
 
-            {/* Geospatial & Prognosis Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              
-              {/* Map Viewer */}
-              <div className="lg:col-span-7">
-                <MapViewer
+                {/* Science Comparison Section */}
+                <div className="grid grid-cols-1 gap-6">
+                  <ComparisonMetrics
+                    language={language}
+                    selectedAOI={selectedAOI}
+                    yearlyAverages={yearlyAverages}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* VIEW MODE 2: Dedicated Dual Map Comparison */}
+            {overviewView === 'dual_map' && (
+              <div className="animate-in fade-in duration-150">
+                <DualMapComparison
                   language={language}
                   selectedAOI={selectedAOI}
-                  onSelectAOI={setSelectedAOI}
-                  hotspots={displayedHotspots}
-                  selectedWeekData={isLiveSync ? null : selectedWeekData}
-                  rawMode={rawMode}
-                  isLiveSync={isLiveSync}
-                  isLoading={isLoadingLive}
+                  allHotspots={displayedHotspots}
                 />
               </div>
+            )}
 
-              {/* Side Prognosis & Directives Column */}
-              <div className="lg:col-span-5 space-y-5">
-                <RiskForecast
+            {/* VIEW MODE 3: Dedicated Polygon & Concession Inspector */}
+            {overviewView === 'polygon' && (
+              <div className="animate-in fade-in duration-150">
+                <PolygonInspector
                   language={language}
                   selectedAOI={selectedAOI}
-                  calendarMatrix={calendarMatrix}
-                  weeklyBaselines={weeklyBaselines}
-                  isLiveSync={isLiveSync}
-                  liveHotspotCount={displayedHotspots.length}
-                />
-                
-                <CriticalAlerts
-                  language={language}
-                  selectedAOI={selectedAOI}
-                  calendarMatrix={calendarMatrix}
-                  weeklyBaselines={weeklyBaselines}
+                  allHotspots={displayedHotspots}
                 />
               </div>
-            </div>
+            )}
 
-            {/* Embedded Native Feature 1: Dual Map Side-by-Side Comparison */}
-            <section id="dual-map-section">
-              <DualMapComparison
-                language={language}
-                selectedAOI={selectedAOI}
-                allHotspots={displayedHotspots}
-              />
-            </section>
-
-            {/* Embedded Native Feature 2: Custom Polygon & Concession Area Inspector */}
-            <section id="polygon-inspector-section">
-              <PolygonInspector
-                language={language}
-                selectedAOI={selectedAOI}
-                allHotspots={displayedHotspots}
-              />
-            </section>
-
-            {/* Scientific Visual Analytics & Charts Suite */}
-            <section>
-              <VisualAnalytics
-                language={language}
-                selectedAOI={selectedAOI}
-                calendarMatrix={calendarMatrix}
-                rawMode={rawMode}
-              />
-            </section>
-
-            {/* Science Comparison Section */}
-            <div className="grid grid-cols-1 gap-6">
-              <ComparisonMetrics
-                language={language}
-                selectedAOI={selectedAOI}
-                yearlyAverages={yearlyAverages}
-              />
-            </div>
           </div>
         )}
 
@@ -377,7 +357,7 @@ export function App() {
         <p>{t.footerCourtesy}</p>
       </footer>
 
-      {/* Only Technical Configuration Modal for MAP_KEY if requested */}
+      {/* Technical Configuration Modal for MAP_KEY if requested */}
       <NasaApiKeyModal
         language={language}
         isOpen={isNasaModalOpen}

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Language, translations } from '../data/translations';
 import { AOIRegion, PRESET_AOIS } from '../engine/harmonizer';
-import { Radio, RefreshCw, Settings2, ChevronDown, Volume2, VolumeX, Split, FileText, MapPin } from 'lucide-react';
-import { speakSituationBriefing, stopSpeakingBriefing } from '../utils/audioBriefing';
+import { Radio, RefreshCw, Settings2, ChevronDown, Volume2, VolumeX, Split, MapPin, Calendar } from 'lucide-react';
+import { speakSituationBriefing } from '../utils/audioBriefing';
+
+export type OverviewViewMode = 'main' | 'dual_map' | 'polygon';
 
 interface DashboardControlBarProps {
   language: Language;
@@ -14,9 +16,8 @@ interface DashboardControlBarProps {
   onToggleLiveSync: () => void;
   isLoadingLive: boolean;
   onOpenApiKeyModal: () => void;
-  onOpenDualMap?: () => void;
-  onOpenExecutiveReport?: () => void;
-  onOpenPolygonInspector?: () => void;
+  activeView: OverviewViewMode;
+  onSelectView: (view: OverviewViewMode) => void;
   totalHotspots?: number;
   anomalyCount?: number;
 }
@@ -31,9 +32,8 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
   onToggleLiveSync,
   isLoadingLive,
   onOpenApiKeyModal,
-  onOpenDualMap,
-  onOpenExecutiveReport,
-  onOpenPolygonInspector,
+  activeView,
+  onSelectView,
   totalHotspots = 0,
   anomalyCount = 0,
 }) => {
@@ -51,7 +51,7 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
   };
 
   return (
-    <div className="bg-white border border-[#e5e5e7] rounded-2xl shadow-xs overflow-hidden">
+    <div className="bg-white border border-[#e5e5e7] rounded-2xl shadow-xs overflow-hidden space-y-0">
       
       {/* Primary Toolbar Controls */}
       <div className="px-4 sm:px-5 py-3.5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3.5">
@@ -128,7 +128,7 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
             <button
               onClick={onOpenApiKeyModal}
               title={language === 'id' ? 'Pengaturan NASA MAP_KEY' : 'NASA MAP_KEY Settings'}
-              className="p-1.5 bg-[#f5f5f7] border-l border-[#e5e5e7] text-[#86868b] hover:text-[#1d1d1f] transition-colors"
+              className="p-1.5 bg-[#f5f5f7] border-l border-[#e5e5e7] text-[#86868b] hover:text-[#1d1d1f] transition-colors cursor-pointer"
             >
               <Settings2 className="w-3.5 h-3.5" />
             </button>
@@ -137,7 +137,7 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
           {/* Voice Audio Briefing Button */}
           <button
             onClick={handleToggleVoice}
-            className={`p-2 rounded-xl border transition-all text-xs font-medium flex items-center gap-1.5 shrink-0 ${
+            className={`p-2 rounded-xl border transition-all text-xs font-medium flex items-center gap-1.5 shrink-0 cursor-pointer ${
               isSpeaking
                 ? 'bg-red-600 text-white border-red-600 animate-pulse'
                 : 'bg-white border-[#e5e5e7] text-[#1d1d1f] hover:bg-[#f5f5f7]'
@@ -151,47 +151,53 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
         </div>
       </div>
 
-      {/* Secondary Quick Action Bar (Dual Map, Dossier SitRep, Polygon Inspector) */}
-      <div className="px-4 sm:px-5 py-2.5 bg-[#fbfbfd] border-t border-[#e5e5e7] flex flex-wrap items-center justify-between gap-2.5 text-xs">
+      {/* Segmented View Mode Switcher (Clean, fast, uncluttered) */}
+      <div className="px-4 sm:px-5 py-2.5 bg-[#fbfbfd] border-t border-[#e5e5e7] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 text-xs">
         
         {/* Left: Biome Info */}
-        <div className="flex items-center gap-2 text-[#6e6e73]">
+        <div className="flex items-center gap-2 text-[#6e6e73] truncate">
           <span className="font-semibold text-[#1d1d1f]">{selectedAOI.biome}</span>
-          <span className="text-[#86868b]">&bull;</span>
-          <span className="hidden sm:inline text-[#86868b]">{selectedAOI.description}</span>
+          <span className="text-[#86868b] hidden md:inline">&bull;</span>
+          <span className="hidden md:inline text-[#86868b] truncate">{selectedAOI.description}</span>
         </div>
 
-        {/* Right: Analytical Tools Quick Navigation */}
-        <div className="flex items-center gap-2 flex-wrap">
-          {onOpenDualMap && (
-            <button
-              onClick={onOpenDualMap}
-              className="px-2.5 py-1 rounded-lg border border-[#e5e5e7] bg-white hover:border-[#1d1d1f] text-[#1d1d1f] font-medium transition flex items-center gap-1.5 text-xs cursor-pointer"
-            >
-              <Split className="w-3.5 h-3.5 text-[#6e6e73]" />
-              <span>{language === 'id' ? 'Komparasi 2 Tahun' : 'Dual Map Comparison'}</span>
-            </button>
-          )}
+        {/* Right: Segmented Tool Switcher */}
+        <div className="flex items-center bg-[#e5e5ea] rounded-xl p-1 gap-1 shrink-0 overflow-x-auto">
+          <button
+            onClick={() => onSelectView('main')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
+              activeView === 'main'
+                ? 'bg-white text-[#1d1d1f] shadow-xs'
+                : 'text-[#6e6e73] hover:text-[#1d1d1f]'
+            }`}
+          >
+            <Calendar className="w-3.5 h-3.5" />
+            <span>{language === 'id' ? 'Kalender & Peta Utama' : 'Main Intel & Calendar'}</span>
+          </button>
 
-          {onOpenPolygonInspector && (
-            <button
-              onClick={onOpenPolygonInspector}
-              className="px-2.5 py-1 rounded-lg border border-[#e5e5e7] bg-white hover:border-[#1d1d1f] text-[#1d1d1f] font-medium transition flex items-center gap-1.5 text-xs cursor-pointer"
-            >
-              <MapPin className="w-3.5 h-3.5 text-[#6e6e73]" />
-              <span>{language === 'id' ? 'Inspektur Poligon' : 'Polygon Inspector'}</span>
-            </button>
-          )}
+          <button
+            onClick={() => onSelectView('dual_map')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
+              activeView === 'dual_map'
+                ? 'bg-white text-[#1d1d1f] shadow-xs'
+                : 'text-[#6e6e73] hover:text-[#1d1d1f]'
+            }`}
+          >
+            <Split className="w-3.5 h-3.5" />
+            <span>{language === 'id' ? 'Komparasi 2 Tahun' : 'Dual Map Compare'}</span>
+          </button>
 
-          {onOpenExecutiveReport && (
-            <button
-              onClick={onOpenExecutiveReport}
-              className="px-2.5 py-1 rounded-lg border border-[#e5e5e7] bg-white hover:border-[#1d1d1f] text-[#1d1d1f] font-medium transition flex items-center gap-1.5 text-xs cursor-pointer"
-            >
-              <FileText className="w-3.5 h-3.5 text-[#6e6e73]" />
-              <span>{language === 'id' ? 'Dossier SitRep A4' : 'Executive SitRep'}</span>
-            </button>
-          )}
+          <button
+            onClick={() => onSelectView('polygon')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
+              activeView === 'polygon'
+                ? 'bg-white text-[#1d1d1f] shadow-xs'
+                : 'text-[#6e6e73] hover:text-[#1d1d1f]'
+            }`}
+          >
+            <MapPin className="w-3.5 h-3.5" />
+            <span>{language === 'id' ? 'Inspektur Poligon' : 'Polygon Inspector'}</span>
+          </button>
         </div>
 
       </div>
