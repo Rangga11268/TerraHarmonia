@@ -26,7 +26,7 @@ export const Logo: React.FC<LogoProps> = ({
         <img
           src="/terra_harmonia_logo.jpg"
           alt="Terra Harmonia"
-          className="w-full h-full object-cover filter brightness-125 contrast-110 saturate-110"
+          className="w-full h-full object-cover"
           loading="eager"
         />
       </div>
