@@ -1,7 +1,7 @@
 import React from 'react';
 import { Language, translations } from '../data/translations';
 import { AOIRegion, PRESET_AOIS } from '../engine/harmonizer';
-import { Flame, Radio, RefreshCw, Satellite, Settings2, ChevronDown } from 'lucide-react';
+import { Radio, RefreshCw, Settings2, ChevronDown } from 'lucide-react';
 
 interface DashboardControlBarProps {
   language: Language;
@@ -29,22 +29,23 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
   const t = translations[language];
 
   return (
-    <div className="bg-white border border-zinc-200 rounded-xl shadow-sm">
-      <div className="px-4 py-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+    <div className="bg-white border border-[#e5e5e7] rounded-2xl shadow-xs overflow-hidden">
+      <div className="px-4 sm:px-5 py-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
 
-        {/* Region selector — takes most space */}
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <span className="text-xs font-semibold text-zinc-400 shrink-0 uppercase tracking-wider">
+        {/* Region Selector */}
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <label htmlFor="aoi-select" className="text-xs font-semibold text-[#86868b] uppercase tracking-wider shrink-0">
             {t.region}
-          </span>
-          <div className="relative flex-1 min-w-0">
+          </label>
+          <div className="relative flex-1 max-w-sm min-w-0">
             <select
+              id="aoi-select"
               value={selectedAOI.id}
               onChange={(e) => {
                 const aoi = PRESET_AOIS.find((a) => a.id === e.target.value);
                 if (aoi) onSelectAOI(aoi);
               }}
-              className="w-full appearance-none bg-zinc-50 border border-zinc-200 rounded-lg pl-3 pr-8 py-2 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent cursor-pointer"
+              className="w-full appearance-none bg-[#f5f5f7] border border-[#e5e5e7] rounded-xl pl-3 pr-8 py-2 text-xs sm:text-sm font-semibold text-[#1d1d1f] focus:outline-none focus:border-[#1d1d1f] cursor-pointer"
             >
               {PRESET_AOIS.map((aoi) => (
                 <option key={aoi.id} value={aoi.id}>
@@ -52,68 +53,60 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
                 </option>
               ))}
             </select>
-            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#86868b] pointer-events-none" />
           </div>
         </div>
 
-        <div className="w-px bg-zinc-200 hidden sm:block self-stretch" />
-
-        {/* Controls row */}
+        {/* Controls */}
         <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-          {/* Data mode toggle */}
-          <div className="flex rounded-lg overflow-hidden border border-zinc-200 text-xs font-semibold">
+          {/* Mode Toggle (Apple style segmented switch) */}
+          <div className="flex rounded-xl bg-[#e5e5ea] p-0.5 text-xs font-medium">
             <button
               onClick={() => setRawMode(false)}
-              className={`flex items-center gap-1.5 px-3 py-2 min-h-[36px] transition-colors ${
+              className={`px-3 py-1.5 rounded-lg transition-all ${
                 !rawMode
-                  ? 'bg-amber-600 text-white'
-                  : 'bg-white text-zinc-500 hover:bg-zinc-50'
+                  ? 'bg-white text-[#1d1d1f] shadow-xs font-semibold'
+                  : 'text-[#6e6e73] hover:text-[#1d1d1f]'
               }`}
             >
-              <Flame className="w-3.5 h-3.5" />
               {t.harmonized}
             </button>
             <button
               onClick={() => setRawMode(true)}
-              className={`flex items-center gap-1.5 px-3 py-2 min-h-[36px] transition-colors ${
+              className={`px-3 py-1.5 rounded-lg transition-all ${
                 rawMode
-                  ? 'bg-slate-700 text-white'
-                  : 'bg-white text-zinc-500 hover:bg-zinc-50'
+                  ? 'bg-white text-[#1d1d1f] shadow-xs font-semibold'
+                  : 'text-[#6e6e73] hover:text-[#1d1d1f]'
               }`}
             >
-              <Satellite className="w-3.5 h-3.5" />
               {t.rawSensors}
             </button>
           </div>
 
-          {/* Live NASA feed */}
-          <div className="flex rounded-lg overflow-hidden border border-zinc-200 text-xs font-semibold">
+          {/* NASA Live Sync Button */}
+          <div className="flex rounded-xl border border-[#e5e5e7] overflow-hidden text-xs">
             <button
               onClick={onToggleLiveSync}
-              className={`flex items-center gap-1.5 px-3 py-2 min-h-[36px] transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 font-medium transition-all ${
                 isLiveSync
-                  ? 'bg-teal-600 text-white'
-                  : 'bg-white text-zinc-500 hover:bg-zinc-50'
+                  ? 'bg-[#1d1d1f] text-white'
+                  : 'bg-white text-[#6e6e73] hover:text-[#1d1d1f] hover:bg-[#f5f5f7]'
               }`}
-              title={isLiveSync ? 'Kembali ke data arsip' : 'Aktifkan data titik api terkini dari NASA'}
             >
               {isLoadingLive ? (
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />
               ) : isLiveSync ? (
-                <span className="relative flex h-2 w-2 shrink-0">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-300 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-200" />
-                </span>
+                <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" />
               ) : (
                 <Radio className="w-3.5 h-3.5" />
               )}
-              {isLiveSync ? t.liveSyncActive : t.liveSync}
+              <span>{isLiveSync ? t.liveSyncActive : t.liveSync}</span>
             </button>
             <button
               onClick={onOpenApiKeyModal}
-              className="px-2.5 py-2 min-h-[36px] bg-white text-zinc-400 hover:text-zinc-700 hover:bg-zinc-50 transition-colors border-l border-zinc-200"
-              aria-label="Pengaturan API NASA"
-              title="Pengaturan koneksi NASA FIRMS"
+              className="px-2 bg-white text-[#86868b] hover:text-[#1d1d1f] border-l border-[#e5e5e7] transition hover:bg-[#f5f5f7]"
+              title="NASA FIRMS API Key Settings"
+              aria-label="API Settings"
             >
               <Settings2 className="w-3.5 h-3.5" />
             </button>
@@ -121,11 +114,11 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
         </div>
       </div>
 
-      {/* Region description strip */}
-      <div className="border-t border-zinc-100 px-4 py-2 text-xs text-zinc-400">
-        <span className="text-amber-600 font-semibold">{selectedAOI.biome}</span>
-        <span className="mx-1.5">·</span>
-        {selectedAOI.description}
+      {/* Region description footnote */}
+      <div className="border-t border-[#e5e5e7] px-4 sm:px-5 py-2 bg-[#fbfbfd] text-xs text-[#86868b] flex items-center gap-2">
+        <span className="font-semibold text-[#1d1d1f]">{selectedAOI.biome}</span>
+        <span>·</span>
+        <span className="truncate">{selectedAOI.description}</span>
       </div>
     </div>
   );

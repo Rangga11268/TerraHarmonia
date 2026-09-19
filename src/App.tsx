@@ -15,7 +15,7 @@ import { PRESET_AOIS, AOIRegion, RawHotspot, HarmonizedWeekData, harmonizeHotspo
 import { generateHistoricalFireData } from './data/generator';
 import { fetchLiveNASAHotspots, LiveSyncResult } from './services/nasaFirmsApi';
 import { Language, translations } from './data/translations';
-import { RefreshCw, Satellite, Sparkles } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 
 export function App() {
   const [language, setLanguage] = useState<Language>('en');
@@ -94,17 +94,10 @@ export function App() {
   const peakYear = highestYear ? highestYear[0] : '2015';
   const peakFRP = highestYear ? Math.round(highestYear[1].frp).toLocaleString() : '0';
 
-  const sourceLabel =
-    liveResult?.source === 'NASA_FIRMS_LIVE'
-      ? 'NASA FIRMS 24H'
-      : liveResult?.source === 'NASA_FIRMS_API_KEY'
-      ? 'NASA FIRMS API'
-      : 'Simulated NRT';
-
   return (
-    <div className="min-h-screen bg-[#fafafa] text-slate-900 flex flex-col font-sans selection:bg-amber-100 selection:text-amber-900">
+    <div className="min-h-screen bg-[#f5f5f7] text-[#1d1d1f] flex flex-col font-sans">
       
-      {/* Apple-style Translucent Navbar */}
+      {/* Apple-style Navigation */}
       <Navbar
         language={language}
         onToggleLanguage={setLanguage}
@@ -114,11 +107,11 @@ export function App() {
         isLiveSync={isLiveSync}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6">
 
         {/* Tab 1: Live Intelligence & Harmonized Calendar (Overview) */}
         {activeTab === 'overview' && (
-          <div className="space-y-5 animate-in fade-in duration-300">
+          <div className="space-y-5 animate-in fade-in duration-200">
             
             {/* Control bar */}
             <DashboardControlBar
@@ -139,84 +132,75 @@ export function App() {
 
             {/* Live sync banner */}
             {isLiveSync && (
-              <div className="bg-teal-50/80 border border-teal-200/80 rounded-2xl px-4 py-3 flex items-center justify-between gap-3 text-xs shadow-xs">
-                <div className="flex items-center gap-3">
-                  <Satellite className="w-4 h-4 text-teal-600 shrink-0" />
-                  <div>
-                    <span className="font-semibold text-slate-900">
-                      {t.liveSyncNotice} {selectedAOI.name}
-                    </span>
-                    <span className="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800 border border-teal-200">
-                      {sourceLabel}
-                    </span>
-                    <p className="text-zinc-500 mt-0.5">
-                      {liveResult
-                        ? `${liveResult.modisCount} MODIS + ${liveResult.viirsCount} VIIRS. ${t.liveSyncOvercount}`
-                        : t.fetchingNasa}
-                    </p>
-                  </div>
+              <div className="bg-white border border-[#e5e5e7] rounded-2xl px-5 py-3 flex items-center justify-between gap-3 text-xs shadow-xs">
+                <div>
+                  <span className="font-semibold text-[#1d1d1f]">
+                    {t.liveSyncNotice} {selectedAOI.name}
+                  </span>
+                  <p className="text-[#86868b] mt-0.5">
+                    {liveResult
+                      ? `${liveResult.modisCount} MODIS + ${liveResult.viirsCount} VIIRS. ${t.liveSyncOvercount}`
+                      : t.fetchingNasa}
+                  </p>
                 </div>
-                <div className="flex items-center gap-2 text-zinc-400 shrink-0">
-                  <span className="text-[11px] hidden sm:block font-mono">{liveResult?.fetchTimestamp || ''}</span>
-                  <button
-                    onClick={() => loadLiveFeed(selectedAOI, userMapKey)}
-                    disabled={isLoadingLive}
-                    className="p-2 hover:text-teal-600 hover:bg-teal-100 rounded-lg transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center"
-                    title={language === 'id' ? 'Perbarui data' : 'Refresh data'}
-                    aria-label={language === 'id' ? 'Perbarui data' : 'Refresh data'}
-                  >
-                    <RefreshCw className={`w-3.5 h-3.5 ${isLoadingLive ? 'animate-spin' : ''}`} />
-                  </button>
-                </div>
+                <button
+                  onClick={() => loadLiveFeed(selectedAOI, userMapKey)}
+                  disabled={isLoadingLive}
+                  className="p-1.5 text-[#0071e3] hover:underline transition-colors flex items-center gap-1 font-medium"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isLoadingLive ? 'animate-spin' : ''}`} />
+                  <span>{language === 'id' ? 'Segarkan' : 'Refresh'}</span>
+                </button>
               </div>
             )}
 
-            {/* Apple-style Differentiated Metric Strip */}
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-0 bg-white border border-zinc-200/80 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden">
-              {/* Hero stat */}
-              <div className="sm:col-span-1 px-5 py-5 flex flex-col justify-between border-b sm:border-b-0 sm:border-r border-zinc-100 bg-amber-600">
-                <p className="text-xs font-bold text-amber-100 tracking-wider uppercase">{t.rawDetections}</p>
+            {/* Metric Strip (Clean Apple Editorial Design) */}
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-0 bg-white border border-[#e5e5e7] rounded-2xl shadow-xs overflow-hidden">
+              
+              {/* Primary metric */}
+              <div className="sm:col-span-1 px-5 py-5 flex flex-col justify-between border-b sm:border-b-0 sm:border-r border-[#e5e5e7] bg-[#fbfbfd]">
+                <span className="text-xs font-semibold text-[#86868b] tracking-wider uppercase">{t.rawDetections}</span>
                 <div>
-                  <div className="text-4xl sm:text-5xl font-extrabold text-white num tracking-tight leading-none mt-2">
+                  <div className="text-3xl sm:text-4xl font-bold text-[#1d1d1f] num tracking-tight leading-none mt-2">
                     {totalEvents.toLocaleString()}
                   </div>
-                  <p className="text-xs text-amber-100/90 mt-1.5 font-medium">
-                    {isLiveSync ? `${selectedAOI.name} (24h Live)` : t.rawDetectionsDesc}
+                  <p className="text-xs text-[#86868b] mt-1.5 font-medium">
+                    {isLiveSync ? `${selectedAOI.name} (Live)` : t.rawDetectionsDesc}
                   </p>
                 </div>
               </div>
 
-              {/* 3 Secondary stats */}
+              {/* 3 Secondary metrics */}
               {[
                 {
                   label: t.historicPeakYear,
                   value: peakYear,
                   sub: `${t.energyTotal}: ${peakFRP} MW`,
-                  valueClass: 'text-slate-900',
+                  valueClass: 'text-[#1d1d1f]',
                 },
                 {
                   label: t.spatialResolution,
                   value: '5.5 km',
                   sub: t.spatialResolutionDesc,
-                  valueClass: 'text-slate-900',
+                  valueClass: 'text-[#1d1d1f]',
                 },
                 {
                   label: t.unusualAnomalies,
                   value: `${anomalyCount}`,
                   sub: t.unusualAnomaliesDesc,
-                  valueClass: anomalyCount > 10 ? 'text-red-600' : 'text-slate-900',
+                  valueClass: anomalyCount > 10 ? 'text-red-600' : 'text-[#1d1d1f]',
                 },
               ].map((kpi) => (
                 <div
                   key={kpi.label}
-                  className="px-5 py-5 flex flex-col justify-between border-b sm:border-b-0 sm:border-r last:border-r-0 border-zinc-100"
+                  className="px-5 py-5 flex flex-col justify-between border-b sm:border-b-0 sm:border-r last:border-r-0 border-[#e5e5e7]"
                 >
-                  <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">{kpi.label}</p>
+                  <span className="text-xs font-semibold text-[#86868b] uppercase tracking-wider">{kpi.label}</span>
                   <div>
-                    <div className={`text-3xl sm:text-4xl font-extrabold num tracking-tight leading-none mt-2 ${kpi.valueClass}`}>
+                    <div className={`text-3xl sm:text-4xl font-bold num tracking-tight leading-none mt-2 ${kpi.valueClass}`}>
                       {kpi.value}
                     </div>
-                    <p className="text-[11px] text-zinc-400 mt-1.5 leading-snug">{kpi.sub}</p>
+                    <p className="text-[11px] text-[#86868b] mt-1.5 leading-snug">{kpi.sub}</p>
                   </div>
                 </div>
               ))}
@@ -233,7 +217,7 @@ export function App() {
               />
             </section>
 
-            {/* Map (Wider) + Side Analytics */}
+            {/* Map + Side Analytics */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
               <div className="lg:col-span-8">
                 <MapViewer
@@ -247,7 +231,7 @@ export function App() {
                 />
               </div>
 
-              <div className="lg:col-span-4 space-y-4">
+              <div className="lg:col-span-4 space-y-5">
                 <RiskForecast
                   language={language}
                   selectedAOI={selectedAOI}
@@ -272,16 +256,16 @@ export function App() {
           </div>
         )}
 
-        {/* Tab 2: Harmonization Lab & Science */}
+        {/* Tab 2: Harmonization Lab */}
         {activeTab === 'lab' && (
-          <div className="animate-in fade-in duration-300">
+          <div className="animate-in fade-in duration-200">
             <HarmonizationLab language={language} />
           </div>
         )}
 
-        {/* Tab 3: Field Directives & Peatland Mitigation */}
+        {/* Tab 3: Mitigation Hub */}
         {activeTab === 'mitigation' && (
-          <div className="animate-in fade-in duration-300">
+          <div className="animate-in fade-in duration-200">
             <MitigationHub
               language={language}
               selectedAOI={selectedAOI}
@@ -290,9 +274,9 @@ export function App() {
           </div>
         )}
 
-        {/* Tab 4: Open Data Registry & Satellite Constellation */}
+        {/* Tab 4: Open Data Registry */}
         {activeTab === 'data-hub' && (
-          <div className="animate-in fade-in duration-300">
+          <div className="animate-in fade-in duration-200">
             <DataHub
               language={language}
               selectedAOI={selectedAOI}
@@ -304,9 +288,9 @@ export function App() {
         )}
       </main>
 
-      {/* Apple-style Minimal Footer */}
-      <footer className="border-t border-zinc-200/80 bg-white py-6 px-4 sm:px-6 text-center text-xs text-zinc-400 space-y-1">
-        <p className="font-medium text-slate-700">
+      {/* Apple Minimal Footer */}
+      <footer className="border-t border-[#e5e5e7] bg-white py-6 px-4 sm:px-6 text-center text-xs text-[#86868b] space-y-1">
+        <p className="font-medium text-[#1d1d1f]">
           {t.appName} &bull; {t.appTagline} &bull; {t.footerChallenge}
         </p>
         <p>{t.footerCourtesy}</p>

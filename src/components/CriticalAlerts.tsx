@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldAlert, CheckCircle2, Download, BellRing, Compass, Flame } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { AOIRegion, HarmonizedWeekData } from '../engine/harmonizer';
 import { Language, translations } from '../data/translations';
 
@@ -49,92 +49,87 @@ export const CriticalAlerts: React.FC<CriticalAlertsProps> = ({
   };
 
   return (
-    <div className="bg-white border border-zinc-200 rounded-xl p-4 shadow-sm flex flex-col justify-between">
+    <div className="bg-white border border-[#e5e5e7] rounded-2xl p-5 shadow-xs flex flex-col justify-between">
       <div>
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
-          <div className="section-title-bar">
-            <ShieldAlert className="w-4 h-4 text-orange-500" />
-            <h3 className="font-bold text-sm text-slate-900">{t.earlyWarningTitle}</h3>
-          </div>
+        <div className="flex items-center justify-between pb-3 border-b border-[#e5e5e7]">
+          <h2 className="font-semibold text-sm text-[#1d1d1f]">
+            {t.earlyWarningTitle}
+          </h2>
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 min-h-[36px] rounded-lg bg-zinc-50 hover:bg-zinc-100 text-slate-600 hover:text-slate-900 text-xs font-semibold border border-zinc-200 transition"
-            title={language === 'id' ? 'Unduh data lengkap sebagai file CSV' : 'Download full dataset as CSV'}
+            className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-[#0071e3] hover:underline"
+            title="Download full dataset as CSV"
           >
             <Download className="w-3.5 h-3.5" />
-            {t.exportCsv}
+            <span>CSV</span>
           </button>
         </div>
 
-        {/* Peak season banner — amber strip, not a soft orange box */}
-        <div className="mt-3 p-3.5 bg-amber-600 rounded-lg">
-          <div className="text-amber-100 text-xs font-semibold mb-1 flex items-center gap-1.5">
-            <Compass className="w-3.5 h-3.5" />
+        {/* Peak season summary in clean neutral card */}
+        <div className="mt-3.5 p-3.5 bg-[#f5f5f7] border border-[#e5e5e7] rounded-xl">
+          <div className="text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1">
             {t.annualPeakSeason}
           </div>
-          <div className="text-2xl font-bold text-white num">
-            {language === 'id' ? 'Minggu' : 'Weeks'} {startWeek} – {endWeek}
-            <span className="text-base font-normal text-amber-200 ml-2">({Math.round((endWeek - startWeek + 1))} {t.weeksDuration})</span>
+          <div className="text-xl font-bold text-[#1d1d1f] num">
+            {language === 'id' ? 'Minggu' : 'Weeks'} {startWeek} – {endWeek}{' '}
+            <span className="text-xs text-[#86868b] font-normal">
+              ({Math.round(endWeek - startWeek + 1)} {t.weeksDuration})
+            </span>
           </div>
-          <p className="text-xs text-amber-100 mt-1.5 leading-relaxed">
+          <p className="text-xs text-[#6e6e73] mt-1.5 leading-relaxed">
             {language === 'id'
-              ? <><strong className="text-white">{selectedAOI.name}</strong>: 20 tahun data NASA membuktikan kebakaran terhebat terpusat di periode ini.</>
-              : <>20 years of NASA data confirm that the most intense fires in <strong className="text-white">{selectedAOI.name}</strong> cluster in this window.</>}
+              ? <>Data historis 26 tahun membuktikan konsentrasi kebakaran terbesar di <strong className="text-[#1d1d1f]">{selectedAOI.name}</strong> terjadi pada rentang minggu ini.</>
+              : <>26-year satellite records confirm that major fire events in <strong className="text-[#1d1d1f]">{selectedAOI.name}</strong> concentrate in this annual dry window.</>}
           </p>
         </div>
 
         {/* Top anomalies */}
         <div className="mt-4">
-          <div className="section-title-bar mb-2">
-            <span className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
-              <BellRing className="w-3.5 h-3.5 text-red-500" />
-              {t.highestAnomalies}
-            </span>
+          <div className="text-xs font-semibold text-[#1d1d1f] mb-2">
+            {t.highestAnomalies}
           </div>
           <div className="space-y-1.5">
             {anomalies.map((anom, idx) => (
               <div
                 key={`${anom.year}-${anom.week}`}
-                className="flex items-center justify-between p-2 rounded-lg bg-zinc-50 border border-zinc-200 text-xs"
+                className="flex items-center justify-between p-2 rounded-lg border border-[#e5e5e7] bg-white text-xs"
               >
                 <div className="flex items-center gap-2">
-                  <span className="w-5 h-5 rounded bg-red-500 text-white flex items-center justify-center text-[10px] font-bold shrink-0 num">
+                  <span className="w-4 h-4 rounded-full bg-[#1d1d1f] text-white flex items-center justify-center text-[10px] font-bold shrink-0 num">
                     {idx + 1}
                   </span>
                   <div>
-                    <strong className="text-slate-800">{t.year} {anom.year}, {language === 'id' ? 'Minggu' : 'Week'} {anom.week}</strong>
-                    <span className="text-zinc-400 ml-2">({anom.dominantSensor})</span>
+                    <strong className="text-[#1d1d1f]">{t.year} {anom.year}, {language === 'id' ? 'Minggu' : 'Wk'} {anom.week}</strong>
+                    <span className="text-[#86868b] ml-1.5">({anom.dominantSensor})</span>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-red-500 font-bold num">+{anom.zScore.toFixed(1)}x</span>
-                  <span className="text-zinc-200 mx-1.5">|</span>
-                  <span className="text-amber-600 font-semibold num">{anom.totalFrpCalibrated} MW</span>
+                  <span className="text-red-600 font-semibold num">+{anom.zScore.toFixed(1)}x</span>
+                  <span className="text-[#86868b] mx-1.5">·</span>
+                  <span className="text-[#1d1d1f] num font-medium">{anom.totalFrpCalibrated} MW</span>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Directives — slate-blue, not sky (sky was too close to cyan/teal already used) */}
-        <div className="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-700">
-          <div className="font-semibold mb-1.5 text-slate-600">{t.directivesTitle}</div>
-          <ul className="list-disc list-inside space-y-1">
-            <li>{language === 'id' ? `Mulai patroli lapangan dua minggu sebelum Minggu ${startWeek}.` : `Begin ground patrols two weeks before Week ${startWeek}.`}</li>
+        {/* Directives in clean typography */}
+        <div className="mt-4 border-t border-[#e5e5e7] pt-3">
+          <div className="font-semibold text-xs text-[#1d1d1f] mb-1.5">
+            {t.directivesTitle}
+          </div>
+          <ul className="list-disc list-inside space-y-1 text-xs text-[#6e6e73]">
+            <li>{language === 'id' ? `Mulai patroli lapangan 2 minggu sebelum Minggu ${startWeek}.` : `Deploy field patrols 2 weeks prior to Week ${startWeek}.`}</li>
             <li>{t.directive2}</li>
             <li>{t.directive3}</li>
           </ul>
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="mt-4 pt-2 border-t border-slate-100 text-[11px] text-slate-400 flex items-center justify-between">
-        <span className="text-emerald-600 flex items-center gap-1.5">
-          <CheckCircle2 className="w-3.5 h-3.5" />
-          {t.verificationComplete}
-        </span>
-        <span className="font-mono">{t.archiveSpan}</span>
+      <div className="mt-4 pt-2 border-t border-[#e5e5e7] text-[10px] text-[#86868b] flex items-center justify-between">
+        <span>{t.verificationComplete}</span>
+        <span className="num">{t.archiveSpan}</span>
       </div>
     </div>
   );

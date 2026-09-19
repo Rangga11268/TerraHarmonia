@@ -1,17 +1,5 @@
 import React, { useState } from 'react';
-import { 
-  ShieldAlert, 
-  Droplets, 
-  MapPin, 
-  Download, 
-  Printer, 
-  Users, 
-  Flame, 
-  CheckCircle2, 
-  AlertTriangle,
-  Compass,
-  FileText
-} from 'lucide-react';
+import { Download, FileText } from 'lucide-react';
 import { PRESET_AOIS, AOIRegion } from '../engine/harmonizer';
 import { Language } from '../data/translations';
 
@@ -28,43 +16,41 @@ export const MitigationHub: React.FC<MitigationHubProps> = ({
 }) => {
   const [selectedTeamUnit, setSelectedTeamUnit] = useState<'manggala_agni' | 'mpa' | 'bpbd'>('manggala_agni');
   const [patrolDate, setPatrolDate] = useState<string>(() => new Date().toISOString().split('T')[0]);
-  const [dispatchGenerated, setDispatchGenerated] = useState(false);
 
   // Region Peatland Risk Table
   const regionRisks = [
-    { aoi: PRESET_AOIS[0], tmag: -48, risk: 'extreme', canalBlocks: 142, hotspotTrend: '+18%' }, // Riau
-    { aoi: PRESET_AOIS[1], tmag: -55, risk: 'extreme', canalBlocks: 280, hotspotTrend: '+34%' }, // Kalteng (PLG)
-    { aoi: PRESET_AOIS[2], tmag: -38, risk: 'high', canalBlocks: 95, hotspotTrend: '+12%' },    // Kalsel
-    { aoi: PRESET_AOIS[3], tmag: -52, risk: 'extreme', canalBlocks: 210, hotspotTrend: '+28%' }, // Sumsel (OKI)
-    { aoi: PRESET_AOIS[4], tmag: -30, risk: 'moderate', canalBlocks: 60, hotspotTrend: '+5%' },  // Kaltim
+    { aoi: PRESET_AOIS[0], tmag: -48, risk: 'extreme', canalBlocks: 142 }, // Riau
+    { aoi: PRESET_AOIS[1], tmag: -55, risk: 'extreme', canalBlocks: 280 }, // Kalteng (PLG)
+    { aoi: PRESET_AOIS[2], tmag: -38, risk: 'high', canalBlocks: 95 },     // Kalsel
+    { aoi: PRESET_AOIS[3], tmag: -52, risk: 'extreme', canalBlocks: 210 }, // Sumsel (OKI)
+    { aoi: PRESET_AOIS[4], tmag: -30, risk: 'moderate', canalBlocks: 60 },  // Kaltim
   ];
 
   const currentRegionRisk = regionRisks.find(r => r.aoi.id === selectedAOI.id) || regionRisks[0];
 
   const handleDownloadDispatch = () => {
     const memo = `===============================================================
-MEMORANDUM DISPATCH PATROLI LAPANGAN - TERRA HARMONIA INTELLIGENCE
-NASA Space Apps Challenge 2026 - Peatland Fire Early Warning
+MEMORANDUM PENUGASAN PATROLI LAPANGAN - TERRA HARMONIA INTELLIGENCE
+NASA Space Apps Challenge 2026 - Peringatan Dini Kebakaran Gambut
 ===============================================================
 Tanggal Patroli    : ${patrolDate}
-Wilayah Prioritas  : ${selectedAOI.name} (${selectedAOI.country})
-Zona Ekosistem     : ${selectedAOI.biome}
-Koordinat Pusat    : ${selectedAOI.center[0].toFixed(4)}° N, ${selectedAOI.center[1].toFixed(4)}° E
+Wilayah Target     : ${selectedAOI.name} (${selectedAOI.country})
+Tipe Ekosistem     : ${selectedAOI.biome}
+Koordinat Titik    : ${selectedAOI.center[0].toFixed(4)}° N, ${selectedAOI.center[1].toFixed(4)}° E
 Status Kerentanan  : ${currentRegionRisk.risk.toUpperCase()}
 Estimasi TMA Gambut: ${currentRegionRisk.tmag} cm (Batas Kritis: -40 cm)
-Sekat Kanal Pantau : ${currentRegionRisk.canalBlocks} Unit
+Sekat Kanal Pantau : ${currentRegionRisk.canalBlocks} Titik
 
-UNIT OPERASIONAL DITUGASKAN:
-- Satuan Kerja     : ${selectedTeamUnit === 'manggala_agni' ? 'Manggala Agni Daops KLHK' : selectedTeamUnit === 'mpa' ? 'Masyarakat Peduli Api (MPA) Desa' : 'Satgas BPBD & Pemadam Kebakaran'}
+SATUAN KERJA DITUGASKAN:
+- Unit Operasional : ${selectedTeamUnit === 'manggala_agni' ? 'Manggala Agni Daops KLHK' : selectedTeamUnit === 'mpa' ? 'Masyarakat Peduli Api (MPA) Desa' : 'Satgas Karhutla BPBD / Damkar'}
 
 INSTRUKSI OPERASIONAL:
-1. Lakukan pengecekan kebasahan serasah dan kedalaman gambut di perimeter.
-2. Pastikan pintu sekat kanal (canal blocking) ditutup rapat untuk mempertahankan air.
-3. Segera laporkan anomali asap bawah tanah sebelum merambat ke tajuk.
-4. Gunakan drone pemantau termal jika jarak pandang terbatas oleh kabut asap.
+1. Lakukan pengecekan kelembapan serasah gambut dan kedalaman air tanah di perimeter.
+2. Pastikan pintu sekat kanal (canal blocking) tertutup rapat untuk mencegah pengeringan.
+3. Pantau tanda-tanda asap bawah tanah (smoldering) sebelum merambat ke tajuk pohon.
+4. Lakukan pendinginan lahan berkala di area bekas kebakaran terdahulu.
 
-Data satelit referensi: NASA FIRMS (MODIS/VIIRS Harmonized Grid 5.5 km)
-Dikeluarkan secara otomatis oleh Terra Harmonia System.
+Data acuan satelit: NASA FIRMS (MODIS/VIIRS Harmonized Grid 5.5 km)
 ===============================================================`;
 
     const blob = new Blob([memo], { type: 'text/plain;charset=utf-8;' });
@@ -73,42 +59,38 @@ Dikeluarkan secara otomatis oleh Terra Harmonia System.
     link.href = url;
     link.download = `Dispatch_Briefing_${selectedAOI.id}_${patrolDate}.txt`;
     link.click();
-    setDispatchGenerated(true);
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-6xl mx-auto">
       
-      {/* Header Banner */}
-      <div className="bg-white border border-zinc-200/80 rounded-2xl p-5 sm:p-7 shadow-[0_4px_24px_rgba(0,0,0,0.02)]">
-        <div className="max-w-3xl space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-50 border border-orange-200 text-orange-800 text-xs font-bold">
-            <ShieldAlert className="w-3.5 h-3.5 text-orange-600" />
-            <span>{language === 'id' ? 'Pusat Komando Mitigasi Lahan Gambut' : 'Peatland Mitigation Command'}</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            {language === 'id'
-              ? 'Prognosis Risiko & Penugasan Patroli Lapangan'
-              : 'Fire Risk Prognosis & Field Patrol Dispatch'}
-          </h2>
-          <p className="text-sm text-zinc-600">
-            {language === 'id'
-              ? 'Menghubungkan data satelit 26 tahun dengan aksi nyata di lapangan. Estimasi tinggi muka air gambut (TMAG) dan pembuatan memorandum penugasan patroli untuk Manggala Agni dan Masyarakat Peduli Api (MPA).'
-              : 'Translating 26-year satellite intelligence into frontline operational action. Peat groundwater depth tracking and patrol dispatch memos for field units.'}
-          </p>
+      {/* Editorial Header (No capsule pills) */}
+      <div className="space-y-2 pt-2 pb-4 border-b border-[#e5e5e7]">
+        <div className="text-xs font-semibold uppercase tracking-wider text-[#86868b]">
+          {language === 'id' ? 'Operasi & Mitigasi Lapangan' : 'Field Operations & Mitigation'}
         </div>
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#1d1d1f] tracking-tight">
+          {language === 'id'
+            ? 'Pusat Komando & Peringatan Dini Lahan Gambut'
+            : 'Peatland Early Warning & Patrol Command'}
+        </h1>
+        <p className="text-sm text-[#6e6e73] max-w-3xl leading-relaxed">
+          {language === 'id'
+            ? 'Menghubungkan kalender historis 26 tahun dengan aksi operasional. Pantau estimasi kedalaman muka air tanah gambut (TMAG) dan buat memorandum briefing penugasan patroli lapangan untuk regu pemadam.'
+            : 'Operationalizing 26-year satellite climatology into field action. Monitor groundwater table depth estimates and generate dispatch briefing memos for patrol units.'}
+        </p>
       </div>
 
-      {/* 5-Region Peatland Vulnerability Grid */}
-      <div className="bg-white border border-zinc-200/80 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4">
-        <div className="section-title-bar flex items-center justify-between">
-          <h3 className="font-bold text-sm text-slate-900">
-            {language === 'id' ? 'Status 5 Wilayah Gambut Utama Indonesia' : 'Priority Indonesian Peatland Regions Status'}
-          </h3>
-          <span className="text-xs text-zinc-400 font-medium">Klik wilayah untuk memilih</span>
+      {/* 5-Region Peatland Status */}
+      <div className="bg-white border border-[#e5e5e7] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-sm text-[#1d1d1f]">
+            {language === 'id' ? 'Status 5 Wilayah Gambut Prioritas' : 'Priority Peatland Regions Status'}
+          </h2>
+          <span className="text-xs text-[#86868b]">Pilih wilayah untuk memuat parameter</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           {regionRisks.map((item) => {
             const isSelected = selectedAOI.id === item.aoi.id;
             return (
@@ -117,26 +99,30 @@ Dikeluarkan secara otomatis oleh Terra Harmonia System.
                 onClick={() => onSelectAOI(item.aoi)}
                 className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
                   isSelected
-                    ? 'bg-amber-50/70 border-amber-500 ring-2 ring-amber-500/20 shadow-sm'
-                    : 'bg-zinc-50/70 border-zinc-200 hover:border-zinc-300 hover:bg-zinc-100/50'
+                    ? 'border-[#1d1d1f] bg-[#f5f5f7] shadow-xs'
+                    : 'border-[#e5e5e7] bg-white hover:border-[#1d1d1f]/30'
                 }`}
               >
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-900 truncate">{item.aoi.name}</span>
-                    <span className={`w-2 h-2 rounded-full ${item.risk === 'extreme' ? 'bg-red-500 animate-pulse' : 'bg-amber-500'}`} />
+                    <span className="text-xs font-bold text-[#1d1d1f] truncate">{item.aoi.name}</span>
+                    {item.risk === 'extreme' && (
+                      <span className="w-2 h-2 rounded-full bg-red-600 inline-block" />
+                    )}
                   </div>
-                  <span className="text-[11px] text-zinc-400 block mt-0.5">{item.aoi.biome}</span>
+                  <span className="text-[11px] text-[#86868b] block mt-0.5 truncate">{item.aoi.biome}</span>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-zinc-200/60 space-y-1 text-xs">
+                <div className="mt-4 pt-3 border-t border-[#e5e5e7] space-y-1 text-xs">
                   <div className="flex justify-between text-[11px]">
-                    <span className="text-zinc-500">Muka Air (TMAG):</span>
-                    <strong className={`num font-bold ${item.tmag <= -40 ? 'text-red-600' : 'text-slate-800'}`}>{item.tmag} cm</strong>
+                    <span className="text-[#86868b]">Muka Air (TMAG):</span>
+                    <span className={`font-semibold num ${item.tmag <= -40 ? 'text-red-600' : 'text-[#1d1d1f]'}`}>
+                      {item.tmag} cm
+                    </span>
                   </div>
                   <div className="flex justify-between text-[11px]">
-                    <span className="text-zinc-500">Sekat Kanal:</span>
-                    <span className="font-semibold text-slate-700 num">{item.canalBlocks} unit</span>
+                    <span className="text-[#86868b]">Sekat Kanal:</span>
+                    <span className="font-medium text-[#1d1d1f] num">{item.canalBlocks} unit</span>
                   </div>
                 </div>
               </div>
@@ -145,35 +131,33 @@ Dikeluarkan secara otomatis oleh Terra Harmonia System.
         </div>
       </div>
 
-      {/* Field Dispatch Planner Generator */}
+      {/* Field Dispatch Planner */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         
-        {/* Dispatch Form Card */}
-        <div className="lg:col-span-6 bg-white border border-zinc-200/80 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4">
-          <div className="section-title-bar">
-            <h3 className="font-bold text-sm text-slate-900">
-              {language === 'id' ? 'Generator Penugasan Patroli Lapangan' : 'Ground Patrol Dispatch Memo Generator'}
-            </h3>
-          </div>
+        {/* Form */}
+        <div className="lg:col-span-6 bg-white border border-[#e5e5e7] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+          <h2 className="font-semibold text-sm text-[#1d1d1f]">
+            {language === 'id' ? 'Pembuatan Memorandum Patroli' : 'Patrol Dispatch Briefing Generator'}
+          </h2>
 
           <div className="space-y-3.5 text-xs">
             <div>
-              <label className="block text-zinc-600 font-semibold mb-1">
-                {language === 'id' ? 'Wilayah Target Patroli' : 'Target Region'}:
+              <label className="block text-[#6e6e73] font-medium mb-1">
+                {language === 'id' ? 'Wilayah Target' : 'Target Region'}:
               </label>
-              <div className="p-2.5 rounded-lg bg-zinc-50 border border-zinc-200 font-bold text-slate-900">
+              <div className="p-2.5 rounded-lg bg-[#f5f5f7] border border-[#e5e5e7] font-semibold text-[#1d1d1f]">
                 {selectedAOI.name} ({selectedAOI.biome})
               </div>
             </div>
 
             <div>
-              <label className="block text-zinc-600 font-semibold mb-1">
-                {language === 'id' ? 'Satuan Tim Lapangan' : 'Field Operational Unit'}:
+              <label className="block text-[#6e6e73] font-medium mb-1">
+                {language === 'id' ? 'Satuan Regu Operasional' : 'Assigned Patrol Unit'}:
               </label>
               <select
                 value={selectedTeamUnit}
                 onChange={(e: any) => setSelectedTeamUnit(e.target.value)}
-                className="w-full bg-zinc-50 border border-zinc-200 rounded-lg p-2.5 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
+                className="w-full bg-white border border-[#e5e5e7] rounded-lg p-2.5 font-medium text-[#1d1d1f] focus:outline-none focus:border-[#1d1d1f] cursor-pointer"
               >
                 <option value="manggala_agni">Manggala Agni (Kementerian LHK)</option>
                 <option value="mpa">Masyarakat Peduli Api (MPA Desa)</option>
@@ -182,52 +166,51 @@ Dikeluarkan secara otomatis oleh Terra Harmonia System.
             </div>
 
             <div>
-              <label className="block text-zinc-600 font-semibold mb-1">
+              <label className="block text-[#6e6e73] font-medium mb-1">
                 {language === 'id' ? 'Tanggal Pelaksanaan' : 'Patrol Date'}:
               </label>
               <input
                 type="date"
                 value={patrolDate}
                 onChange={(e) => setPatrolDate(e.target.value)}
-                className="w-full bg-zinc-50 border border-zinc-200 rounded-lg p-2 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
-              >
-              </input>
+                className="w-full bg-white border border-[#e5e5e7] rounded-lg p-2 font-medium text-[#1d1d1f] focus:outline-none focus:border-[#1d1d1f] cursor-pointer"
+              />
             </div>
           </div>
 
           <button
             onClick={handleDownloadDispatch}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs transition shadow-sm focus-visible:ring-2 focus-visible:ring-amber-400 min-h-[44px]"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#1d1d1f] hover:bg-black text-white font-medium text-xs transition shadow-xs min-h-[42px]"
           >
             <Download className="w-4 h-4" />
-            <span>{language === 'id' ? 'Unduh Dokumen Memo Penugasan (.TXT)' : 'Download Dispatch Memo Briefing'}</span>
+            <span>{language === 'id' ? 'Unduh Dokumen Memo (.TXT)' : 'Download Dispatch Memo'}</span>
           </button>
         </div>
 
-        {/* Live Preview Memo */}
-        <div className="lg:col-span-6 bg-zinc-900 text-zinc-100 rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col justify-between font-mono text-xs space-y-4">
+        {/* Live Preview */}
+        <div className="lg:col-span-6 bg-white border border-[#e5e5e7] rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col justify-between font-mono text-xs space-y-4">
           <div>
-            <div className="flex items-center justify-between text-zinc-400 border-b border-zinc-800 pb-2 text-[11px]">
-              <span className="flex items-center gap-1.5 text-amber-400 font-bold">
+            <div className="flex items-center justify-between text-[#86868b] border-b border-[#e5e5e7] pb-2 text-[11px]">
+              <span className="font-semibold text-[#1d1d1f] flex items-center gap-1.5">
                 <FileText className="w-3.5 h-3.5" />
-                BRIEFING MEMORANDUM PREVIEW
+                DRAF MEMORANDUM BRIEFING
               </span>
-              <span>CONFIDENTIAL // FIELD USE</span>
+              <span>TERRA HARMONIA</span>
             </div>
 
-            <div className="mt-3 space-y-1.5 text-[11px] leading-relaxed text-zinc-300">
-              <p><span className="text-zinc-500">TARGET:</span> {selectedAOI.name}</p>
-              <p><span className="text-zinc-500">STATUS:</span> <span className="text-red-400 font-bold">SIAGA KRITIS (TMAG {currentRegionRisk.tmag} cm)</span></p>
-              <p><span className="text-zinc-500">SEKAT KANAL:</span> {currentRegionRisk.canalBlocks} Titik Pemantauan Aktif</p>
-              <p className="mt-2 text-zinc-400 border-l-2 border-amber-500 pl-2">
-                "Instruksi: Awasi batas sekat kanal utama dan lakukan pembasahan gambut berkala untuk mencegah kebakaran bawah tanah smoldering."
+            <div className="mt-3 space-y-1.5 text-[11px] leading-relaxed text-[#1d1d1f]">
+              <p><span className="text-[#86868b]">TARGET:</span> {selectedAOI.name}</p>
+              <p><span className="text-[#86868b]">STATUS:</span> <strong className="text-red-600">SIAGA DARURAT (TMAG {currentRegionRisk.tmag} cm)</strong></p>
+              <p><span className="text-[#86868b]">SEKAT KANAL:</span> {currentRegionRisk.canalBlocks} Titik Terpantau</p>
+              <p className="mt-2 text-[#6e6e73] border-l-2 border-[#1d1d1f] pl-2.5">
+                "Instruksi: Pertahankan tinggi muka air gambut di atas -40 cm dan lakukan pemantauan serasah untuk mencegah kebakaran bawah tanah smoldering."
               </p>
             </div>
           </div>
 
-          <div className="pt-2 border-t border-zinc-800 text-[10px] text-zinc-500 flex justify-between">
-            <span>TERRA HARMONIA ENGINE 2026</span>
-            <span>NASA FIRMS COMPLIANT</span>
+          <div className="pt-2 border-t border-[#e5e5e7] text-[10px] text-[#86868b] flex justify-between">
+            <span>NASA FIRMS HISTORICAL REFERENCE</span>
+            <span>SIAGA OPERASIONAL</span>
           </div>
         </div>
       </div>

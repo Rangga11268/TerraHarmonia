@@ -4,49 +4,58 @@
 
 @layer base {
   body {
-    @apply bg-zinc-50 text-slate-900;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #f5f5f7; /* Apple standard light canvas */
+    color: #1d1d1f; /* Apple standard primary text */
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  h1, h2, h3 {
-    font-feature-settings: 'cv01', 'cv03', 'ss01';
+  h1, h2, h3, h4 {
+    letter-spacing: -0.02em;
+    color: #1d1d1f;
   }
 
-  /* Tabular numbers for data values only */
+  /* Tabular numbers for clean numeric column alignment */
   .num {
     font-variant-numeric: tabular-nums;
-    font-feature-settings: 'tnum';
+    font-feature-settings: "tnum";
   }
 }
 
-/* Tight scrollbar — not distracting */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: #f4f4f5; }
-::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
+/* Subtle, unobtrusive scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1d1d6;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #aeaeb2;
+}
 
-/* Leaflet background override */
-.leaflet-container { background: #e4e4e7; }
+/* Leaflet background */
+.leaflet-container {
+  background: #e5e5ea;
+}
 
-/* Calendar heat cell — quick pop on hover */
+/* Heatmap cell transition */
 .heat-cell {
-  transition: transform 80ms ease, box-shadow 80ms ease;
+  transition: transform 120ms ease, opacity 120ms ease;
 }
 .heat-cell:hover {
-  transform: scale(1.18);
+  transform: scale(1.15);
   z-index: 10;
   position: relative;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
-/* Amber accent bar — identity motif used on section titles */
-.section-title-bar {
-  border-left: 3px solid #d97706;
-  padding-left: 10px;
-}
-
-/* Smooth focus ring — all interactive elements */
+/* Focus state */
 *:focus-visible {
-  outline: 2px solid #d97706;
+  outline: 2px solid #0071e3;
   outline-offset: 2px;
 }
