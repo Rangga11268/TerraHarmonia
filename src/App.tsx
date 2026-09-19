@@ -4,6 +4,7 @@ import { DashboardControlBar } from './components/DashboardControlBar';
 import { BurningCalendar } from './components/BurningCalendar';
 import { MapViewer } from './components/MapViewer';
 import { ComparisonMetrics } from './components/ComparisonMetrics';
+import { VisualAnalytics } from './components/VisualAnalytics';
 import { CriticalAlerts } from './components/CriticalAlerts';
 import { RiskForecast } from './components/RiskForecast';
 import { HarmonizationLab } from './components/HarmonizationLab';
@@ -252,6 +253,16 @@ export function App() {
                 />
               </div>
             </div>
+
+            {/* Scientific Visual Analytics & Charts Suite */}
+            <section>
+              <VisualAnalytics
+                language={language}
+                selectedAOI={selectedAOI}
+                calendarMatrix={calendarMatrix}
+                rawMode={rawMode}
+              />
+            </section>
 
             {/* Science Comparison Section */}
             <div className="grid grid-cols-1 gap-6">
