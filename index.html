@@ -16,10 +16,12 @@
         try {
           var saved = localStorage.getItem('terra_harmonia_theme');
           var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-          if (saved === 'dark' || ((!saved || saved === 'system') && systemDark)) {
+          if (saved === 'dark' || (!saved && systemDark)) {
             document.documentElement.classList.add('dark');
+            if (document.body) document.body.classList.add('dark');
           } else {
             document.documentElement.classList.remove('dark');
+            if (document.body) document.body.classList.remove('dark');
           }
         } catch (e) {}
       })();

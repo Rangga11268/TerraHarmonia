@@ -60,13 +60,16 @@ export function App() {
     return () => mql.removeEventListener('change', handler);
   }, [hasUserOverride]);
 
-  // Synchronize 'dark' class on <html> documentElement
+  // Synchronize 'dark' class on <html> and <body>
   useEffect(() => {
     const root = document.documentElement;
+    const body = document.body;
     if (theme === 'dark') {
       root.classList.add('dark');
+      if (body) body.classList.add('dark');
     } else {
       root.classList.remove('dark');
+      if (body) body.classList.remove('dark');
     }
   }, [theme]);
 
