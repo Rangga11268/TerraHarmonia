@@ -230,10 +230,10 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
           </span>
           {[
             { key: 'all', label: 'Semua (26 Tahun)' },
-            { key: '2015', label: '🔥 El Niño 2015 (Super Peak)' },
-            { key: '2019', label: '⚠️ El Niño 2019 (IOD+)' },
-            { key: '2023', label: '🍂 El Niño 2023' },
-            { key: 'lanina', label: '🌧️ La Niña (Basah 2010/16/20)' },
+            { key: '2015', label: 'El Niño 2015 (Puncak Ekstrem)' },
+            { key: '2019', label: 'El Niño 2019 (IOD Positif)' },
+            { key: '2023', label: 'El Niño 2023' },
+            { key: 'lanina', label: 'La Niña (Periode Basah)' },
           ].map(({ key, label }) => (
             <button
               key={key}

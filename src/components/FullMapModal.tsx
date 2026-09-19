@@ -445,7 +445,7 @@ STATUS RISIKO & REKOMENDASI:
             <span>{language === 'id' ? 'Kembali' : 'Back'}</span>
           </button>
 
-          <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse shrink-0 hidden sm:inline-block" />
+          <div className="w-2 h-2 rounded-full bg-red-600 shrink-0 hidden sm:inline-block" />
 
           <div className="min-w-0">
             <h1 className="text-sm font-bold text-[#1d1d1f] tracking-tight truncate">

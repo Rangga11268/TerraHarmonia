@@ -12,30 +12,33 @@ export const Logo: React.FC<LogoProps> = ({
   showSubtitle = true,
 }) => {
   const sizeMap = {
-    sm: { img: 'w-6 h-6 rounded-md', title: 'text-sm font-semibold', sub: 'text-[9px]' },
-    md: { img: 'w-8 h-8 rounded-lg', title: 'text-base font-semibold', sub: 'text-[10px]' },
-    lg: { img: 'w-10 h-10 rounded-xl', title: 'text-lg font-bold', sub: 'text-xs' },
+    sm: { img: 'w-7 h-7 rounded-lg', title: 'text-sm font-bold', sub: 'text-[9px]' },
+    md: { img: 'w-9 h-9 rounded-xl', title: 'text-base font-bold', sub: 'text-[10px]' },
+    lg: { img: 'w-11 h-11 rounded-2xl', title: 'text-lg font-extrabold', sub: 'text-xs' },
   };
 
   const { img, title, sub } = sizeMap[size];
 
   return (
     <div className={`inline-flex items-center gap-2.5 select-none ${className}`}>
-      <div className={`overflow-hidden shrink-0 border border-black/10 shadow-[0_1px_3px_rgba(0,0,0,0.08)] bg-white ${img}`}>
+      {/* High-Contrast Crisp Vector Emblem */}
+      <div className={`overflow-hidden shrink-0 shadow-sm border border-black/10 bg-[#0f172a] ${img}`}>
         <img
-          src="/terra_harmonia_logo.jpg"
-          alt="Terra Harmonia"
-          className="w-full h-full object-cover"
+          src="/favicon.svg"
+          alt="Terra Harmonia Emblem"
+          className="w-full h-full object-contain p-0.5"
           loading="eager"
         />
       </div>
-      <div className="flex flex-col justify-center min-w-0 leading-none">
-        <div className={`tracking-tight text-[#1d1d1f] ${title}`}>
+
+      {/* Clean Apple-style Typography */}
+      <div className="flex flex-col justify-center min-w-0 leading-tight">
+        <div className={`tracking-tight text-[#1d1d1f] font-bold ${title}`}>
           Terra Harmonia
         </div>
         {showSubtitle && (
-          <span className={`text-[#86868b] tracking-normal mt-0.5 hidden sm:block ${sub}`}>
-            NASA Space Apps 2026
+          <span className={`text-[#86868b] tracking-normal font-medium hidden sm:block ${sub}`}>
+            NASA Space Apps Challenge 2026
           </span>
         )}
       </div>
