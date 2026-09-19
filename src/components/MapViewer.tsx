@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { AOIRegion, RawHotspot, HarmonizedWeekData } from '../engine/harmonizer';
-import { MapPin, Flame, Layers } from 'lucide-react';
+import { MapPin, Layers, Flame, AlertCircle } from 'lucide-react';
 import { Language, translations } from '../data/translations';
 
 interface MapViewerProps {
@@ -11,6 +11,17 @@ interface MapViewerProps {
   hotspots: RawHotspot[];
   selectedWeekData: HarmonizedWeekData | null;
   rawMode: boolean;
+  isLiveSync?: boolean;
+  isLoading?: boolean;
+}
+
+// ponytail: marker FRP bins — good enough for visual scale, no fancy normalization needed
+function getMarkerRadius(frp: number): number {
+  if (frp < 15) return 5;
+  if (frp < 40) return 7;
+  if (frp < 100) return 10;
+  if (frp < 250) return 14;
+  return 18;
 }
 
 export const MapViewer: React.FC<MapViewerProps> = ({
@@ -18,66 +29,57 @@ export const MapViewer: React.FC<MapViewerProps> = ({
   selectedAOI,
   hotspots,
   selectedWeekData,
-  rawMode
+  rawMode,
+  isLiveSync = false,
+  isLoading = false,
 }) => {
   const t = translations[language];
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const layerGroupRef = useRef<L.LayerGroup | null>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
-  const [basemap, setBasemap] = useState<'dark' | 'satellite'>('dark');
+  const [basemap, setBasemap] = useState<'dark' | 'satellite'>('satellite');
 
+  // Init map once
   useEffect(() => {
-    if (!mapContainerRef.current) return;
+    if (!mapContainerRef.current || mapInstanceRef.current) return;
 
-    if (!mapInstanceRef.current) {
-      const map = L.map(mapContainerRef.current, {
-        center: selectedAOI.center,
-        zoom: selectedAOI.zoom,
-        zoomControl: false,
-        attributionControl: false
-      });
+    const map = L.map(mapContainerRef.current, {
+      center: selectedAOI.center,
+      zoom: selectedAOI.zoom,
+      zoomControl: false,
+      attributionControl: false,
+    });
 
-      tileLayerRef.current = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-        maxZoom: 16,
-        attribution: 'Basemap: Esri World Dark Gray | NASA FIRMS'
-      }).addTo(map);
+    tileLayerRef.current = L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      { maxZoom: 18, attribution: 'Esri World Imagery' }
+    ).addTo(map);
 
-      L.control.zoom({ position: 'topright' }).addTo(map);
-
-      layerGroupRef.current = L.layerGroup().addTo(map);
-      mapInstanceRef.current = map;
-    }
+    L.control.zoom({ position: 'topright' }).addTo(map);
+    layerGroupRef.current = L.layerGroup().addTo(map);
+    mapInstanceRef.current = map;
   }, []);
 
+  // Basemap switcher
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
-
-    if (tileLayerRef.current) {
-      map.removeLayer(tileLayerRef.current);
-    }
+    if (tileLayerRef.current) map.removeLayer(tileLayerRef.current);
 
     const url = basemap === 'satellite'
       ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
-      : 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+      : 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
 
-    const attribution = basemap === 'satellite'
-      ? 'Esri World Imagery | NASA FIRMS'
-      : 'Esri World Dark Gray | NASA FIRMS';
-
-    tileLayerRef.current = L.tileLayer(url, {
-      maxZoom: 16,
-      attribution
-    }).addTo(map);
+    tileLayerRef.current = L.tileLayer(url, { maxZoom: 18 }).addTo(map);
   }, [basemap]);
 
+  // Fly to new AOI
   useEffect(() => {
-    const map = mapInstanceRef.current;
-    if (!map) return;
-    map.setView(selectedAOI.center, selectedAOI.zoom, { animate: true });
+    mapInstanceRef.current?.setView(selectedAOI.center, selectedAOI.zoom, { animate: true });
   }, [selectedAOI]);
 
+  // Render hotspot markers
   useEffect(() => {
     const map = mapInstanceRef.current;
     const layerGroup = layerGroupRef.current;
@@ -86,82 +88,122 @@ export const MapViewer: React.FC<MapViewerProps> = ({
     layerGroup.clearLayers();
 
     const [minLat, minLon, maxLat, maxLon] = selectedAOI.bbox;
-    const bounds: L.LatLngBoundsLiteral = [
-      [minLat, minLon],
-      [maxLat, maxLon]
-    ];
 
-    L.rectangle(bounds, {
-      color: '#06B6D4',
+    // AOI bounding box outline
+    L.rectangle([[minLat, minLon], [maxLat, maxLon]], {
+      color: '#f97316',
       weight: 1.5,
-      dashArray: '4, 4',
-      fillColor: '#06B6D4',
-      fillOpacity: 0.05
+      dashArray: '6 4',
+      fillColor: '#f97316',
+      fillOpacity: 0.04,
     }).addTo(layerGroup);
 
-    let displayHotspots = hotspots.filter((h) => h.aoiId === selectedAOI.id);
+    // Filter and slice hotspots
+    let display = hotspots.filter((h) => h.aoiId === selectedAOI.id);
 
-    if (selectedWeekData) {
-      displayHotspots = displayHotspots.filter((h) => {
-        const d = new Date(h.date);
-        return d.getUTCFullYear() === selectedWeekData.year;
-      });
-      displayHotspots = displayHotspots.slice(0, 350);
-    } else {
-      displayHotspots = displayHotspots.slice(-150);
+    // Confidence filter — only show reliable detections (skip low-confidence noise)
+    if (isLiveSync) {
+      display = display.filter((h) => h.confidence >= 70);
     }
 
-    displayHotspots.forEach((spot) => {
-      const isVIIRS = spot.instrument === 'VIIRS';
-      
-      const radius = rawMode 
-        ? (isVIIRS ? 4 : 8)
-        : Math.min(12, Math.max(5, Math.log(spot.frp + 1) * 2));
+    if (selectedWeekData && !isLiveSync) {
+      display = display.filter((h) => new Date(h.date).getUTCFullYear() === selectedWeekData.year);
+      display = display.slice(0, 500);
+    } else {
+      display = display.slice(-300);
+    }
 
-      const fillColor = isVIIRS ? '#F97316' : '#EF4444';
+    display.forEach((spot, idx) => {
+      const isVIIRS = spot.instrument === 'VIIRS';
+      const radius = rawMode
+        ? (isVIIRS ? 4 : 7)
+        : getMarkerRadius(spot.frp);
+
+      // Bright, high-contrast colors visible on both satellite and light basemap
+      const color = isVIIRS ? '#f97316' : '#ef4444';   // orange vs red
+      const strokeColor = isVIIRS ? '#fff7ed' : '#fef2f2';
+
+      const intensity =
+        spot.frp < 15 ? (language === 'id' ? 'Rendah' : 'Low')
+        : spot.frp < 50 ? (language === 'id' ? 'Sedang' : 'Moderate')
+        : spot.frp < 150 ? (language === 'id' ? 'Tinggi' : 'High')
+        : (language === 'id' ? 'Sangat Tinggi' : 'Extreme');
+
+      const popupHtml = language === 'id'
+        ? `<div style="font-family:system-ui,sans-serif;font-size:12px;min-width:180px;padding:2px">
+            <div style="font-weight:700;color:#b45309;font-size:13px;margin-bottom:4px">Titik Api Terdeteksi</div>
+            <div><b>Sensor:</b> ${spot.instrument} (${spot.satellite})</div>
+            <div><b>Tanggal:</b> ${spot.date} pukul ${spot.time.slice(0,2)}:${spot.time.slice(2)} UTC</div>
+            <div><b>Kekuatan Panas:</b> ${spot.frp} MW &mdash; <span style="color:${spot.frp>100?'#dc2626':'#d97706'}">${intensity}</span></div>
+            <div><b>Keyakinan Deteksi:</b> ${spot.confidence}%</div>
+            <div style="color:#6b7280;margin-top:3px;font-size:10px">${spot.lat.toFixed(4)}&deg;, ${spot.lon.toFixed(4)}&deg;</div>
+          </div>`
+        : `<div style="font-family:system-ui,sans-serif;font-size:12px;min-width:180px;padding:2px">
+            <div style="font-weight:700;color:#b45309;font-size:13px;margin-bottom:4px">Active Fire Detected</div>
+            <div><b>Sensor:</b> ${spot.instrument} (${spot.satellite})</div>
+            <div><b>Date:</b> ${spot.date} at ${spot.time.slice(0,2)}:${spot.time.slice(2)} UTC</div>
+            <div><b>Heat Power:</b> ${spot.frp} MW &mdash; <span style="color:${spot.frp>100?'#dc2626':'#d97706'}">${intensity}</span></div>
+            <div><b>Detection Confidence:</b> ${spot.confidence}%</div>
+            <div style="color:#6b7280;margin-top:3px;font-size:10px">${spot.lat.toFixed(4)}&deg;, ${spot.lon.toFixed(4)}&deg;</div>
+          </div>`;
 
       const circle = L.circleMarker([spot.lat, spot.lon], {
         radius,
-        fillColor,
-        color: isVIIRS ? '#FFEDD5' : '#FECACA',
-        weight: 1,
-        opacity: 0.9,
-        fillOpacity: 0.75
+        fillColor: color,
+        color: strokeColor,
+        weight: 1.2,
+        opacity: 0.95,
+        fillOpacity: 0.85,
       });
 
-      circle.bindPopup(`
-        <div style="font-family: system-ui, sans-serif; font-size: 12px; color: #0f172a; padding: 4px;">
-          <strong style="color: #c2410c; font-size: 13px;">${spot.instrument} ${t.activeHotspots}</strong><br/>
-          <strong>${t.satellite}:</strong> ${spot.satellite}<br/>
-          <strong>${t.acquisition}:</strong> ${spot.date} (${spot.time} UTC)<br/>
-          <strong>${t.frpPower}:</strong> ${spot.frp} MW<br/>
-          <strong>${t.confidence}:</strong> ${spot.confidence}%<br/>
-          <strong>${t.coordinates}:</strong> ${spot.lat.toFixed(3)} deg, ${spot.lon.toFixed(3)} deg
-        </div>
-      `);
-
+      circle.bindPopup(popupHtml, { maxWidth: 240 });
       circle.addTo(layerGroup);
     });
-  }, [selectedAOI, hotspots, selectedWeekData, rawMode, language]);
+
+    // Empty state marker if zero results
+    if (display.length === 0 && !isLoading) {
+      const center = selectedAOI.center;
+      L.marker(center, {
+        icon: L.divIcon({
+          className: '',
+          html: `<div style="background:white;border:1.5px solid #e2e8f0;border-radius:8px;padding:8px 12px;font-size:12px;font-family:system-ui,sans-serif;color:#475569;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.12)">
+            ${language === 'id' ? 'Tidak ada titik api aktif di area ini' : 'No active fire detections in this area'}
+          </div>`,
+          iconAnchor: [100, 20],
+        })
+      }).addTo(layerGroup);
+    }
+  }, [selectedAOI, hotspots, selectedWeekData, rawMode, isLiveSync, isLoading, language]);
+
+  const markerCount = hotspots
+    .filter((h) => h.aoiId === selectedAOI.id)
+    .filter((h) => !isLiveSync || h.confidence >= 70)
+    .length;
 
   return (
-    <div className="relative bg-slate-800/90 border border-slate-700/80 rounded-xl overflow-hidden shadow-md flex flex-col h-[480px]">
-      <div className="bg-slate-900 border-b border-slate-700/80 px-3.5 py-2 flex flex-wrap items-center justify-between gap-2 z-10">
-        <div className="flex items-center gap-2 text-xs">
-          <MapPin className="w-4 h-4 text-cyan-400 shrink-0" />
-          <span className="font-semibold text-white">{selectedAOI.name}</span>
-          <span className="text-slate-400">({selectedAOI.biome})</span>
+    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col">
+      {/* Map header */}
+      <div className="px-4 py-2.5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 bg-white">
+        <div className="flex items-center gap-2">
+          <MapPin className="w-4 h-4 text-orange-500 shrink-0" />
+          <span className="font-semibold text-slate-900 text-sm">{selectedAOI.name}</span>
+          <span className="text-xs text-slate-400">({selectedAOI.biome})</span>
+          {markerCount > 0 && (
+            <span className="text-[11px] bg-orange-50 text-orange-600 border border-orange-200 rounded-full px-2 py-0.5 font-mono">
+              {markerCount.toLocaleString()} {language === 'id' ? 'titik' : 'pts'}
+            </span>
+          )}
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Basemap Switcher */}
-          <div className="flex items-center bg-slate-800 rounded-md p-0.5 border border-slate-700">
+        <div className="flex items-center gap-2">
+          {/* Basemap toggle */}
+          <div className="flex items-center bg-slate-50 rounded-lg p-0.5 border border-slate-200 text-xs">
             <button
               onClick={() => setBasemap('dark')}
-              className={`px-2 py-1 text-[11px] font-medium rounded transition-colors flex items-center gap-1 ${
+              className={`px-2 py-1 rounded font-medium transition-colors flex items-center gap-1 ${
                 basemap === 'dark'
-                  ? 'bg-slate-700 text-cyan-300 font-semibold shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-slate-700 text-white'
+                  : 'text-slate-500 hover:text-slate-900'
               }`}
               title={t.darkMap}
             >
@@ -170,10 +212,10 @@ export const MapViewer: React.FC<MapViewerProps> = ({
             </button>
             <button
               onClick={() => setBasemap('satellite')}
-              className={`px-2 py-1 text-[11px] font-medium rounded transition-colors flex items-center gap-1 ${
+              className={`px-2 py-1 rounded font-medium transition-colors ${
                 basemap === 'satellite'
-                  ? 'bg-cyan-700 text-white font-semibold shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-cyan-600 text-white'
+                  : 'text-slate-500 hover:text-slate-900'
               }`}
               title={t.satelliteMap}
             >
@@ -181,30 +223,51 @@ export const MapViewer: React.FC<MapViewerProps> = ({
             </button>
           </div>
 
-          {/* Sensor Legend */}
-          <div className="flex items-center gap-2.5 text-xs font-mono">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block shadow-sm" />
-              <span className="text-slate-300 text-[11px]">{t.modisLabel}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block shadow-sm" />
-              <span className="text-slate-300 text-[11px]">{t.viirsLabel}</span>
-            </div>
+          {/* Legend */}
+          <div className="hidden sm:flex items-center gap-2 text-[11px] font-mono text-slate-500">
+            <span className="flex items-center gap-1">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block border border-red-200" />
+              MODIS
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block border border-orange-200" />
+              VIIRS
+            </span>
           </div>
         </div>
       </div>
 
-      <div ref={mapContainerRef} className="w-full flex-1 z-0" />
+      {/* Map tile */}
+      <div className="relative">
+        <div ref={mapContainerRef} className="w-full h-[560px] lg:h-[620px]" />
 
-      <div className="absolute bottom-3 left-3 z-10 bg-slate-900/95 border border-slate-700 rounded-lg p-3 text-xs max-w-xs pointer-events-none">
-        <div className="flex items-center gap-1.5 font-bold text-amber-400 mb-1">
-          <Flame className="w-4 h-4" />
-          <span>{t.spatialActiveTitle}</span>
+        {/* Loading overlay */}
+        {isLoading && (
+          <div className="absolute inset-0 bg-white/70 flex items-center justify-center z-20">
+            <div className="bg-white border border-slate-200 rounded-xl px-5 py-4 shadow-md flex items-center gap-3 text-sm text-slate-700">
+              <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+              {language === 'id' ? 'Memuat titik api dari NASA...' : 'Loading fire data from NASA...'}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Map footer legend */}
+      <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+        <div className="flex items-center gap-1.5">
+          <Flame className="w-3.5 h-3.5 text-orange-500" />
+          <span>
+            {language === 'id'
+              ? 'Ukuran lingkaran = kekuatan panas (FRP dalam Megawatt). Merah = MODIS, Oranye = VIIRS.'
+              : 'Circle size = heat power (FRP in Megawatts). Red = MODIS, Orange = VIIRS.'}
+          </span>
         </div>
-        <p className="text-xs text-slate-300 leading-relaxed">
-          {t.spatialActiveDesc}
-        </p>
+        {isLiveSync && (
+          <div className="flex items-center gap-1 text-cyan-600">
+            <AlertCircle className="w-3 h-3" />
+            <span>{language === 'id' ? 'Hanya titik keyakinan >=70% ditampilkan' : 'Only confidence >=70% shown'}</span>
+          </div>
+        )}
       </div>
     </div>
   );
