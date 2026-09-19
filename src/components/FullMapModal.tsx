@@ -5,6 +5,7 @@ import { AOIRegion, RawHotspot, PRESET_AOIS } from '../engine/harmonizer';
 import { Language, translations } from '../data/translations';
 import {
   X,
+  ArrowLeft,
   Play,
   Pause,
   RotateCcw,
@@ -431,9 +432,21 @@ STATUS RISIKO & REKOMENDASI:
     <div className="fixed inset-0 z-[2000] bg-[#1d1d1f] flex flex-col font-sans select-none overflow-hidden animate-in fade-in duration-200">
       
       {/* Top Glass Navigation Header */}
-      <header className="h-14 bg-white/90 backdrop-blur-xl border-b border-[#e5e5e7] px-4 sm:px-6 flex items-center justify-between gap-4 z-10 shrink-0">
+      <header className="h-14 bg-white/90 backdrop-blur-xl border-b border-[#e5e5e7] px-4 sm:px-6 flex items-center justify-between gap-3 z-10 shrink-0">
+        
+        {/* Left: Back / Return Button & Title */}
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse shrink-0" />
+          <button
+            onClick={onClose}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#f5f5f7] hover:bg-[#e5e5ea] text-[#1d1d1f] font-semibold text-xs rounded-xl border border-[#e5e5e7] transition-all shadow-xs shrink-0 cursor-pointer"
+            title="Kembali ke Dashboard (Esc)"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>{language === 'id' ? 'Kembali' : 'Back'}</span>
+          </button>
+
+          <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse shrink-0 hidden sm:inline-block" />
+
           <div className="min-w-0">
             <h1 className="text-sm font-bold text-[#1d1d1f] tracking-tight truncate">
               Terra Harmonia GIS Full Explorer
@@ -444,7 +457,7 @@ STATUS RISIKO & REKOMENDASI:
           </div>
         </div>
 
-        {/* Quick Spatial Presets */}
+        {/* Center: Quick Spatial Presets */}
         <div className="hidden lg:flex items-center gap-1.5 overflow-x-auto py-1">
           {PRESET_AOIS.map((aoi) => {
             const isSel = selectedAOI.id === aoi.id;
@@ -452,7 +465,7 @@ STATUS RISIKO & REKOMENDASI:
               <button
                 key={aoi.id}
                 onClick={() => onSelectAOI(aoi)}
-                className={`px-3 py-1 text-xs rounded-full transition-all whitespace-nowrap ${
+                className={`px-3 py-1 text-xs rounded-full transition-all whitespace-nowrap cursor-pointer ${
                   isSel
                     ? 'bg-[#1d1d1f] text-white font-medium shadow-xs'
                     : 'bg-[#f5f5f7] text-[#6e6e73] hover:text-[#1d1d1f] hover:bg-[#e5e5ea]'
@@ -464,13 +477,13 @@ STATUS RISIKO & REKOMENDASI:
           })}
         </div>
 
-        {/* Top Right Controls */}
+        {/* Right Controls: Basemap & Close Button */}
         <div className="flex items-center gap-2.5">
           {/* Basemap switch */}
           <div className="flex items-center bg-[#f5f5f7] rounded-xl p-0.5 text-xs font-medium border border-[#e5e5e7]">
             <button
               onClick={() => setBasemap('satellite')}
-              className={`px-2.5 py-1 rounded-lg transition-all ${
+              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                 basemap === 'satellite' ? 'bg-white text-[#1d1d1f] shadow-xs font-semibold' : 'text-[#86868b]'
               }`}
             >
@@ -478,7 +491,7 @@ STATUS RISIKO & REKOMENDASI:
             </button>
             <button
               onClick={() => setBasemap('dark')}
-              className={`px-2.5 py-1 rounded-lg transition-all ${
+              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                 basemap === 'dark' ? 'bg-white text-[#1d1d1f] shadow-xs font-semibold' : 'text-[#86868b]'
               }`}
             >
@@ -486,7 +499,7 @@ STATUS RISIKO & REKOMENDASI:
             </button>
             <button
               onClick={() => setBasemap('topo')}
-              className={`px-2.5 py-1 rounded-lg transition-all ${
+              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                 basemap === 'topo' ? 'bg-white text-[#1d1d1f] shadow-xs font-semibold' : 'text-[#86868b]'
               }`}
             >
@@ -494,13 +507,14 @@ STATUS RISIKO & REKOMENDASI:
             </button>
           </div>
 
-          {/* Close Button */}
+          {/* Primary Close Button */}
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full text-[#6e6e73] hover:text-[#1d1d1f] hover:bg-[#f5f5f7] transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#1d1d1f] hover:bg-black text-white font-semibold text-xs rounded-xl transition-all shadow-xs shrink-0 cursor-pointer"
             title="Tutup Peta Penuh (Esc)"
           >
-            <X className="w-5 h-5" />
+            <X className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">{language === 'id' ? 'Tutup Peta' : 'Close Map'}</span>
           </button>
         </div>
       </header>
