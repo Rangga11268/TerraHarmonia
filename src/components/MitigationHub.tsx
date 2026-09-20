@@ -19,11 +19,13 @@ import {
   BarChart3,
   TrendingUp,
   Search,
-  Filter,
+  X,
   ChevronLeft,
   ChevronRight,
-  SlidersHorizontal,
-  ArrowUpDown
+  ArrowUpDown,
+  Sparkles,
+  Zap,
+  RotateCcw
 } from 'lucide-react';
 import { PRESET_AOIS, AOIRegion, HarmonizedWeekData, RawHotspot } from '../engine/harmonizer';
 import { Language, translations } from '../data/translations';
@@ -47,6 +49,7 @@ interface MitigationHubProps {
   onRefreshLive?: () => void;
 }
 
+type FilterPill = 'all' | 'extreme_frp' | 'high_frp' | 'viirs' | 'modis';
 const PAGE_SIZE = 24;
 
 export const MitigationHub: React.FC<MitigationHubProps> = ({
@@ -68,12 +71,11 @@ export const MitigationHub: React.FC<MitigationHubProps> = ({
   const [liveWeather, setLiveWeather] = useState<LiveWeatherData | null>(null);
   const [isLoadingWeather, setIsLoadingWeather] = useState<boolean>(true);
 
-  // Hotspots Explorer Filters & Pagination state
-  const [hotspotSearch, setHotspotSearch] = useState<string>('');
-  const [hotspotSensorFilter, setHotspotSensorFilter] = useState<'all' | 'MODIS' | 'VIIRS'>('all');
-  const [hotspotFrpFilter, setHotspotFrpFilter] = useState<'all' | 'high' | 'extreme'>('all');
-  const [hotspotSortBy, setHotspotSortBy] = useState<'frp_desc' | 'confidence_desc' | 'time_desc'>('frp_desc');
-  const [hotspotPage, setHotspotPage] = useState<number>(1);
+  // Streamlined Smart Filter & Pagination state
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [activeFilterPill, setActiveFilterPill] = useState<FilterPill>('all');
+  const [sortOrder, setSortOrder] = useState<'frp_desc' | 'confidence_desc' | 'time_desc'>('frp_desc');
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   // Fetch live weather when AOI changes
   useEffect(() => {
@@ -97,12 +99,12 @@ export const MitigationHub: React.FC<MitigationHubProps> = ({
     };
   }, [selectedAOI]);
 
-  // Reset pagination when filter or AOI changes
+  // Reset pagination on filter or AOI change
   useEffect(() => {
-    setHotspotPage(1);
-  }, [selectedAOI, hotspotSearch, hotspotSensorFilter, hotspotFrpFilter, hotspotSortBy]);
+    setCurrentPage(1);
+  }, [selectedAOI, searchQuery, activeFilterPill, sortOrder]);
 
-  // Comprehensive Region Peatland Risk & Hydrology Database (BRGM & KLHK Baseline)
+  // Comprehensive Region Peatland Risk & Hydrology Database
   const regionRisks: Record<string, { tmag: number; risk: 'extreme' | 'high' | 'moderate' | 'nominal'; canalBlocks: number; khgName: string; peatDepth: string; fwi: number }> = {
     riau: { tmag: -48, risk: 'extreme', canalBlocks: 142, khgName: 'KHG Sungai Siak - Sungai Kampar', peatDepth: '4.8 – 7.0 m', fwi: 28.4 },
     kalteng: { tmag: -55, risk: 'extreme', canalBlocks: 280, khgName: 'Kawasan Eks-PLG Blok A & C (Kahayan)', peatDepth: '5.5 – 9.0 m', fwi: 32.1 },
@@ -123,53 +125,63 @@ export const MitigationHub: React.FC<MitigationHubProps> = ({
   const maxLiveFrp = regionLiveSpots.length > 0 ? Math.max(...regionLiveSpots.map(h => h.frp)) : 0;
   const effectiveFwi = liveWeather ? liveWeather.fwiScore : currentRegionRisk.fwi;
 
-  // High-performance filtered & sorted hotspots
+  // Streamlined filtering and sorting
   const filteredHotspots = useMemo(() => {
-    let result = [...regionLiveSpots];
+    let list = [...regionLiveSpots];
 
-    // 1. Sensor Filter
-    if (hotspotSensorFilter !== 'all') {
-      result = result.filter(h => h.instrument === hotspotSensorFilter);
+    // Quick Pill Filter
+    if (activeFilterPill === 'extreme_frp') {
+      list = list.filter(h => h.frp >= 50);
+    } else if (activeFilterPill === 'high_frp') {
+      list = list.filter(h => h.frp >= 25);
+    } else if (activeFilterPill === 'viirs') {
+      list = list.filter(h => h.instrument === 'VIIRS');
+    } else if (activeFilterPill === 'modis') {
+      list = list.filter(h => h.instrument === 'MODIS');
     }
 
-    // 2. FRP Threshold Filter
-    if (hotspotFrpFilter === 'high') {
-      result = result.filter(h => h.frp >= 25);
-    } else if (hotspotFrpFilter === 'extreme') {
-      result = result.filter(h => h.frp >= 50);
-    }
-
-    // 3. Search Query Filter
-    if (hotspotSearch.trim()) {
-      const q = hotspotSearch.toLowerCase().trim();
-      result = result.filter(h => {
-        const matchCoord = `${h.lat.toFixed(4)}, ${h.lon.toFixed(4)}`.includes(q);
-        const matchSat = (h.satellite || '').toLowerCase().includes(q);
-        const matchInst = (h.instrument || '').toLowerCase().includes(q);
-        const matchTime = (h.time || '').includes(q);
-        return matchCoord || matchSat || matchInst || matchTime;
+    // Search Query
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      list = list.filter(h => {
+        const coordStr = `${h.lat.toFixed(4)}, ${h.lon.toFixed(4)}`;
+        return (
+          coordStr.includes(q) ||
+          (h.satellite || '').toLowerCase().includes(q) ||
+          (h.instrument || '').toLowerCase().includes(q) ||
+          (h.time || '').includes(q)
+        );
       });
     }
 
-    // 4. Sorting
-    result.sort((a, b) => {
-      if (hotspotSortBy === 'frp_desc') return b.frp - a.frp;
-      if (hotspotSortBy === 'confidence_desc') return b.confidence - a.confidence;
-      if (hotspotSortBy === 'time_desc') return (b.time || '').localeCompare(a.time || '');
-      return 0;
-    });
+    // Sort Order
+    if (sortOrder === 'frp_desc') {
+      list.sort((a, b) => b.frp - a.frp);
+    } else if (sortOrder === 'confidence_desc') {
+      list.sort((a, b) => b.confidence - a.confidence);
+    } else if (sortOrder === 'time_desc') {
+      list.sort((a, b) => (b.time || '').localeCompare(a.time || ''));
+    }
 
-    return result;
-  }, [regionLiveSpots, hotspotSensorFilter, hotspotFrpFilter, hotspotSearch, hotspotSortBy]);
+    return list;
+  }, [regionLiveSpots, activeFilterPill, searchQuery, sortOrder]);
 
   const totalPages = Math.max(1, Math.ceil(filteredHotspots.length / PAGE_SIZE));
-  const safeCurrentPage = Math.min(totalPages, Math.max(1, hotspotPage));
+  const safeCurrentPage = Math.min(totalPages, Math.max(1, currentPage));
 
-  // Current page's chunk
+  // Current page chunk
   const paginatedHotspots = useMemo(() => {
-    const startIndex = (safeCurrentPage - 1) * PAGE_SIZE;
-    return filteredHotspots.slice(startIndex, startIndex + PAGE_SIZE);
+    const start = (safeCurrentPage - 1) * PAGE_SIZE;
+    return filteredHotspots.slice(start, start + PAGE_SIZE);
   }, [filteredHotspots, safeCurrentPage]);
+
+  const hasActiveFilters = activeFilterPill !== 'all' || searchQuery.trim().length > 0 || sortOrder !== 'frp_desc';
+
+  const handleResetFilters = () => {
+    setActiveFilterPill('all');
+    setSearchQuery('');
+    setSortOrder('frp_desc');
+  };
 
   const handleExportCSV = () => {
     const headers = 'ID,Latitude,Longitude,FRP_MW,Brightness_K,Instrument,Satellite,Confidence_Pct,Date,Time_UTC\n';
@@ -264,7 +276,7 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
             onClick={() => setActiveSubTab('simulator')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer min-h-[36px] ${
               activeSubTab === 'simulator'
-                ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs'
+                ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
                 : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
             }`}
           >
@@ -276,19 +288,19 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
             onClick={() => setActiveSubTab('charts')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer min-h-[36px] ${
               activeSubTab === 'charts'
-                ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs'
+                ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
                 : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
             }`}
           >
             <BarChart3 className="w-3.5 h-3.5 text-blue-500" />
-            <span>{language === 'id' ? 'Grafik Prognosis & Visual' : 'Prognosis & Climate Charts'}</span>
+            <span>{language === 'id' ? 'Grafik Prognosis' : 'Prognosis Charts'}</span>
           </button>
 
           <button
             onClick={() => setActiveSubTab('hotspots')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer min-h-[36px] ${
               activeSubTab === 'hotspots'
-                ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs'
+                ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
                 : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
             }`}
           >
@@ -305,12 +317,12 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
             onClick={() => setActiveSubTab('sitrep')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer min-h-[36px] ${
               activeSubTab === 'sitrep'
-                ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs'
+                ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
                 : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
             }`}
           >
             <FileText className="w-3.5 h-3.5 text-emerald-600" />
-            <span>{language === 'id' ? 'Dokumen Resmi (A4 PDF)' : 'Official SitRep (PDF)'}</span>
+            <span>{language === 'id' ? 'Dokumen SitRep' : 'SitRep Dossier'}</span>
           </button>
         </div>
       </div>
@@ -319,10 +331,10 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
       <div className="print:hidden bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl p-4 sm:p-5 shadow-xs">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           
-          {/* Region Buttons */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-xs font-bold text-[#86868b] dark:text-[#9ca3af] mr-1 uppercase">
-              {language === 'id' ? 'Wilayah Target:' : 'Target AOI:'}
+          {/* Streamlined Horizontal Pill Region Selector */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+            <span className="text-xs font-bold text-[#86868b] dark:text-[#9ca3af] mr-1 uppercase shrink-0">
+              {language === 'id' ? 'Sektor:' : 'Sector:'}
             </span>
             {PRESET_AOIS.map((aoi) => {
               const isSelected = selectedAOI.id === aoi.id;
@@ -330,7 +342,7 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
                 <button
                   key={aoi.id}
                   onClick={() => onSelectAOI(aoi)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer min-h-[36px] ${
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer whitespace-nowrap shrink-0 min-h-[34px] ${
                     isSelected
                       ? 'bg-[#1d1d1f] dark:bg-white text-white dark:text-[#111827] shadow-xs'
                       : 'bg-[#f5f5f7] dark:bg-[#151d2f] text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white border border-[#e5e5e7] dark:border-[#1f2937]'
@@ -347,10 +359,10 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
             <button
               onClick={onRefreshLive}
               disabled={isLoadingLive}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition shadow-xs cursor-pointer disabled:opacity-50 shrink-0 min-h-[36px]"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition shadow-xs cursor-pointer disabled:opacity-50 shrink-0 min-h-[34px]"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isLoadingLive ? 'animate-spin' : ''}`} />
-              <span>{isLoadingLive ? (language === 'id' ? 'Menyinkronkan...' : 'Syncing NASA...') : (language === 'id' ? 'Sinkronkan Data Live' : 'Sync Live Satellite Data')}</span>
+              <span>{isLoadingLive ? (language === 'id' ? 'Menyinkronkan...' : 'Syncing...') : (language === 'id' ? 'Sinkronkan Data Live' : 'Sync Live')}</span>
             </button>
           )}
 
@@ -520,103 +532,121 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
         </div>
       )}
 
-      {/* Sub-View 3: High-Performance Paginated Hotspots Explorer */}
+      {/* Sub-View 3: Streamlined & Unified Hotspot Explorer */}
       {activeSubTab === 'hotspots' && (
-        <div className="bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4 animate-in fade-in duration-150">
+        <div className="bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl p-4 sm:p-5 shadow-xs space-y-4 animate-in fade-in duration-150">
           
-          {/* Header & Stats Bar */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-[#e5e5e7] dark:border-[#1f2937]">
-            <div>
-              <h3 className="font-bold text-base text-[#1d1d1f] dark:text-white flex items-center gap-2">
-                <span>{language === 'id' ? 'Penjelajah Titik Api & Target Disposisi Satelit' : 'Hotspots Explorer & Target Dispatch Roster'}</span>
-                <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-[#f5f5f7] dark:bg-[#151d2f] text-[#1d1d1f] dark:text-white border border-[#e5e5e7] dark:border-[#1f2937]">
-                  {filteredHotspots.length.toLocaleString()} {language === 'id' ? 'Titik' : 'Points'}
-                </span>
+          {/* Header & Quick Action Row */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#e5e5e7] dark:border-[#1f2937]">
+            <div className="flex items-center gap-2">
+              <h3 className="font-bold text-sm sm:text-base text-[#1d1d1f] dark:text-white">
+                {language === 'id' ? 'Daftar Titik Panas Satelit' : 'Active Satellite Hotspots'}
               </h3>
-              <p className="text-xs text-[#6e6e73] dark:text-[#9ca3af] mt-0.5">
-                {language === 'id'
-                  ? `Daftar titik api dengan paginasi cepat dan resolusi wilayah untuk ${selectedAOI.name}.`
-                  : `Paginated hotspot roster with high-speed geographic resolution for ${selectedAOI.name}.`}
-              </p>
+              <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-[#f5f5f7] dark:bg-[#151d2f] text-[#1d1d1f] dark:text-white border border-[#e5e5e7] dark:border-[#1f2937]">
+                {filteredHotspots.length.toLocaleString()} {language === 'id' ? 'titik' : 'pts'}
+              </span>
             </div>
 
             <div className="flex items-center gap-2">
+              {hasActiveFilters && (
+                <button
+                  onClick={handleResetFilters}
+                  className="px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-semibold flex items-center gap-1 border border-rose-200 dark:border-rose-900 transition cursor-pointer"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  <span>{language === 'id' ? 'Reset Filter' : 'Reset'}</span>
+                </button>
+              )}
+
               <button
                 onClick={handleExportCSV}
                 className="px-3 py-1.5 rounded-xl bg-[#f5f5f7] dark:bg-[#151d2f] hover:bg-[#e5e5ea] dark:hover:bg-[#1f2937] text-[#1d1d1f] dark:text-white text-xs font-semibold flex items-center gap-1.5 border border-[#e5e5e7] dark:border-[#1f2937] transition cursor-pointer"
-                title="Ekspor CSV Data Terfilter"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>{language === 'id' ? 'Ekspor CSV' : 'Export CSV'}</span>
+                <span>CSV</span>
               </button>
             </div>
           </div>
 
-          {/* Search, Filters, and Sorting Controls */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5 text-xs">
+          {/* Unified Clean Filter Bar (Search + Quick Chips + Sort) */}
+          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5 text-xs">
             
-            {/* Search Box (4 cols) */}
-            <div className="lg:col-span-4 relative">
-              <Search className="w-4 h-4 text-[#86868b] dark:text-[#9ca3af] absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={hotspotSearch}
-                onChange={(e) => setHotspotSearch(e.target.value)}
-                placeholder={language === 'id' ? 'Cari koordinat, satelit, waktu...' : 'Search coordinates, satellite, time...'}
-                className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#f5f5f7] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937] text-[#1d1d1f] dark:text-white placeholder-[#86868b] dark:placeholder-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-[#0071e3]"
-              />
+            {/* Quick Filter Pill Chips */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+              {[
+                { id: 'all', label: language === 'id' ? 'Semua' : 'All' },
+                { id: 'extreme_frp', label: language === 'id' ? 'FRP Ekstrem (≥50MW)' : 'Extreme (≥50MW)' },
+                { id: 'high_frp', label: language === 'id' ? 'FRP Tinggi (≥25MW)' : 'High (≥25MW)' },
+                { id: 'viirs', label: 'VIIRS 375m' },
+                { id: 'modis', label: 'MODIS 1km' },
+              ].map((chip) => {
+                const isActive = activeFilterPill === chip.id;
+                return (
+                  <button
+                    key={chip.id}
+                    onClick={() => setActiveFilterPill(chip.id as FilterPill)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer whitespace-nowrap shrink-0 min-h-[32px] ${
+                      isActive
+                        ? 'bg-[#1d1d1f] dark:bg-white text-white dark:text-[#111827] shadow-xs'
+                        : 'bg-[#f5f5f7] dark:bg-[#151d2f] text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white border border-[#e5e5e7] dark:border-[#1f2937]'
+                    }`}
+                  >
+                    {chip.label}
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Sensor Filter (3 cols) */}
-            <div className="lg:col-span-3">
-              <select
-                value={hotspotSensorFilter}
-                onChange={(e) => setHotspotSensorFilter(e.target.value as any)}
-                className="w-full px-3 py-2 rounded-xl bg-[#f5f5f7] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937] text-[#1d1d1f] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]"
-              >
-                <option value="all">{language === 'id' ? 'Semua Sensor (MODIS + VIIRS)' : 'All Sensors (MODIS + VIIRS)'}</option>
-                <option value="MODIS">MODIS (Terra &amp; Aqua 1km)</option>
-                <option value="VIIRS">VIIRS (SNPP &amp; NOAA 375m)</option>
-              </select>
-            </div>
+            {/* Right: Search Box + Sort Switcher */}
+            <div className="flex items-center gap-2 shrink-0">
+              {/* Search Box with Clear Button */}
+              <div className="relative flex-1 md:w-56">
+                <Search className="w-3.5 h-3.5 text-[#86868b] dark:text-[#9ca3af] absolute left-2.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={language === 'id' ? 'Cari koordinat, satelit...' : 'Search coordinates...'}
+                  className="w-full pl-8 pr-7 py-1.5 rounded-xl bg-[#f5f5f7] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937] text-[#1d1d1f] dark:text-white placeholder-[#86868b] dark:placeholder-[#9ca3af] text-xs focus:outline-none focus:ring-2 focus:ring-[#0071e3]"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-[#86868b] hover:text-[#1d1d1f] dark:hover:text-white cursor-pointer"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
 
-            {/* FRP Threshold Filter (3 cols) */}
-            <div className="lg:col-span-3">
-              <select
-                value={hotspotFrpFilter}
-                onChange={(e) => setHotspotFrpFilter(e.target.value as any)}
-                className="w-full px-3 py-2 rounded-xl bg-[#f5f5f7] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937] text-[#1d1d1f] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]"
+              {/* Sort Order Button Toggle */}
+              <button
+                onClick={() => {
+                  if (sortOrder === 'frp_desc') setSortOrder('time_desc');
+                  else if (sortOrder === 'time_desc') setSortOrder('confidence_desc');
+                  else setSortOrder('frp_desc');
+                }}
+                className="px-3 py-1.5 rounded-xl bg-[#f5f5f7] dark:bg-[#151d2f] hover:bg-[#e5e5ea] dark:hover:bg-[#1f2937] border border-[#e5e5e7] dark:border-[#1f2937] text-[#1d1d1f] dark:text-white text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer min-h-[32px] shrink-0"
+                title="Ganti Urutan Sort"
               >
-                <option value="all">{language === 'id' ? 'Semua Tingkat Daya (FRP)' : 'All Radiative Power'}</option>
-                <option value="high">{language === 'id' ? 'FRP Tinggi (≥ 25 MW)' : 'High FRP (≥ 25 MW)'}</option>
-                <option value="extreme">{language === 'id' ? 'FRP Ekstrem (≥ 50 MW)' : 'Extreme FRP (≥ 50 MW)'}</option>
-              </select>
-            </div>
-
-            {/* Sort Filter (2 cols) */}
-            <div className="lg:col-span-2">
-              <select
-                value={hotspotSortBy}
-                onChange={(e) => setHotspotSortBy(e.target.value as any)}
-                className="w-full px-3 py-2 rounded-xl bg-[#f5f5f7] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937] text-[#1d1d1f] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]"
-              >
-                <option value="frp_desc">{language === 'id' ? 'FRP Tertinggi' : 'Highest FRP'}</option>
-                <option value="confidence_desc">{language === 'id' ? 'Keyakinan %' : 'Confidence %'}</option>
-                <option value="time_desc">{language === 'id' ? 'Waktu Terbaru' : 'Newest'}</option>
-              </select>
+                <ArrowUpDown className="w-3 h-3 text-[#86868b]" />
+                <span>
+                  {sortOrder === 'frp_desc' ? 'FRP ↓' : sortOrder === 'time_desc' ? (language === 'id' ? 'Waktu ↓' : 'Time ↓') : 'Keyakinan ↓'}
+                </span>
+              </button>
             </div>
 
           </div>
 
-          {/* Hotspots Grid Rendering (Fast 24 items per page) */}
+          {/* Hotspots Grid Rendering (24 items per page) */}
           {filteredHotspots.length === 0 ? (
             <div className="text-center py-12 text-xs text-[#86868b] dark:text-[#9ca3af]">
               {language === 'id'
-                ? 'Tidak ada anomali titik panas yang cocok dengan filter pencarian saat ini.'
-                : 'No active thermal anomalies matched the current search filters.'}
+                ? 'Tidak ada anomali titik panas yang cocok dengan filter saat ini.'
+                : 'No active thermal anomalies matched the current filters.'}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
               {paginatedHotspots.map((spot) => {
                 const loc = resolveHotspotLocation(spot.lat, spot.lon, selectedAOI.id, language);
                 const isHighFRP = spot.frp >= 25;
@@ -699,7 +729,7 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
 
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setHotspotPage(p => Math.max(1, p - 1))}
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                   disabled={safeCurrentPage <= 1}
                   className="px-3 py-1.5 rounded-xl bg-[#f5f5f7] dark:bg-[#151d2f] hover:bg-[#e5e5ea] dark:hover:bg-[#1f2937] text-[#1d1d1f] dark:text-white border border-[#e5e5e7] dark:border-[#1f2937] disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 font-semibold transition cursor-pointer"
                 >
@@ -712,7 +742,7 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
                 </div>
 
                 <button
-                  onClick={() => setHotspotPage(p => Math.min(totalPages, p + 1))}
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                   disabled={safeCurrentPage >= totalPages}
                   className="px-3 py-1.5 rounded-xl bg-[#f5f5f7] dark:bg-[#151d2f] hover:bg-[#e5e5ea] dark:hover:bg-[#1f2937] text-[#1d1d1f] dark:text-white border border-[#e5e5e7] dark:border-[#1f2937] disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 font-semibold transition cursor-pointer"
                 >
