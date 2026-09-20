@@ -205,7 +205,7 @@ export const VisualAnalytics: React.FC<VisualAnalyticsProps> = ({
         </div>
 
         {/* Tab Selector */}
-        <div className="flex items-center bg-[#f5f5f7] dark:bg-[#1f2937] rounded-xl p-0.5 text-xs font-medium border border-[#e5e5e7] dark:border-[#374151] shrink-0 overflow-x-auto max-w-full">
+        <div className="flex flex-wrap items-center bg-[#f5f5f7] dark:bg-[#1f2937] rounded-xl p-0.5 text-xs font-medium border border-[#e5e5e7] dark:border-[#374151] shrink-0 scrollbar-none">
           {[
             { id: 'trend' as ChartTab, label: t.tabTrend, icon: TrendingUp },
             { id: 'seasonality' as ChartTab, label: t.tabSeasonality, icon: Calendar },
@@ -318,7 +318,7 @@ export const VisualAnalytics: React.FC<VisualAnalyticsProps> = ({
             <span className="text-[#86868b] dark:text-[#9ca3af] font-medium">
               {language === 'id' ? 'Bandingkan Rata-rata 26 Tahun dengan Anomali Tahun:' : 'Compare 26-Yr Average against Specific Year:'}
             </span>
-            <div className="flex items-center gap-1.5 overflow-x-auto">
+            <div className="flex flex-wrap items-center gap-1.5 scrollbar-none">
               {[2015, 2019, 2021, 2023, 2026].map((yr) => (
                 <button
                   key={yr}

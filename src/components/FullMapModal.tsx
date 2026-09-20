@@ -512,7 +512,7 @@ STATUS RISIKO & REKOMENDASI:
         </div>
 
         {/* Center: Quick Spatial Presets */}
-        <div className="hidden lg:flex items-center gap-1.5 overflow-x-auto py-1">
+        <div className="hidden lg:flex flex-wrap items-center gap-1.5 py-1 scrollbar-none">
           {PRESET_AOIS.map((aoi) => {
             const isSel = selectedAOI.id === aoi.id;
             return (
@@ -694,46 +694,70 @@ STATUS RISIKO & REKOMENDASI:
                 <button
                   onClick={() => setIsPlaying(!isPlaying)}
                   className="w-10 h-10 rounded-full bg-[#1d1d1f] dark:bg-white text-white dark:text-[#111827] flex items-center justify-center hover:bg-black dark:hover:bg-neutral-200 transition-all shrink-0 shadow-sm cursor-pointer"
-                  title={isPlaying ? 'Jeda Animasi' : 'Putar Animasi (2000–2026)'}
+                  title={isPlaying ? 'Jeda Animasi' : 'Putar Animasi (2000-2026)'}
                 >
                   {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
                 </button>
 
                 <div>
-                  <div className="text-[11px] text-[#86868b] dark:text-[#9ca3af] uppercase tracking-wider font-semibold">
+                  <div className="text-[10px] text-[#86868b] dark:text-[#9ca3af] uppercase tracking-wider font-semibold">
                     {language === 'id' ? 'Tahun Observasi' : 'Observation Year'}
                   </div>
-                  <div className="text-xl font-bold text-[#1d1d1f] dark:text-white num leading-none mt-0.5">
-                    {selectedYear}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl font-bold text-[#1d1d1f] dark:text-white num leading-none">
+                      {selectedYear}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedYear(Math.max(2000, selectedYear - 1));
+                          setIsPlaying(false);
+                        }}
+                        className="w-6 h-6 rounded-md bg-[#f5f5f7] dark:bg-[#1f2937] text-[#1d1d1f] dark:text-white hover:bg-[#e5e5ea] dark:hover:bg-[#374151] text-xs font-bold flex items-center justify-center cursor-pointer transition-colors"
+                        title="-1 Tahun"
+                      >
+                        -1
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedYear(Math.min(2026, selectedYear + 1));
+                          setIsPlaying(false);
+                        }}
+                        className="w-6 h-6 rounded-md bg-[#f5f5f7] dark:bg-[#1f2937] text-[#1d1d1f] dark:text-white hover:bg-[#e5e5ea] dark:hover:bg-[#374151] text-xs font-bold flex items-center justify-center cursor-pointer transition-colors"
+                        title="+1 Tahun"
+                      >
+                        +1
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Range Slider */}
-              <div className="flex-1 mx-2">
-                <input
-                  type="range"
-                  min="2000"
-                  max="2026"
-                  step="1"
-                  value={selectedYear}
-                  onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                  className="w-full h-1.5 bg-[#e5e5e7] dark:bg-[#374151] rounded-lg appearance-none cursor-pointer accent-[#1d1d1f] dark:accent-white"
-                />
-                <div className="flex justify-between text-[10px] text-[#86868b] dark:text-[#9ca3af] font-medium mt-1">
-                  <span>2000 (MODIS Era)</span>
+              {/* Visual Timeline Epoch Bar (Non-slider) */}
+              <div className="flex-1 mx-2 space-y-1">
+                <div className="w-full h-2 bg-[#e5e5e7] dark:bg-[#374151] rounded-full overflow-hidden relative">
+                  <div
+                    className="h-full bg-[#1d1d1f] dark:bg-emerald-400 transition-all duration-300"
+                    style={{ width: `${((selectedYear - 2000) / 26) * 100}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-[10px] text-[#86868b] dark:text-[#9ca3af] font-medium">
+                  <span>2000 (MODIS)</span>
                   <span className="font-semibold text-red-600 dark:text-red-400">2015 El Niño</span>
-                  <span>2026 ({language === 'id' ? 'Sekarang' : 'Current'})</span>
+                  <span>2026 (Live)</span>
                 </div>
               </div>
 
               {/* Climate Presets */}
-              <div className="flex items-center gap-1.5 shrink-0 overflow-x-auto">
+              <div className="flex flex-wrap items-center gap-1.5 shrink-0 scrollbar-none">
                 {[
+                  { yr: 2000, label: '2000 Baseline' },
                   { yr: 2015, label: '2015 Super El Niño' },
                   { yr: 2019, label: '2019 El Niño' },
                   { yr: 2023, label: '2023 El Niño' },
-                  { yr: 2021, label: '2021 La Niña' },
+                  { yr: 2026, label: '2026 Live' },
                 ].map(({ yr, label }) => (
                   <button
                     key={yr}
@@ -744,7 +768,7 @@ STATUS RISIKO & REKOMENDASI:
                     className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all cursor-pointer ${
                       selectedYear === yr
                         ? 'bg-red-500 text-white shadow-xs font-semibold'
-                        : 'bg-[#f5f5f7] dark:bg-[#1f2937] text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
+                        : 'bg-[#f5f5f7] dark:bg-[#1f2937] text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white border border-[#e5e5e7] dark:border-[#1f2937]'
                     }`}
                   >
                     {label}

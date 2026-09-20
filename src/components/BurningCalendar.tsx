@@ -219,7 +219,7 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
 
       {/* Climate Anomaly Quick Filter Strip */}
       <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
-        <div className="flex items-center gap-1.5 overflow-x-auto py-1 max-w-full">
+        <div className="flex flex-wrap items-center gap-1.5 py-1 max-w-full scrollbar-none">
           <span className="text-[#86868b] dark:text-[#9ca3af] font-medium mr-1 text-[11px] uppercase tracking-wider hidden sm:inline">
             {t.climateAnomaly}
           </span>
@@ -258,8 +258,8 @@ export const BurningCalendar: React.FC<BurningCalendarProps> = ({
       {viewMode === 'matrix' && (
         <div className="space-y-3">
           
-          {/* Scrollable Heatmap Container with Custom Scroll Styling */}
-          <div className="overflow-x-auto pb-2 border border-[#e5e5e7] dark:border-[#1f2937] rounded-xl bg-[#fafafa] dark:bg-[#0b0f19] p-3 sm:p-4">
+          {/* Scrollable Heatmap Container with Clean Scroll Styling */}
+          <div className="overflow-x-auto pb-2 border border-[#e5e5e7] dark:border-[#1f2937] rounded-xl bg-[#fafafa] dark:bg-[#0b0f19] p-3 sm:p-4 scrollbar-none">
             <div className="min-w-[840px]">
               
               {/* Month Header Legend with Dry Season Band */}

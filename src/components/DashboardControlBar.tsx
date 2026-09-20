@@ -162,7 +162,7 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
         </div>
 
         {/* Right: Segmented Tool Switcher */}
-        <div className="flex items-center bg-[#e5e5ea] dark:bg-[#1f2937] rounded-xl p-1 gap-1 shrink-0 overflow-x-auto">
+        <div className="flex flex-wrap items-center bg-[#e5e5ea] dark:bg-[#1f2937] rounded-xl p-1 gap-1 shrink-0 scrollbar-none">
           <button
             onClick={() => onSelectView('main')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer min-h-[34px] ${

@@ -20,7 +20,7 @@ export const Header: React.FC<HeaderProps> = ({ language, onToggleLanguage, onOp
 
         {/* Brand */}
         <div className="flex items-center gap-3 min-w-0">
-          {/* Wordmark logo: flame icon + text — no image dependency */}
+          {/* Wordmark logo: flame icon + text, no image dependency */}
           <div className="flex items-center gap-1.5 shrink-0">
             <div className="bg-amber-600 rounded-md p-1.5">
               <Flame className="w-4 h-4 text-white" strokeWidth={2.5} />
@@ -39,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({ language, onToggleLanguage, onOp
         {/* Right: language + team */}
         <div className="flex items-center gap-2.5 shrink-0">
 
-          {/* Language pill — minimal, not a pill just a flat toggle */}
+          {/* Language toggle: flat segmented control */}
           <div className="flex items-center rounded-md overflow-hidden border border-slate-700 text-xs font-semibold">
             <button
               onClick={() => onToggleLanguage('en')}
@@ -65,7 +65,7 @@ export const Header: React.FC<HeaderProps> = ({ language, onToggleLanguage, onOp
             </button>
           </div>
 
-          {/* Team — text button, not a badge */}
+          {/* Team: text button */}
           <button
             onClick={onOpenTeam}
             className="text-xs font-semibold text-slate-400 hover:text-white transition-colors px-2 py-1.5 min-h-[34px] rounded"
