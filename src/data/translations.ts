@@ -280,7 +280,7 @@ export const translations = {
     // New Enhancements (Tour, Dispatch, GeoJSON)
     scienceTourBtn: '30-Sec Tour',
     tourModalTitle: 'Terra Harmonia: 30-Second Science Briefing',
-    tourModalSubtitle: 'Core mathematical principles and operational impact for NASA Space Apps 2026',
+    tourModalSubtitle: 'Core mathematical principles and operational impact of Terra Harmonia',
     shortcutsTitle: 'Power-User Keyboard Shortcuts',
     offlineEngineBadge: 'Zero-Latency Offline Engine',
     offlineEngineTooltip: '100% client-side mathematics & historical dataset for field operations with intermittent connectivity.',
@@ -585,8 +585,8 @@ export const translations = {
     // New Enhancements (Tour, Dispatch, GeoJSON)
     scienceTourBtn: 'Tur 30 Detik',
     tourModalTitle: 'Terra Harmonia: Briefing Ilmiah 30 Detik',
-    tourModalSubtitle: 'Prinsip matematika inti dan dampak operasional untuk juri NASA Space Apps 2026',
-    shortcutsTitle: 'Pintasan Keyboard Presentasi Juri',
+    tourModalSubtitle: 'Prinsip matematika inti dan dampak operasional platform Terra Harmonia',
+    shortcutsTitle: 'Pintasan Keyboard Daya Cepat',
     offlineEngineBadge: 'Mesin Offline Zero-Latency',
     offlineEngineTooltip: '100% komputasi matematis & dataset historis berjalan client-side tanpa server, tangguh untuk area pedalaman.',
     geoJsonExport: 'GeoJSON (Layer QGIS & ArcGIS)',

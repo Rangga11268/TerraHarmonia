@@ -120,16 +120,16 @@ export const JudgesEvaluationGuide: React.FC<JudgesEvaluationGuideProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-sm sm:text-base font-bold text-[#1d1d1f] dark:text-white tracking-tight">
-                {language === 'id' ? 'Panduan Cepat Evaluasi Juri & Pengunjung' : 'Judges & Evaluators Quick-Start Roadmap'}
+                {language === 'id' ? 'Panduan Cepat & Alur Eksplorasi Interaktif' : 'Quick-Start Interactive Exploration Guide'}
               </h2>
               <span className="hidden sm:inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white">
-                {language === 'id' ? 'Interaktif' : 'Interactive'}
+                {language === 'id' ? 'Panduan Cepat' : 'Quick Guide'}
               </span>
             </div>
             <p className="text-xs text-[#6e6e73] dark:text-[#9ca3af] mt-0.5">
               {language === 'id'
-                ? 'Klik tombol aksi di setiap kartu untuk menguji langsung 4 keunggulan utama Terra Harmonia:'
-                : 'Click the action buttons below to test-drive the 4 core pillars of Terra Harmonia:'}
+                ? 'Jelajahi inovasi sains, peta satelit multi-sensor, dan sistem mitigasi karhutla Terra Harmonia melalui 4 alur langkah berikut:'
+                : "Explore Terra Harmonia's multi-sensor science, satellite intelligence, and field mitigation across 4 guided steps:"}
             </p>
           </div>
         </div>

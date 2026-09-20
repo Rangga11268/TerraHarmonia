@@ -271,8 +271,8 @@ export const ScienceTourModal: React.FC<ScienceTourModalProps> = ({
             <div className="space-y-3">
               <p className="text-xs text-[#6e6e73] dark:text-[#9ca3af]">
                 {language === 'id'
-                  ? 'Gunakan tombol keyboard berikut untuk navigasi cepat selama sesi presentasi penjurian NASA Space Apps:'
-                  : 'Use these keyboard shortcuts for seamless zero-latency navigation during NASA Space Apps judging pitch sessions:'}
+                  ? 'Gunakan tombol keyboard berikut untuk navigasi cepat dan kendali penuh tanpa mouse:'
+                  : 'Use these keyboard shortcuts for seamless zero-latency navigation and hands-free control:'}
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                 {shortcuts.map((sc) => (
