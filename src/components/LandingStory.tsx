@@ -95,102 +95,119 @@ export const LandingStory: React.FC<LandingStoryProps> = ({
   return (
     <div className="w-full space-y-10 sm:space-y-14 animate-in fade-in duration-200 max-w-full overflow-hidden">
       
-      {/* 1. HERO SECTION (Decluttered, High-Contrast, Brand Palette) */}
-      <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-neutral-800 bg-[#070A10] text-white p-6 sm:p-12 lg:p-16 shadow-2xl space-y-8">
+      {/* 1. HERO SECTION (Editorial 2-Column Split Layout) */}
+      <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-neutral-800 bg-[#070A10] text-white p-6 sm:p-10 lg:p-12 shadow-2xl">
         
-        {/* HD Satellite Backdrop (Subtle Texture & Deep Vignette) */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-25 mix-blend-screen scale-105 pointer-events-none"
-          style={{ backgroundImage: "url('/terra_hero_satellite_earth.jpg')" }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#070A10]/95 via-[#070A10]/75 to-[#070A10] pointer-events-none" />
+        {/* Subtle Ambient Background Mesh */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 max-w-4xl mx-auto text-center space-y-6">
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
           
-          {/* Top Pill Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900/90 backdrop-blur-md border border-neutral-700/80 text-xs font-semibold text-neutral-300">
-            <span className="w-2 h-2 rounded-full bg-sky-400" />
-            <span className="tracking-tight text-[11px] sm:text-xs">
-              NASA Space Apps Challenge 2026 &bull; Earth Observation Intelligence
-            </span>
-          </div>
+          {/* Left Column: Concise Editorial Content & Actions */}
+          <div className="lg:col-span-7 space-y-5 text-left">
+            
+            {/* Main Headline */}
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+              {language === 'id' ? (
+                <>
+                  Harmonisasi <span className="text-sky-400">26 Tahun Titik Api</span> Satelit NASA di Indonesia
+                </>
+              ) : (
+                <>
+                  Harmonizing <span className="text-sky-400">26 Years of NASA Satellite</span> Fire Records
+                </>
+              )}
+            </h1>
 
-          {/* Main Headline */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15] text-white">
-            {language === 'id' ? (
-              <>
-                Harmonisasi <span className="text-sky-400">26 Tahun Data Titik Api</span> Satelit NASA di Indonesia
-              </>
-            ) : (
-              <>
-                Harmonizing <span className="text-sky-400">26 Years of NASA Satellite</span> Fire Records
-              </>
-            )}
-          </h1>
+            {/* Punchy, Clean Description */}
+            <p className="text-sm sm:text-base text-neutral-300 leading-relaxed font-normal max-w-xl">
+              {language === 'id'
+                ? 'Mengoreksi bias sensorik 300% transisi MODIS ke VIIRS, merekonstruksi data iklim 2000–2026 secara homogen, dan memantau risiko kebakaran bawah tanah pada 13.4 juta hektar lahan gambut Indonesia.'
+                : 'Correcting the 300% sensor transition bias between MODIS and VIIRS, reconstructing 2000–2026 fire climatology, and monitoring peatland hydrology across 13.4 million hectares.'}
+            </p>
 
-          {/* Subtitle / Direct Value Proposition */}
-          <p className="text-base sm:text-lg text-neutral-300 max-w-2xl mx-auto leading-relaxed font-normal">
-            {language === 'id'
-              ? 'Platform analisis geospasial untuk mengoreksi anomali transisi sensor MODIS ke VIIRS, merekonstruksi tren iklim historis, dan memantau risiko kebakaran bawah tanah pada 13.4 juta hektar lahan gambut Indonesia.'
-              : 'A geospatial analysis platform correcting the MODIS-to-VIIRS sensor transition bias, reconstructing historical climate trends, and monitoring smoldering fire risks across 13.4 million hectares of Indonesian peatlands.'}
-          </p>
+            {/* Action CTAs */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+              <button
+                onClick={() => onSelectTab('overview')}
+                className="w-full sm:w-auto h-12 min-h-[48px] px-6 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+              >
+                <Activity className="w-4 h-4" />
+                <span>{language === 'id' ? 'Buka Peta & Data' : 'Launch Intel & Map'}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
 
-          {/* Action CTAs (Mobile: Full-Width Stacked, Desktop: Inline) */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 pt-2">
-            <button
-              onClick={() => onSelectTab('overview')}
-              className="w-full sm:w-auto h-12 min-h-[48px] px-7 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2.5 cursor-pointer active:scale-[0.99]"
-            >
-              <Activity className="w-4 h-4" />
-              <span>{language === 'id' ? 'Buka Peta & Intelijen Data' : 'Launch Intel & Map'}</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+              <button
+                onClick={() => onSelectTab('lab')}
+                className="w-full sm:w-auto h-12 min-h-[48px] px-5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-neutral-200 hover:text-white border border-neutral-700 font-semibold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+              >
+                <Cpu className="w-4 h-4 text-sky-400" />
+                <span>{language === 'id' ? 'Lab Harmonisasi' : 'Harmonization Lab'}</span>
+              </button>
 
-            <button
-              onClick={() => onSelectTab('lab')}
-              className="w-full sm:w-auto h-12 min-h-[48px] px-6 rounded-xl bg-neutral-900/90 hover:bg-neutral-800 text-neutral-200 hover:text-white border border-neutral-700 font-semibold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
-            >
-              <Cpu className="w-4 h-4 text-sky-400" />
-              <span>{language === 'id' ? 'Lab Harmonisasi & Fisika' : 'Harmonization Lab & Physics'}</span>
-            </button>
-          </div>
-
-          {/* Quick Guide Text Link */}
-          <div className="pt-1">
-            <button
-              onClick={onOpenTour}
-              className="inline-flex items-center gap-1.5 text-xs text-neutral-400 hover:text-sky-400 transition cursor-pointer py-1"
-            >
-              <PlayCircle className="w-3.5 h-3.5 text-sky-400" />
-              <span>{language === 'id' ? 'Pelajari alur kerja platform dalam 30 detik' : 'Learn the 30-second platform walkthrough'}</span>
-              <ArrowRight className="w-3 h-3 opacity-70" />
-            </button>
-          </div>
-
-          {/* 4 Quantitative Proof Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 pt-6 border-t border-neutral-800/80 text-left">
-            <div className="p-4 rounded-xl bg-neutral-900/60 border border-neutral-800">
-              <span className="text-[10px] font-bold uppercase text-neutral-400 tracking-wider block">Rentang Data NASA</span>
-              <strong className="text-xl sm:text-2xl font-black text-white num block mt-0.5">26 Tahun</strong>
-              <span className="text-[11px] text-neutral-400">Arsip 2000 &ndash; 2026</span>
+              <button
+                onClick={onOpenTour}
+                className="w-full sm:w-auto h-12 min-h-[48px] px-4 rounded-xl text-neutral-400 hover:text-sky-300 text-xs font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <PlayCircle className="w-3.5 h-3.5 text-sky-400" />
+                <span>{language === 'id' ? 'Tur 30 Detik' : '30-Sec Tour'}</span>
+              </button>
             </div>
 
-            <div className="p-4 rounded-xl bg-neutral-900/60 border border-neutral-800">
-              <span className="text-[10px] font-bold uppercase text-neutral-400 tracking-wider block">Fusi Spasial Grid</span>
-              <strong className="text-xl sm:text-2xl font-black text-sky-400 num block mt-0.5">5.5 km</strong>
-              <span className="text-[11px] text-neutral-400">Equal-Area Binning</span>
+            {/* Compact Key Stats Pills */}
+            <div className="grid grid-cols-3 gap-2.5 pt-4 border-t border-neutral-800/80 max-w-lg">
+              <div className="p-2.5 rounded-lg bg-neutral-900/60 border border-neutral-800/80">
+                <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">Rentang Data</span>
+                <strong className="text-sm sm:text-base font-bold text-white block mt-0.5">26 Tahun</strong>
+              </div>
+              <div className="p-2.5 rounded-lg bg-neutral-900/60 border border-neutral-800/80">
+                <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">Grid Equal-Area</span>
+                <strong className="text-sm sm:text-base font-bold text-sky-400 block mt-0.5">5.5 km</strong>
+              </div>
+              <div className="p-2.5 rounded-lg bg-neutral-900/60 border border-neutral-800/80">
+                <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">Gambut BRGM</span>
+                <strong className="text-sm sm:text-base font-bold text-amber-400 block mt-0.5">&lt; -40 cm</strong>
+              </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-neutral-900/60 border border-neutral-800">
-              <span className="text-[10px] font-bold uppercase text-neutral-400 tracking-wider block">Ambang Gambut BRGM</span>
-              <strong className="text-xl sm:text-2xl font-black text-amber-400 num block mt-0.5">&lt; -40 cm</strong>
-              <span className="text-[11px] text-neutral-400">Batas Kritis TMAG</span>
-            </div>
+          </div>
 
-            <div className="p-4 rounded-xl bg-neutral-900/60 border border-neutral-800">
-              <span className="text-[10px] font-bold uppercase text-neutral-400 tracking-wider block">Latensi Eksekusi</span>
-              <strong className="text-xl sm:text-2xl font-black text-neutral-200 num block mt-0.5">0 ms</strong>
-              <span className="text-[11px] text-neutral-400">Mesin Sisi Klien</span>
+          {/* Right Column: High-Definition Interactive Satellite Frame */}
+          <div className="lg:col-span-5">
+            <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-neutral-700/80 bg-neutral-950 shadow-2xl group aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3]">
+              <img
+                src="/terra_hero_satellite_earth.jpg"
+                alt="NASA Terra and Suomi-NPP Earth Observation Satellite Fleet over Indonesia"
+                className="w-full h-full object-cover object-center transform transition duration-700 group-hover:scale-105"
+                loading="eager"
+              />
+
+              {/* Dark Vignette Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/90 via-neutral-950/20 to-neutral-950/30 pointer-events-none" />
+
+              {/* Live HUD Badges on Visual */}
+              <div className="absolute inset-0 p-3.5 sm:p-4 flex flex-col justify-between pointer-events-none">
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-neutral-950/80 backdrop-blur-md border border-neutral-700/80 text-[10px] font-mono text-sky-300">
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping" />
+                    <span>NASA TERRA &bull; SUOMI-NPP</span>
+                  </span>
+                  <span className="text-[10px] font-mono text-neutral-400 bg-neutral-950/80 backdrop-blur-md px-2 py-0.5 rounded border border-neutral-800">
+                    LEO 705 km
+                  </span>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-neutral-950/90 backdrop-blur-md border border-neutral-700/80 space-y-0.5">
+                  <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-amber-400">
+                    <Flame className="w-3 h-3 text-amber-400" />
+                    <span>Pemindaian Lahan Gambut Indonesia</span>
+                  </div>
+                  <p className="text-[10px] text-neutral-300 font-mono">
+                    Kalimantan &bull; Sumatra &bull; Riau &bull; Papua
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -517,10 +534,6 @@ export const LandingStory: React.FC<LandingStoryProps> = ({
       <section className="rounded-2xl sm:rounded-3xl bg-[#070A10] text-white border border-neutral-800 p-6 sm:p-10 shadow-xl space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 pb-5 border-b border-neutral-800">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 text-xs font-semibold text-sky-300 border border-sky-500/30">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Open Science MIT &bull; Pemrosesan Data 100% Sisi Klien</span>
-            </div>
             <h2 className="text-xl sm:text-3xl font-bold tracking-tight">
               {language === 'id' ? 'Mulai Eksplorasi Data Satelit Karhutla' : 'Explore Indonesian Satellite Fire Intelligence'}
             </h2>
