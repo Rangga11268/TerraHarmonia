@@ -1,7 +1,7 @@
 import React from 'react';
 import { AOIRegion, HarmonizedWeekData, RawHotspot } from '../engine/harmonizer';
 import { Language, translations } from '../data/translations';
-import { Printer, FileText, Download, ShieldCheck, CheckCircle2, QrCode, ExternalLink } from 'lucide-react';
+import { Printer, FileText, Download, ShieldCheck, CheckCircle2, QrCode, ExternalLink, Globe } from 'lucide-react';
 import { LiveWeatherData } from '../services/weatherApi';
 import { resolveHotspotLocation } from '../utils/locationResolver';
 
@@ -24,10 +24,6 @@ export const ExecutiveReport: React.FC<ExecutiveReportProps> = ({
 }) => {
   const t = translations[language];
 
-  const handlePrint = () => {
-    window.print();
-  };
-
   const today = new Date();
   const reportDateFormatted = today.toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', {
     weekday: 'long',
@@ -49,11 +45,203 @@ export const ExecutiveReport: React.FC<ExecutiveReportProps> = ({
   const effectiveFwi = liveWeather ? liveWeather.fwiScore : 28;
   const threatLevel = effectiveFwi >= 70 ? 'SIAGA DARURAT / EXTREME' : effectiveFwi >= 48 ? 'SIAGA TINGGI / HIGH' : effectiveFwi >= 26 ? 'WASPADA / MODERATE' : 'TERKENDALI / NOMINAL';
 
-  const anomalyWeeks = Object.values(calendarMatrix).filter((w) => w.isUnusualCondition).length;
-  const totalFrp = Object.values(calendarMatrix).reduce((sum, w) => sum + (w.totalFrpCalibrated || w.totalFrpRaw || 0), 0);
-
   // Top 5 active hotspots
   const topSpots = liveHotspots.slice(0, 5);
+
+  /**
+   * Opens an isolated, standalone printable window containing ONLY the official document
+   * with pure print styles and zero surrounding website UI.
+   */
+  const handlePrintIsolated = () => {
+    const docElement = document.getElementById('official-sitrep-document');
+    if (!docElement) {
+      window.print();
+      return;
+    }
+
+    const printWindow = window.open('', '_blank', 'width=900,height=1100');
+    if (!printWindow) {
+      window.print();
+      return;
+    }
+
+    const htmlContent = `
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>${docRegNumber} - Official Situation Report</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 10mm 14mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #111827;
+      background: #ffffff;
+      font-size: 11px;
+      line-height: 1.5;
+      padding: 12px 18px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0;
+    }
+    th, td {
+      border: 1px solid #d1d5db;
+      padding: 6px 8px;
+      text-align: left;
+      font-size: 10.5px;
+    }
+    th {
+      background-color: #f3f4f6;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 9.5px;
+    }
+    .header-border {
+      border-bottom: 2.5px solid #111827;
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border: 1px solid #be123c;
+      background-color: #fff1f2;
+      color: #be123c;
+      font-weight: 800;
+      font-size: 9px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      background-color: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-size: 11.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 4px;
+      margin-top: 14px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .text-justify {
+      text-align: justify;
+    }
+    .sig-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 2px solid #111827;
+      text-align: center;
+      page-break-inside: avoid;
+    }
+    .sig-stamp {
+      height: 55px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 8px 0;
+    }
+    .stamp-box {
+      border: 1.5px solid #059669;
+      background: #ecfdf5;
+      color: #065f46;
+      font-weight: 800;
+      font-size: 9px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    @media print {
+      body {
+        padding: 0;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="no-print" style="margin-bottom: 15px; padding: 10px; background: #f3f4f6; border-radius: 8px; text-align: center;">
+    <button onclick="window.print()" style="padding: 8px 18px; font-weight: bold; background: #111827; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">
+      🖨️ Cetak / Simpan PDF Sekarang
+    </button>
+  </div>
+  ${docElement.innerHTML}
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        window.print();
+      }, 400);
+    };
+  </script>
+</body>
+</html>
+    `;
+
+    printWindow.document.open();
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+  };
+
+  /**
+   * Direct download of the official document as a standalone offline HTML file
+   */
+  const handleDownloadStandaloneHTML = () => {
+    const docElement = document.getElementById('official-sitrep-document');
+    if (!docElement) return;
+
+    const fileContent = `<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>${docRegNumber}</title>
+  <style>
+    @page { size: A4 portrait; margin: 12mm 15mm; }
+    body { font-family: sans-serif; color: #111827; background: #fff; font-size: 11px; line-height: 1.5; padding: 20px; max-width: 850px; margin: 0 auto; }
+    table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+    th, td { border: 1px solid #d1d5db; padding: 6px 8px; font-size: 10.5px; }
+    th { background: #f3f4f6; font-weight: bold; }
+    .badge { border: 1px solid #be123c; background: #fff1f2; color: #be123c; font-weight: bold; padding: 2px 6px; }
+  </style>
+</head>
+<body>
+  ${docElement.innerHTML}
+</body>
+</html>`;
+
+    const blob = new Blob([fileContent], { type: 'text/html;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `SITREP_${selectedAOI.id.toUpperCase()}_${today.toISOString().split('T')[0]}.html`;
+    link.click();
+  };
 
   return (
     <div className="bg-white border border-[#e5e5e7] rounded-3xl shadow-sm overflow-hidden text-[#1d1d1f] font-sans">
@@ -74,19 +262,33 @@ export const ExecutiveReport: React.FC<ExecutiveReportProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Direct Download Button */}
           <button
-            onClick={handlePrint}
+            onClick={handleDownloadStandaloneHTML}
+            className="px-3.5 py-2.5 rounded-xl bg-[#f5f5f7] hover:bg-[#e5e5ea] text-[#1d1d1f] text-xs font-semibold flex items-center gap-1.5 border border-[#e5e5e7] transition cursor-pointer min-h-[40px]"
+            title="Unduh Dokumen Mandiri (.html)"
+          >
+            <Download className="w-4 h-4 text-[#86868b]" />
+            <span>{language === 'id' ? 'Unduh Dokumen (.html)' : 'Download Doc (.html)'}</span>
+          </button>
+
+          {/* Isolated Clean Window Print Button */}
+          <button
+            onClick={handlePrintIsolated}
             className="px-4 py-2.5 rounded-xl bg-[#1d1d1f] hover:bg-black text-white text-xs font-semibold flex items-center gap-2 shadow-xs transition cursor-pointer min-h-[40px]"
           >
-            <Printer className="w-4 h-4" />
-            <span>{language === 'id' ? 'Cetak Dokumen Resmi (PDF / Print)' : 'Print Official Document (PDF)'}</span>
+            <Printer className="w-4 h-4 text-emerald-400" />
+            <span>{language === 'id' ? 'Cetak / Unduh PDF Resmi' : 'Print / Export Official PDF'}</span>
           </button>
         </div>
       </div>
 
       {/* Official Printable Document Container (A4 Proportional) */}
-      <div className="p-6 sm:p-12 space-y-7 bg-white text-[#111827] max-w-4xl mx-auto print:p-0 print:m-0 print:max-w-full">
+      <div
+        id="official-sitrep-document"
+        className="p-6 sm:p-12 space-y-7 bg-white text-[#111827] max-w-4xl mx-auto print:p-0 print:m-0 print:max-w-full"
+      >
         
         {/* 1. Official Government & NASA Letterhead (Kop Surat Resmi) */}
         <div className="border-b-2 border-[#111827] pb-4 flex items-center justify-between gap-4">

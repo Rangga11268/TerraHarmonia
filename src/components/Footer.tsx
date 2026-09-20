@@ -117,7 +117,7 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
   const [activeTarget, setActiveTarget] = useState<GroundTarget>(groundTargets[1]);
 
   return (
-    <footer className="relative w-full bg-[#fbfbfd] dark:bg-[#060911] border-t border-[#e5e5e7] dark:border-[#1f2937] text-[#1d1d1f] dark:text-[#f3f4f6] transition-colors overflow-hidden">
+    <footer className="print:hidden relative w-full bg-[#fbfbfd] dark:bg-[#060911] border-t border-[#e5e5e7] dark:border-[#1f2937] text-[#1d1d1f] dark:text-[#f3f4f6] transition-colors overflow-hidden">
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-12">
         

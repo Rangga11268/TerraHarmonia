@@ -145,7 +145,7 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
     <div className="w-full space-y-6">
       
       {/* 1. Top Header & Live Situational Strip */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-[#e5e5e7] dark:border-[#1f2937]">
+      <div className="print:hidden flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-[#e5e5e7] dark:border-[#1f2937]">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-[#86868b] dark:text-[#9ca3af]">
@@ -231,7 +231,7 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
       </div>
 
       {/* 2. Region Quick Selector & Live Telemetry KPI Bar */}
-      <div className="bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl p-4 sm:p-5 shadow-xs">
+      <div className="print:hidden bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl p-4 sm:p-5 shadow-xs">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           
           {/* Region Buttons */}
