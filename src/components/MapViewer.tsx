@@ -185,20 +185,20 @@ export const MapViewer: React.FC<MapViewerProps> = ({
               <strong style="font-size:13px;color:#0f172a;">${spot.instrument} (${spot.satellite})</strong>
             </div>
             <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;background:${intensityColor}15;color:${intensityColor};border:1px solid ${intensityColor}30;">
-              ${intensity.toUpperCase()} • ${spot.frp} MW
+              ${intensity.toUpperCase()} &bull; ${spot.frp} MW
             </span>
           </div>
 
           <!-- Administrative Region & Peat Landscape -->
           <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px;margin-bottom:8px;">
-            <div style="font-size:11px;font-weight:700;color:#0071e3;text-transform:uppercase;letter-spacing:0.5px;">
-              📍 ${loc.regency}
+            <div style="font-size:11px;font-weight:700;color:#0071e3;letter-spacing:0.3px;">
+              ${loc.regency}
             </div>
-            ${loc.district ? `<div style="font-size:11px;color:#475569;margin-top:2px;"><b>Kecamatan/Area:</b> ${loc.district}</div>` : ''}
+            ${loc.district ? `<div style="font-size:11px;color:#475569;margin-top:2px;"><b>${language === 'id' ? 'Kecamatan' : 'District'}:</b> ${loc.district}</div>` : ''}
             <div style="font-size:11px;color:#059669;margin-top:3px;font-weight:600;">
-              🌿 ${loc.landscape}
+              ${loc.landscape}
             </div>
-            ${loc.isPeatland ? `<div style="font-size:10px;color:#b45309;margin-top:2px;"><b>Estimasi Kedalaman Gambut:</b> ${loc.peatDepthEstimate}</div>` : ''}
+            ${loc.isPeatland ? `<div style="font-size:10px;color:#b45309;margin-top:2px;"><b>${language === 'id' ? 'Kedalaman Gambut' : 'Peat Depth'}:</b> ${loc.peatDepthEstimate}</div>` : ''}
           </div>
 
           <!-- Precise Coordinates & Local Time -->
@@ -206,7 +206,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({
             <div style="background:#f1f5f9;padding:6px;border-radius:6px;">
               <span style="font-size:9px;color:#64748b;text-transform:uppercase;font-weight:700;display:block;">${language === 'id' ? 'Koordinat Presisi' : 'Coordinates'}</span>
               <strong style="font-family:monospace;font-size:11px;color:#0f172a;display:block;margin-top:2px;">
-                ${spot.lat.toFixed(5)}°, ${spot.lon.toFixed(5)}°
+                ${spot.lat.toFixed(5)}&deg;, ${spot.lon.toFixed(5)}&deg;
               </strong>
               <span style="font-size:9px;color:#64748b;display:block;margin-top:1px;">
                 ${loc.coordinatesDMS}
@@ -226,16 +226,16 @@ export const MapViewer: React.FC<MapViewerProps> = ({
 
           <!-- Telemetry & Sensor Stats -->
           <div style="font-size:11px;border-top:1px solid #f1f5f9;padding-top:6px;color:#475569;display:flex;justify-content:space-between;">
-            <span><b>${language === 'id' ? 'Suhu Termal' : 'Thermal Temp'}:</b> ${tempCelsius}°C (${spot.brightness} K)</span>
+            <span><b>${language === 'id' ? 'Suhu Termal' : 'Thermal Temp'}:</b> ${tempCelsius}&deg;C (${spot.brightness} K)</span>
             <span><b>${language === 'id' ? 'Keyakinan' : 'Confidence'}:</b> ${spot.confidence}%</span>
           </div>
 
           <!-- Direct Navigation Link -->
           <div style="margin-top:8px;padding-top:6px;border-top:1px dashed #cbd5e1;display:flex;align-items:center;justify-content:space-between;font-size:10.5px;">
-            <a href="${loc.googleMapsUrl}" target="_blank" rel="noopener noreferrer" style="color:#0071e3;text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:3px;">
-              ↗ ${language === 'id' ? 'Buka di Google Maps' : 'Open in Google Maps'}
+            <a href="${loc.googleMapsUrl}" target="_blank" rel="noopener noreferrer" style="color:#0071e3;text-decoration:underline;font-weight:600;">
+              ${language === 'id' ? 'Buka di Google Maps' : 'Open in Google Maps'}
             </a>
-            <span style="color:#94a3b8;font-size:9.5px;">NASA FIRMS Data</span>
+            <span style="color:#94a3b8;font-size:9.5px;">NASA FIRMS Active Fire</span>
           </div>
 
         </div>

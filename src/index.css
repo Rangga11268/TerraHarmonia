@@ -72,12 +72,39 @@
   background: #4b5563;
 }
 
-/* Leaflet background */
+/* Leaflet container & Popups */
 .leaflet-container {
   background: #e5e5ea;
 }
 .dark .leaflet-container {
   background: #0f172a;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #ffffff;
+  color: #1e293b;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.12), 0 2px 6px -1px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  padding: 2px;
+}
+.dark .leaflet-popup-content-wrapper {
+  background: #111827;
+  color: #f3f4f6;
+  border-color: #374151;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.5);
+}
+.leaflet-popup-tip {
+  background: #ffffff;
+}
+.dark .leaflet-popup-tip {
+  background: #111827;
+}
+.leaflet-popup-close-button {
+  color: #64748b !important;
+}
+.dark .leaflet-popup-close-button {
+  color: #9ca3af !important;
 }
 
 /* Heatmap cell transition */
