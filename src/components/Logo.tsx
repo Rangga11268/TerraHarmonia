@@ -80,7 +80,7 @@ export const Logo: React.FC<LogoProps> = ({
         </div>
         {showSubtitle && (
           <span className={`text-[#86868b] dark:text-[#9ca3af] tracking-normal font-medium hidden sm:block ${sub}`}>
-            NASA Space Apps Challenge 2026
+            NASA Space Apps Jakarta 2026
           </span>
         )}
       </div>

@@ -708,7 +708,7 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
         <div className="pt-6 border-t border-[#e5e5e7] dark:border-[#1f2937] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#86868b] dark:text-[#9ca3af]">
           <div className="flex items-center gap-3">
             <Logo size="sm" showSubtitle={false} showNasaBadge={true} />
-            <span>&copy; 2026 Terra Harmonia &bull; NASA Space Apps Challenge &bull; NASA FIRMS &amp; Earthdata</span>
+            <span>&copy; 2026 Terra Harmonia &bull; NASA Space Apps Jakarta 2026 &bull; NASA FIRMS &amp; Earthdata</span>
           </div>
 
           <div className="flex items-center gap-4 text-[11px]">
@@ -716,7 +716,7 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>NASA Space Network: Nominal</span>
             </span>
-            <span>Indonesia 2026</span>
+            <span>Jakarta, Indonesia 2026</span>
           </div>
         </div>
 
