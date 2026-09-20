@@ -16,6 +16,7 @@ import {
   Radio
 } from 'lucide-react';
 import { fetchLiveWeather, LiveWeatherData } from '../services/weatherApi';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
 
 interface RiskForecastProps {
   language: Language;
@@ -35,7 +36,7 @@ export const RiskForecast: React.FC<RiskForecastProps> = ({
 }) => {
   const [weatherData, setWeatherData] = useState<LiveWeatherData | null>(null);
   const [isLoadingWeather, setIsLoadingWeather] = useState<boolean>(true);
-  const [forecastView, setForecastView] = useState<'3week' | '14day'>('14day');
+  const [forecastView, setForecastView] = useState<'14day' | '3week'>('14day');
 
   // Fetch live weather when AOI changes
   useEffect(() => {
@@ -103,6 +104,14 @@ export const RiskForecast: React.FC<RiskForecastProps> = ({
     extreme: { label: language === 'id' ? 'Siaga Darurat' : 'Emergency State', color: 'text-red-700 dark:text-red-400', bg: 'bg-red-500/10 border-red-500/20' },
   }[riskTier];
 
+  // Prepare chart series data
+  const sparklineData = (weatherData?.dailyForecast || []).map((d) => ({
+    day: new Date(d.date).getDate(),
+    fwi: d.fwiScore,
+    temp: d.tempMax,
+    rain: d.precipitationSum,
+  }));
+
   return (
     <div className="bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl p-5 shadow-xs flex flex-col justify-between transition-colors">
       <div className="space-y-4">
@@ -114,7 +123,7 @@ export const RiskForecast: React.FC<RiskForecastProps> = ({
             </h2>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 text-[10px] font-mono font-bold">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>{isLiveSync ? 'LIVE NASA + OPEN-METEO' : 'LIVE WEATHER SYNC'}</span>
+              <span>{isLiveSync ? 'LIVE NASA + METEO' : 'LIVE WEATHER SYNC'}</span>
             </span>
           </div>
           
@@ -208,7 +217,7 @@ export const RiskForecast: React.FC<RiskForecastProps> = ({
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold text-[#86868b] dark:text-[#9ca3af]">
             {forecastView === '14day'
-              ? (language === 'id' ? 'Prakiraan Harian (14 Hari Kedepan)' : 'Daily Outlook (Next 14 Days)')
+              ? (language === 'id' ? 'Tren Prognosis Harian (14 Hari)' : '14-Day Daily Risk Trajectory')
               : (language === 'id' ? 'Prakiraan Iklim 3 Minggu' : '3-Week Climatological Outlook')}
           </span>
           <div className="flex items-center gap-1 text-[10px]">
@@ -220,7 +229,7 @@ export const RiskForecast: React.FC<RiskForecastProps> = ({
                   : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
               }`}
             >
-              14D Daily
+              14D Sparkline
             </button>
             <button
               onClick={() => setForecastView('3week')}
@@ -230,40 +239,63 @@ export const RiskForecast: React.FC<RiskForecastProps> = ({
                   : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
               }`}
             >
-              3W Trends
+              3W Climatology
             </button>
           </div>
         </div>
 
-        {/* 14-Day Micro-Bar Timeline */}
+        {/* 14-Day Visual Mini Sparkline Chart */}
         {forecastView === '14day' && (
-          <div className="grid grid-cols-7 gap-1.5 text-center">
-            {(weatherData?.dailyForecast || []).slice(0, 7).map((d, idx) => {
-              const dayLabel = new Date(d.date).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { weekday: 'narrow' });
-              const dateNum = new Date(d.date).getDate();
-              const isHigh = d.fwiScore >= 50;
+          <div className="space-y-2">
+            <div className="w-full h-24 bg-[#fafafa] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937] rounded-xl p-2">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={sparklineData} margin={{ top: 2, right: 4, left: -25, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="riskSparkGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0.0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="day" tick={{ fontSize: 9 }} stroke="#88888860" />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 9 }} stroke="#88888860" />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#111827',
+                      borderColor: '#374151',
+                      borderRadius: '8px',
+                      color: '#fff',
+                      fontSize: '10px',
+                      padding: '4px 8px',
+                    }}
+                    formatter={(val: any) => [`${val}/100`, 'FWI']}
+                  />
+                  <Area type="monotone" dataKey="fwi" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#riskSparkGrad)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
 
-              return (
-                <div
-                  key={d.date}
-                  className={`p-1.5 rounded-lg border transition-all ${
-                    isHigh
-                      ? 'bg-red-500/10 dark:bg-red-950/30 border-red-500/30 text-red-700 dark:text-red-400'
-                      : d.fwiScore >= 30
-                      ? 'bg-amber-500/10 dark:bg-amber-950/30 border-amber-500/30 text-amber-700 dark:text-amber-400'
-                      : 'bg-[#f8fafc] dark:bg-[#151d2f] border-[#e5e5e7] dark:border-[#1f2937] text-[#1d1d1f] dark:text-white'
-                  }`}
-                  title={`${d.date}: ${d.tempMax}°C, ${d.precipitationSum}mm rain, FWI: ${d.fwiScore}`}
-                >
-                  <span className="text-[9px] block text-[#86868b] dark:text-[#9ca3af] font-medium">{dayLabel}</span>
-                  <span className="text-[10px] font-bold block num">{dateNum}</span>
-                  <span className="text-[9px] font-bold block mt-0.5 num">{d.tempMax}°</span>
-                  <span className={`text-[8px] font-mono block mt-0.5 ${d.precipitationSum > 1 ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-[#86868b]'}`}>
-                    {d.precipitationSum > 0 ? `${d.precipitationSum}m` : '0'}
-                  </span>
-                </div>
-              );
-            })}
+            {/* Micro 7-day pill grid */}
+            <div className="grid grid-cols-7 gap-1 text-center">
+              {(weatherData?.dailyForecast || []).slice(0, 7).map((d) => {
+                const dayLabel = new Date(d.date).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { weekday: 'narrow' });
+                const dateNum = new Date(d.date).getDate();
+                const isHigh = d.fwiScore >= 50;
+
+                return (
+                  <div
+                    key={d.date}
+                    className={`p-1 rounded-md border text-[9px] ${
+                      isHigh
+                        ? 'bg-red-500/10 border-red-500/30 text-red-700 dark:text-red-400 font-bold'
+                        : 'bg-[#f8fafc] dark:bg-[#151d2f] border-[#e5e5e7] dark:border-[#1f2937] text-[#6e6e73] dark:text-[#9ca3af]'
+                    }`}
+                  >
+                    <span className="block text-[8px] opacity-75">{dayLabel}</span>
+                    <span className="block font-mono font-bold">{dateNum}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 

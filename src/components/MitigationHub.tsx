@@ -15,12 +15,15 @@ import {
   CloudRain,
   ExternalLink,
   Satellite,
-  Compass
+  Compass,
+  BarChart3,
+  TrendingUp
 } from 'lucide-react';
 import { PRESET_AOIS, AOIRegion, HarmonizedWeekData, RawHotspot } from '../engine/harmonizer';
 import { Language, translations } from '../data/translations';
 import { PeatlandSimulator } from './PeatlandSimulator';
 import { ExecutiveReport } from './ExecutiveReport';
+import { MitigationCharts } from './MitigationCharts';
 import { LiveSyncResult } from '../services/nasaFirmsApi';
 import { fetchLiveWeather, LiveWeatherData } from '../services/weatherApi';
 import { resolveHotspotLocation } from '../utils/locationResolver';
@@ -51,7 +54,7 @@ export const MitigationHub: React.FC<MitigationHubProps> = ({
   onRefreshLive,
 }) => {
   const t = translations[language];
-  const [activeSubTab, setActiveSubTab] = useState<'simulator' | 'hotspots' | 'sitrep'>('simulator');
+  const [activeSubTab, setActiveSubTab] = useState<'simulator' | 'charts' | 'hotspots' | 'sitrep'>('simulator');
   const [selectedTeamUnit, setSelectedTeamUnit] = useState<'manggala_agni' | 'mpa' | 'bpbd'>('manggala_agni');
   const [patrolDate, setPatrolDate] = useState<string>(() => new Date().toISOString().split('T')[0]);
   const [liveWeather, setLiveWeather] = useState<LiveWeatherData | null>(null);
@@ -165,13 +168,13 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
           </h1>
           <p className="text-xs sm:text-sm text-[#6e6e73] dark:text-[#9ca3af] max-w-2xl leading-relaxed">
             {language === 'id'
-              ? 'Sistem aksi mitigasi taktis berbasis data satelit NASA & meteorologi real-time: simulasi hidrologi kubah gambut, pemantauan sekat kanal (canal blocking), dan pembuatan memorandum penugasan patroli Manggala Agni.'
-              : 'Actionable satellite & meteorological intelligence: peatland hydrology rewetting simulations, canal blocking management, and automated field dispatch memorandums.'}
+              ? 'Sistem aksi mitigasi taktis berbasis data satelit NASA & meteorologi real-time: simulasi hidrologi kubah gambut, grafik analitik cuaca 14 hari, pemantauan sekat kanal, dan pembuatan dokumen intelijen resmi.'
+              : 'Actionable satellite & meteorological intelligence: peatland hydrology rewetting simulations, 14-day weather analytics, canal blocking management, and official intelligence dossiers.'}
           </p>
         </div>
 
         {/* Sub-view switcher */}
-        <div className="flex items-center bg-[#e5e5ea] dark:bg-[#1f2937] rounded-xl p-1 gap-1 shrink-0">
+        <div className="flex flex-wrap items-center bg-[#e5e5ea] dark:bg-[#1f2937] rounded-xl p-1 gap-1 shrink-0">
           <button
             onClick={() => setActiveSubTab('simulator')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer min-h-[36px] ${
@@ -185,6 +188,18 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
           </button>
 
           <button
+            onClick={() => setActiveSubTab('charts')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer min-h-[36px] ${
+              activeSubTab === 'charts'
+                ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs'
+                : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
+            }`}
+          >
+            <BarChart3 className="w-3.5 h-3.5 text-blue-500" />
+            <span>{language === 'id' ? 'Grafik Prognosis & Visual' : 'Prognosis & Climate Charts'}</span>
+          </button>
+
+          <button
             onClick={() => setActiveSubTab('hotspots')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer min-h-[36px] ${
               activeSubTab === 'hotspots'
@@ -192,7 +207,7 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
                 : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
             }`}
           >
-            <Flame className="w-3.5 h-3.5" />
+            <Flame className="w-3.5 h-3.5 text-rose-500" />
             <span>{language === 'id' ? 'Titik Api Aktif' : 'Active Hotspots'}</span>
             {regionLiveSpots.length > 0 && (
               <span className="px-1.5 py-0.2 rounded-full bg-rose-500 text-white text-[9px] font-bold">
@@ -209,8 +224,8 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
                 : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
             }`}
           >
-            <FileText className="w-3.5 h-3.5" />
-            <span>{t.subTabSitRep}</span>
+            <FileText className="w-3.5 h-3.5 text-emerald-600" />
+            <span>{language === 'id' ? 'Dokumen Resmi (A4 PDF)' : 'Official SitRep (PDF)'}</span>
           </button>
         </div>
       </div>
@@ -406,7 +421,21 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
         </div>
       )}
 
-      {/* Sub-View 2: Active Hotspots & Dispatch List */}
+      {/* Sub-View 2: Charts & Visual Analytics Suite */}
+      {activeSubTab === 'charts' && (
+        <div className="animate-in fade-in duration-150">
+          <MitigationCharts
+            language={language}
+            selectedAOI={selectedAOI}
+            liveWeather={liveWeather}
+            liveHotspots={regionLiveSpots}
+            currentTmat={currentRegionRisk.tmag}
+            effectiveTmat={Math.min(0, currentRegionRisk.tmag + 12)}
+          />
+        </div>
+      )}
+
+      {/* Sub-View 3: Active Hotspots & Dispatch List */}
       {activeSubTab === 'hotspots' && (
         <div className="bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4 animate-in fade-in duration-150">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#e5e5e7] dark:border-[#1f2937]">
@@ -507,7 +536,7 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
         </div>
       )}
 
-      {/* Sub-View 3: Executive Situation Report Dossier (A4 Print Ready) */}
+      {/* Sub-View 4: Executive Situation Report Dossier (A4 Print Ready) */}
       {activeSubTab === 'sitrep' && (
         <div className="animate-in fade-in duration-150">
           <ExecutiveReport
@@ -515,6 +544,8 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
             selectedAOI={selectedAOI}
             calendarMatrix={calendarMatrix}
             totalHotspots={activeSpotCount}
+            liveWeather={liveWeather}
+            liveHotspots={regionLiveSpots}
           />
         </div>
       )}
