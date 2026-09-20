@@ -4,6 +4,7 @@
 
   # Terra Harmonia
   ### Multi-Decadal Earth Observation Satellite Harmonization & Wildfire Intelligence Platform
+  ### Platform Harmonisasi Satelit Observasi Bumi & Intelijen Kebakaran Hutan Multi-Dekade
 
   [![NASA Space Apps Challenge](https://img.shields.io/badge/NASA_Space_Apps-2026_Global_Challenge-0B3D91?style=for-the-badge&logo=nasa&logoColor=white)](https://www.spaceappschallenge.org/)
   [![Challenge Category](https://img.shields.io/badge/Challenge-MODIS_&_VIIRS_Harmonization-EA580C?style=for-the-badge)](https://www.spaceappschallenge.org/)
@@ -13,12 +14,14 @@
   [![Vite](https://img.shields.io/badge/Vite-6.1-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 
   <p align="center">
-    <strong>Eliminating 14-Year Multi-Sensor Granularity Disparities to Restore Continuous 26-Year Wildfire Baselines (2000-2026) across Indonesian Peatland Ecosystems.</strong>
+    <strong>[ <a href="#-english">English</a> | <a href="#-bahasa-indonesia">Bahasa Indonesia</a> ]</strong>
   </p>
 
 </div>
 
 ---
+
+# 🇬🇧 English
 
 ## Executive Summary
 
@@ -30,7 +33,7 @@ Because VIIRS provides an observational ground footprint approximately **7 times
 
 Without mathematical and spatial harmonization, raw historical archives create a dangerous statistical artifact: **wildfire frequency appears to abruptly triple post-2012**. This distorts long-term climate baselines, fire regime analysis, and disaster mitigation resource allocation.
 
-**Terra Harmonia** bridges this technological gap through **5.5 km equal-area spatial binning**, **cross-sensor Fire Radiative Power (FRP) radiometric calibration**, and **real-time hydrological telemetry integration**, providing environmental authorities with an authoritative multi-decade intelligence suite.
+**Terra Harmonia** bridges this technological gap through **5.5 km equal-area spatial binning**, **cross-sensor Fire Radiative Power (FRP) radiometric calibration**, and **real-time meteorological telemetry integration**, providing environmental authorities with an authoritative multi-decade intelligence suite.
 
 ---
 
@@ -90,56 +93,7 @@ Without mathematical and spatial harmonization, raw historical archives create a
 
 ---
 
-## Project Structure
-
-```
-src/
-├── components/
-│   ├── BurningCalendar.tsx     # 26-Year 52-week contribution matrix & climatology
-│   ├── ComparisonMetrics.tsx   # Multi-sensor KPI disparity summary
-│   ├── CriticalAlerts.tsx      # Early warning anomaly detection & CSV export
-│   ├── DashboardControlBar.tsx # Region switcher, view mode switcher, audio briefing
-│   ├── DataHub.tsx             # NASA FIRMS API integration & raw data inspector
-│   ├── DualMapComparison.tsx   # Split-screen synchronized sensor comparison
-│   ├── ExecutiveReport.tsx     # Official SitRep dossier & direct 1-click PDF download
-│   ├── Footer.tsx              # Scientific documentation & NASA team credits
-│   ├── FullMapModal.tsx        # Full-screen GIS viewer with timeline epoch scrubber
-│   ├── HarmonizationLab.tsx    # Interactive sensor footprint & physics simulator
-│   ├── Header.tsx              # Minimalist navbar & language switcher
-│   ├── MapViewer.tsx           # Primary Leaflet map with Indonesia hard boundary lock
-│   ├── MitigationCharts.tsx    # 14-day prognosis & peat hydrology Recharts suite
-│   ├── MitigationHub.tsx       # Live weather, BRGM simulator & paginated hotspots
-│   ├── NasaApiKeyModal.tsx     # Custom MAP_KEY settings for live NASA FIRMS feeds
-│   ├── Navbar.tsx              # Clean top navigation with light/dark mode switch
-│   ├── PeatlandSimulator.tsx   # BRGM TMAT water table & canal block physics engine
-│   ├── PolygonInspector.tsx    # GeoJSON peat dome polygon drawing & analytics
-│   ├── RiskForecast.tsx        # Composite Fire Risk Index & 14-day trajectory
-│   ├── TeamPage.tsx            # Team identity & project methodology dossier
-│   └── VisualAnalytics.tsx     # Longitudinal 26-year trend & seasonality charts
-├── data/
-│   ├── generator.ts            # Calibrated multi-decade satellite records
-│   └── translations.ts         # Complete English & Indonesian dictionary
-├── engine/
-│   └── harmonizer.ts           # Spatial binning, FRP weighting, and Z-score engine
-├── services/
-│   ├── nasaFirmsApi.ts         # NASA FIRMS live satellite telemetry client
-│   └── weatherApi.ts           # Open-Meteo live weather & forecast service
-├── utils/
-│   ├── audioBriefing.ts        # Web Speech API situation briefing synthesizer
-│   └── locationResolver.ts     # GPS coordinate to Indonesian regency reverse lookup
-├── App.tsx                     # Master state coordinator & route manager
-└── index.css                   # Global Tailwind styles & .scrollbar-none utilities
-```
-
----
-
 ## Quick Start
-
-### Prerequisites
-- Node.js (v18.0.0 or higher recommended)
-- npm or yarn package manager
-
-### Installation
 
 ```bash
 # 1. Clone the repository
@@ -149,39 +103,115 @@ cd TerraHarmonia
 # 2. Install dependencies
 npm install
 
-# 3. Start the local development server
+# 3. Start local development server
 npm run dev
-```
 
-Visit `http://localhost:3000` (or Vite's assigned port) in your browser.
-
-### Production Build & Verification
-
-```bash
-# Run TypeScript typecheck and compile Vite production bundle
+# 4. Build for production
 npm run build
-
-# Preview production build locally
-npm run preview
 ```
 
 ---
 
-## Team & Challenge Verification
+<br />
 
-- **Challenge Category**: NASA Space Apps Challenge 2026: *Harmonization of MODIS and VIIRS Hot Spots*
-- **Team**: Terra Harmonia
-- **Author**: Darell Rangga
-- **Open Science Data Sources**: 
+# 🇮🇩 Bahasa Indonesia
+
+## Ringkasan Eksekutif
+
+Selama lebih dari dua dekade, satelit observasi bumi NASA telah memantau kebakaran hutan dan lahan (karhutla) secara global:
+1. **MODIS (Terra & Aqua)**: Resolusi 1.0 km pada nadir, beroperasi sejak tahun 2000.
+2. **VIIRS (Suomi-NPP & NOAA-20)**: Resolusi 375 m pada nadir, beroperasi sejak akhir 2011/2012.
+
+Karena ukuran piksel VIIRS sekitar **7 kali lebih kecil** dibandingkan MODIS, satu front kebakaran yang sama di lapangan sering kali terdeteksi sebagai **3 hingga 7 titik terpisah oleh sensor VIIRS**.
+
+Tanpa harmonisasi matematis dan spasial, arsip historis mentah memicu ilusi statistik yang berbahaya: **seolah-olah frekuensi kebakaran melonjak 3x lipat pasca-2012**. Hal ini mendistorsi garis dasar (*baseline*) iklim jangka panjang, analisis tren kebakaran, dan alokasi sumber daya pemadaman darurat.
+
+**Terra Harmonia** menyelesaikan disparitas teknologi ini melalui **pengelompokan spasial equal-area 5.5 km**, **kalibrasi radiometrik daya radiasi api (FRP)**, dan **integrasi telemetri cuaca live**, memberikan platform intelijen multi-dekade yang presisi dan tervalidasi bagi otoritas lingkungan hidup.
+
+---
+
+## Arsitektur & Kemampuan Utama Platform
+
+```
+┌──────────────────────────────────────────────────────────────────────────────────────────┐
+│                                STRUKTUR TERRA HARMONIA                                   │
+├────────────────────────────┬────────────────────────────┬────────────────────────────────┤
+│    🛰️ HARMONISASI SENSOR    │     🗺️ GIS & INTELIJEN     │    🛡️ MITIGASI & PROGNOSIS     │
+├────────────────────────────┼────────────────────────────┼────────────────────────────────┤
+│ • Spatial Binning 5.5 km   │ • Penguncian Batas Peta    │ • Cuaca Live Open-Meteo API    │
+│ • Kalibrasi Radiometri FRP │   (Khusus Kepulauan RI)    │ • Model Fisika TMAT BRGM       │
+│ • Normalisasi Tren 26 Thn  │ • Stepper Tahun 2000-2026  │ • Grafik Prognosis 14 Hari     │
+│ • Simulator Interaktif     │ • Split-Screen Peta Ganda  │ • Download Dokumen SitRep PDF  │
+│   Footprint Spasial Sensor │ • Inspektur Poligon Gambut │ • Explorer Titik Panas Cepat   │
+└────────────────────────────┴────────────────────────────┴────────────────────────────────┘
+```
+
+### 1. Mesin Harmonisasi Lintas-Dekade
+- **Spatial Binning Equal-Area 5.5 km**: Menyatukan titik-titik sub-piksel terfragmentasi dari berbagai orbit satelit ke dalam satu klaster fisik yang koheren.
+- **Kalibrasi Radiometrik Empiris**:
+  $$\text{FRP}_{\text{terkalibrasi}} = (\text{FRP}_{\text{MODIS}} \times 1.04) + (\text{FRP}_{\text{VIIRS}} \times 0.88)$$
+- **Indeks Aktivitas Pembakaran (BAI)**: Menstandarkan kerapatan titik dan daya radiasi energi termal ke dalam skala keparahan 0-100.
+- **Deteksi Anomali Statistik**: Menghitung rata-rata bergerak historis 26 tahun tiap minggu kalender untuk mendeteksi lonjakan ekstrem ($Z > 2.0\sigma$).
+
+### 2. Suite GIS & Intelijen Kepulauan Indonesia
+- **Penguncian Batas Kedaulatan Peta (*Hard Boundary Lock*)**: Membatasi navigasi peta secara ketat hanya pada wilayah kedaulatan Indonesia (`[-11.5° LS, 94.0° BT]` hingga `[6.5° LU, 141.5° BT]`) dengan `maxBoundsViscosity: 1.0` dan `minZoom: 4` (pengguna tidak bisa menggeser keluar dari Indonesia).
+- **Timeline Historis 26 Tahun Bebas Slider**: Navigasi tahunan menggunakan tombol stepper (`-1`, `+1`) dan tombol pintas anomali iklim (*2000 Baseline, 2015 Super El Niño, 2019 El Niño, 2023 El Niño, 2026 Live*).
+- **Komparasi Peta Ganda A/B**: Tampilan layar terbagi (*split-screen*) sinkron untuk membandingkan data mentah sensor vs data terharmonisasi.
+- **Inspektur Poligon Kubah Gambut**: Fitur gambar GeoJSON poligon interaktif untuk menghitung luas area, total pelepasan energi radiasi termal, dan risiko spesifik kubah gambut.
+- **Briefing Suara AI (Web Speech API)**: Membacakan laporan situasi intelejen terkini dalam bentuk audio untuk komandan operasi lapangan.
+
+### 3. Hub Mitigasi & Prognosis Operasional Lapangan
+- **Telemetri Cuaca Live**: Integrasi langsung dengan Open-Meteo API untuk data suhu, kelembapan udara (RH), kecepatan angin, dan Hari Tanpa Hujan (HTH).
+- **Fisika Hidrologi Gambut BRGM**: Menghitung Tinggi Muka Air Tanah (TMAT) terhadap ambang batas kritis -40 cm BRGM/KLHK, Kadar Air Gambut (%), estimasi kedalaman bakar (cm), dan potensi emisi CO₂e per hektar.
+- **Explorer Titik Panas Berperforma Tinggi**: Sistem pemuatan data cepat (24 item per halaman) dengan chip filter 1-klik (*FRP ≥50MW, VIIRS 375m, MODIS 1km*) dan pencarian instan tanpa *lag*.
+- **Download Langsung PDF Laporan Situasi (SitRep)**: Pembuatan dokumen PDF resmi beresolusi tinggi langsung di peramban via `jsPDF` dan `html2canvas` berstandar A4 nasional.
+
+### 4. Laboratorium Harmonisasi & Fisika Sensor
+- **Simulator Footprint Sensor Interaktif (SVG Visualizer)**: Visualisasi grafis langsung yang memperlihatkan bagaimana sebuah kebakaran fisik dideteksi oleh piksel MODIS 1 km vs sub-piksel VIIRS 375 m vs grid 5.5 km Terra Harmonia.
+- **Matriks Spesifikasi Teknis Satelit**: Tabel perbandingan lengkap spesifikasi instrumen satelit NASA EOS (Terra/Aqua) dan JPSS (Suomi-NPP/NOAA-20).
+
+---
+
+## Panduan Instalasi & Penggunaan
+
+### Prasyarat
+- Node.js (versi 18.0.0 atau lebih tinggi)
+- npm atau yarn
+
+### Langkah Pemasangan
+
+```bash
+# 1. Kloning repositori
+git clone https://github.com/Rangga11268/TerraHarmonia.git
+cd TerraHarmonia
+
+# 2. Pasang dependensi
+npm install
+
+# 3. Jalankan server pengembangan lokal
+npm run dev
+
+# 4. Bangun versi produksi
+npm run build
+```
+
+---
+
+## Tim & Sumber Data Terbuka
+
+- **Kategori Tantangan**: NASA Space Apps Challenge 2026: *Harmonization of MODIS and VIIRS Hot Spots*
+- **Nama Tim**: Terra Harmonia
+- **Peserta**: Darell Rangga
+- **Sumber Data Terbuka**:
   - NASA FIRMS (Fire Information for Resource Management System)
-  - MODIS Airborne/Spaceborne Sensor Archives (Terra & Aqua)
-  - VIIRS Spaceborne Sensor Archives (Suomi-NPP & NOAA-20)
-  - Open-Meteo Global Meteorological Forecast Model
-  - Badan Restorasi Gambut dan Mangrove (BRGM) Technical Specifications
+  - Arsip Sensor Satelit MODIS (Terra & Aqua)
+  - Arsip Sensor Satelit VIIRS (Suomi-NPP & NOAA-20)
+  - Model Prakiraan Cuaca Global Open-Meteo
+  - Parameter Hidrologi Badan Restorasi Gambut dan Mangrove (BRGM)
 
 ---
 
 <div align="center">
-  <p>Dedicated to advancing Earth observation science, environmental transparency, and peatland wildfire prevention.</p>
-  <sub>Terra Harmonia © 2026. Built with open NASA Earth Observation telemetry.</sub>
+  <p>Didedikasikan untuk memajukan sains observasi bumi, transparansi data lingkungan hidup, dan pencegahan kebakaran lahan gambut di Indonesia.</p>
+  <sub>Terra Harmonia © 2026. Dibangun dengan telemetri terbuka NASA Earth Observation.</sub>
 </div>
