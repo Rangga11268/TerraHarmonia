@@ -7,6 +7,7 @@ import { ComparisonMetrics } from './components/ComparisonMetrics';
 import { VisualAnalytics } from './components/VisualAnalytics';
 import { CriticalAlerts } from './components/CriticalAlerts';
 import { RiskForecast } from './components/RiskForecast';
+import { JudgesEvaluationGuide } from './components/JudgesEvaluationGuide';
 import { Footer } from './components/Footer';
 import { NasaApiKeyModal } from './components/NasaApiKeyModal';
 import { ScienceTourModal } from './components/ScienceTourModal';
@@ -358,7 +359,25 @@ export function App() {
             {/* VIEW MODE 1: Main Intelligence & 26-Year Matrix */}
             {overviewView === 'main' && (
               <div className="space-y-6 animate-in fade-in duration-150">
-                {/* Metric Strip (Clean Apple Design) */}
+                {/* 1. Interactive Judges & Evaluator Quick-Start Roadmap */}
+                <JudgesEvaluationGuide
+                  language={language}
+                  selectedAOI={selectedAOI}
+                  onSelectAOI={(aoi) => {
+                    setSelectedAOI(aoi);
+                    setSelectedKey(null);
+                    setSelectedWeekData(null);
+                    setActiveScenario(null);
+                  }}
+                  rawMode={rawMode}
+                  setRawMode={setRawMode}
+                  onSelectScenario={handleSelectScenario}
+                  activeScenario={activeScenario}
+                  onSelectTab={setActiveTab}
+                  onOpenTour={() => setIsTourModalOpen(true)}
+                />
+
+                {/* 2. Metric Strip (Clean Apple Design) */}
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-0 bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl shadow-xs overflow-hidden">
                   
                   <div className="sm:col-span-1 px-5 py-5 flex flex-col justify-between border-b sm:border-b-0 sm:border-r border-[#e5e5e7] dark:border-[#1f2937] bg-[#fbfbfd] dark:bg-[#151d2f]">
@@ -408,7 +427,7 @@ export function App() {
                   ))}
                 </div>
 
-                {/* Interactive 26-Year Burning Calendar */}
+                {/* 3. Interactive 26-Year Burning Calendar */}
                 <section>
                   <BurningCalendar
                     language={language}
@@ -419,10 +438,10 @@ export function App() {
                   />
                 </section>
 
-                {/* Geospatial & Prognosis Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                  {/* Map Viewer */}
-                  <div className="lg:col-span-7">
+                {/* 4. Geospatial & Prognosis Section: Perfectly Balanced 2-Column Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                  {/* Left Column (7 cols): Map Viewer + Sensor Bias Proof Card */}
+                  <div className="lg:col-span-7 space-y-6">
                     <MapViewer
                       language={language}
                       selectedAOI={selectedAOI}
@@ -433,10 +452,16 @@ export function App() {
                       isLiveSync={isLiveSync}
                       isLoading={isLoadingLive}
                     />
+
+                    <ComparisonMetrics
+                      language={language}
+                      selectedAOI={selectedAOI}
+                      yearlyAverages={yearlyAverages}
+                    />
                   </div>
 
-                  {/* Side Prognosis & Directives Column */}
-                  <div className="lg:col-span-5 space-y-5">
+                  {/* Right Column (5 cols): Weather Prognosis & Extreme Anomaly Alerts */}
+                  <div className="lg:col-span-5 space-y-6">
                     <RiskForecast
                       language={language}
                       selectedAOI={selectedAOI}
@@ -455,7 +480,7 @@ export function App() {
                   </div>
                 </div>
 
-                {/* Scientific Visual Analytics & Charts Suite */}
+                {/* 5. Full-Width Deep Interactive Visual Analytics & Physics Suite */}
                 <section>
                   <VisualAnalytics
                     language={language}
@@ -464,15 +489,6 @@ export function App() {
                     rawMode={rawMode}
                   />
                 </section>
-
-                {/* Science Comparison Section */}
-                <div className="grid grid-cols-1 gap-6">
-                  <ComparisonMetrics
-                    language={language}
-                    selectedAOI={selectedAOI}
-                    yearlyAverages={yearlyAverages}
-                  />
-                </div>
               </div>
             )}
 
