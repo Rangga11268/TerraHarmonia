@@ -3,7 +3,7 @@ import { Logo } from './Logo';
 import { Language, translations } from '../data/translations';
 import { Menu, X, Sun, Moon, Sparkles } from 'lucide-react';
 
-export type NavTab = 'overview' | 'lab' | 'mitigation' | 'data-hub' | 'team';
+export type NavTab = 'story' | 'overview' | 'lab' | 'mitigation' | 'data-hub' | 'team';
 export type ThemeMode = 'system' | 'light' | 'dark';
 
 interface NavbarProps {
@@ -33,6 +33,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
+    { id: 'story' as NavTab, label: t.navStory },
     { id: 'overview' as NavTab, label: t.navOverview },
     { id: 'lab' as NavTab, label: t.navLab },
     { id: 'mitigation' as NavTab, label: t.navMitigation },

@@ -162,11 +162,12 @@ export const ScienceTourModal: React.FC<ScienceTourModalProps> = ({
   ];
 
   const shortcuts = [
+    { key: '0', label: language === 'id' ? 'Buka Misi & Ikhtisar Eksekutif' : 'Open Mission Story Tab' },
     { key: '1', label: language === 'id' ? 'Buka Tab Intelijen & Peta' : 'Open Intel & Map Tab' },
     { key: '2', label: language === 'id' ? 'Buka Lab Harmonisasi' : 'Open Harmonization Lab' },
     { key: '3', label: language === 'id' ? 'Buka Pusat Mitigasi & SitRep' : 'Open Mitigation Hub & SitRep' },
     { key: '4', label: language === 'id' ? 'Buka Pusat Data Satelit & Ekspor' : 'Open Data Hub & GeoJSON Export' },
-    { key: '5', label: language === 'id' ? 'Buka Profil Tim & Berkas Ilmiah' : 'Open Team Dossier' },
+    { key: '5', label: language === 'id' ? 'Buka Profil Kreator & Berkas Ilmiah' : 'Open Creator Dossier' },
     { key: 'L', label: language === 'id' ? 'Toggle NASA FIRMS Live Sync' : 'Toggle NASA FIRMS Live Sync' },
     { key: 'T', label: language === 'id' ? 'Toggle Tema Dark / Light' : 'Toggle Dark / Light Theme' },
     { key: '?', label: language === 'id' ? 'Buka Modal Briefing & Shortcut' : 'Open Briefing & Shortcuts Modal' },

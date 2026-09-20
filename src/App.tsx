@@ -18,6 +18,7 @@ import { Language, translations } from './data/translations';
 import { RefreshCw, Loader2 } from 'lucide-react';
 
 // Lazy-loaded heavy modules for blazing initial load time
+const LandingStory = lazy(() => import('./components/LandingStory').then(m => ({ default: m.LandingStory })));
 const HarmonizationLab = lazy(() => import('./components/HarmonizationLab').then(m => ({ default: m.HarmonizationLab })));
 const MitigationHub = lazy(() => import('./components/MitigationHub').then(m => ({ default: m.MitigationHub })));
 const DataHub = lazy(() => import('./components/DataHub').then(m => ({ default: m.DataHub })));
@@ -233,7 +234,9 @@ export function App() {
         return;
       }
 
-      if (e.key === '1') {
+      if (e.key === '0' || e.key === 's' || e.key === 'S') {
+        setActiveTab('story');
+      } else if (e.key === '1') {
         setActiveTab('overview');
       } else if (e.key === '2') {
         setActiveTab('lab');
@@ -301,6 +304,19 @@ export function App() {
 
       {/* Main Canvas */}
       <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 py-6">
+
+        {/* Tab 0: Mission Story & Executive Overview */}
+        {activeTab === 'story' && (
+          <Suspense fallback={<TabLoadingFallback label={language === 'id' ? 'Memuat Misi & Ikhtisar Eksekutif...' : 'Loading Mission Story...'} />}>
+            <div className="animate-in fade-in duration-200">
+              <LandingStory
+                language={language}
+                onSelectTab={setActiveTab}
+                onOpenTour={() => setIsTourModalOpen(true)}
+              />
+            </div>
+          </Suspense>
+        )}
 
         {/* Tab 1: Live Intelligence & Harmonized Calendar (Overview) */}
         {activeTab === 'overview' && (

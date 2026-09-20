@@ -10,11 +10,12 @@ export const translations = {
     rawSensors: 'Raw Sensors',
     team: 'Team Profile',
     region: 'Region',
+    navStory: 'Mission Story',
     navOverview: 'Intel & Map',
     navLab: 'Harmonization Lab',
     navMitigation: 'Field Mitigation',
     navData: 'Data & Satellite',
-    navTeam: 'Our Team',
+    navTeam: 'Creator Dossier',
     liveFirms: 'NASA FIRMS Live',
     
     // Quick Tools / Dashboard Control Bar
@@ -315,11 +316,12 @@ export const translations = {
     rawSensors: 'Sensor Mentah',
     team: 'Profil Tim',
     region: 'Wilayah',
+    navStory: 'Misi & Ikhtisar',
     navOverview: 'Intelijen & Peta',
     navLab: 'Lab Harmonisasi',
     navMitigation: 'Prognosis & Mitigasi',
     navData: 'Data & Satelit',
-    navTeam: 'Profil Tim',
+    navTeam: 'Profil Kreator',
     liveFirms: 'NASA FIRMS Live',
     
     // Quick Tools / Dashboard Control Bar
