@@ -280,42 +280,42 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
           </p>
         </div>
 
-        {/* Sub-view switcher */}
-        <div className="flex flex-wrap items-center bg-[#e5e5ea] dark:bg-[#1f2937] rounded-xl p-1 gap-1 shrink-0">
+        {/* Sub-view switcher - 2x2 on Mobile, 4x1 on Desktop */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 bg-[#e5e5ea] dark:bg-[#1f2937] rounded-xl p-1 gap-1 w-full md:w-auto">
           <button
             onClick={() => setActiveSubTab('simulator')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer min-h-[36px] ${
+            className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px] ${
               activeSubTab === 'simulator'
                 ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
                 : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
             }`}
           >
-            <Activity className="w-3.5 h-3.5" />
-            <span>{t.subTabSimulator}</span>
+            <Activity className="w-4 h-4 shrink-0" />
+            <span className="truncate">{t.subTabSimulator}</span>
           </button>
 
           <button
             onClick={() => setActiveSubTab('charts')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer min-h-[36px] ${
+            className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px] ${
               activeSubTab === 'charts'
                 ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
                 : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
             }`}
           >
-            <BarChart3 className="w-3.5 h-3.5 text-blue-500" />
-            <span>{language === 'id' ? 'Grafik Prognosis' : 'Prognosis Charts'}</span>
+            <BarChart3 className="w-4 h-4 text-blue-500 shrink-0" />
+            <span className="truncate">{language === 'id' ? 'Grafik Prognosis' : 'Prognosis Charts'}</span>
           </button>
 
           <button
             onClick={() => setActiveSubTab('hotspots')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer min-h-[36px] ${
+            className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px] ${
               activeSubTab === 'hotspots'
                 ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
                 : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
             }`}
           >
-            <Flame className="w-3.5 h-3.5 text-rose-500" />
-            <span>{language === 'id' ? 'Titik Api Aktif' : 'Active Hotspots'}</span>
+            <Flame className="w-4 h-4 text-rose-500 shrink-0" />
+            <span className="truncate">{language === 'id' ? 'Titik Api' : 'Hotspots'}</span>
             {regionLiveSpots.length > 0 && (
               <span className="px-1.5 py-0.2 rounded-full bg-rose-500 text-white text-[9px] font-bold">
                 {regionLiveSpots.length.toLocaleString()}
@@ -325,14 +325,14 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
 
           <button
             onClick={() => setActiveSubTab('sitrep')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer min-h-[36px] ${
+            className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px] ${
               activeSubTab === 'sitrep'
                 ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
                 : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
             }`}
           >
-            <FileText className="w-3.5 h-3.5 text-emerald-600" />
-            <span>{language === 'id' ? 'Dokumen SitRep' : 'SitRep Dossier'}</span>
+            <FileText className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span className="truncate">{language === 'id' ? 'Dokumen SitRep' : 'SitRep Dossier'}</span>
           </button>
         </div>
       </div>

@@ -52,42 +52,42 @@ export const HarmonizationLab: React.FC<HarmonizationLabProps> = ({ language }) 
         </p>
       </div>
 
-      {/* Mode Sub-Tabs */}
-      <div className="flex flex-wrap items-center bg-[#e5e5ea] dark:bg-[#1f2937] rounded-xl p-1 gap-1">
+      {/* Mode Sub-Tabs - Equal Width Grid on Mobile */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 bg-[#e5e5ea] dark:bg-[#1f2937] rounded-xl p-1 gap-1 w-full">
         <button
           onClick={() => setActiveTab('visualizer')}
-          className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer min-h-[36px] ${
+          className={`px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer min-h-[44px] ${
             activeTab === 'visualizer'
               ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
               : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
           }`}
         >
-          <Layers className="w-3.5 h-3.5 text-blue-500" />
-          <span>{language === 'id' ? 'Simulator Footprint Interaktif' : 'Interactive Footprint Lab'}</span>
+          <Layers className="w-4 h-4 text-blue-500 shrink-0" />
+          <span className="truncate">{language === 'id' ? 'Simulator Footprint Interaktif' : 'Interactive Footprint Lab'}</span>
         </button>
 
         <button
           onClick={() => setActiveTab('physics')}
-          className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer min-h-[36px] ${
+          className={`px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer min-h-[44px] ${
             activeTab === 'physics'
               ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
               : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
           }`}
         >
-          <Cpu className="w-3.5 h-3.5 text-emerald-500" />
-          <span>{language === 'id' ? 'Alur Algoritma Harmonisasi' : 'Harmonization Pipeline'}</span>
+          <Cpu className="w-4 h-4 text-emerald-500 shrink-0" />
+          <span className="truncate">{language === 'id' ? 'Alur Algoritma Harmonisasi' : 'Harmonization Pipeline'}</span>
         </button>
 
         <button
           onClick={() => setActiveTab('matrix')}
-          className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer min-h-[36px] ${
+          className={`px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer min-h-[44px] ${
             activeTab === 'matrix'
               ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
               : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
           }`}
         >
-          <Activity className="w-3.5 h-3.5 text-amber-500" />
-          <span>{language === 'id' ? 'Matriks Spesifikasi Sensor' : 'Sensor Spec Matrix'}</span>
+          <Activity className="w-4 h-4 text-amber-500 shrink-0" />
+          <span className="truncate">{language === 'id' ? 'Matriks Spesifikasi Sensor' : 'Sensor Spec Matrix'}</span>
         </button>
       </div>
 

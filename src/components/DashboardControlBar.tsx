@@ -82,13 +82,13 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
         </div>
 
         {/* Controls: Mode Toggle, NASA Live Sync, Voice & Tools */}
-        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap justify-between sm:justify-end">
+        <div className="grid grid-cols-1 sm:grid-cols-3 md:flex items-center gap-2 w-full md:w-auto">
           
           {/* Mode Toggle (Apple style segmented switch) */}
-          <div className="flex flex-1 sm:flex-initial rounded-xl bg-[#e5e5ea] dark:bg-[#1f2937] p-0.5 text-xs font-medium">
+          <div className="flex w-full sm:w-auto rounded-xl bg-[#e5e5ea] dark:bg-[#1f2937] p-0.5 text-xs font-medium min-h-[44px] items-center">
             <button
               onClick={() => setRawMode(false)}
-              className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg transition-all cursor-pointer min-h-[36px] ${
+              className={`flex-1 sm:flex-initial px-3 py-2 rounded-lg transition-all cursor-pointer min-h-[38px] flex items-center justify-center ${
                 !rawMode
                   ? 'bg-white dark:bg-[#374151] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
                   : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
@@ -98,7 +98,7 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
             </button>
             <button
               onClick={() => setRawMode(true)}
-              className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg transition-all cursor-pointer min-h-[36px] ${
+              className={`flex-1 sm:flex-initial px-3 py-2 rounded-lg transition-all cursor-pointer min-h-[38px] flex items-center justify-center ${
                 rawMode
                   ? 'bg-white dark:bg-[#374151] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
                   : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
@@ -109,56 +109,56 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
           </div>
 
           {/* NASA Live Sync Button */}
-          <div className="flex rounded-xl border border-[#e5e5e7] dark:border-[#374151] overflow-hidden text-xs shrink-0">
+          <div className="flex w-full sm:w-auto rounded-xl border border-[#e5e5e7] dark:border-[#374151] overflow-hidden text-xs min-h-[44px]">
             <button
               onClick={onToggleLiveSync}
-              className={`flex items-center gap-1.5 px-3 py-1.5 font-medium transition-all cursor-pointer min-h-[36px] ${
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 font-medium transition-all cursor-pointer min-h-[44px] ${
                 isLiveSync
                   ? 'bg-[#1d1d1f] dark:bg-white text-white dark:text-[#111827] font-semibold'
                   : 'bg-white dark:bg-[#111827] text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white hover:bg-[#f5f5f7] dark:hover:bg-[#1f2937]'
               }`}
             >
               {isLoadingLive ? (
-                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                <RefreshCw className="w-4 h-4 animate-spin" />
               ) : (
-                <Radio className={`w-3.5 h-3.5 ${isLiveSync ? 'text-red-500 animate-pulse' : ''}`} />
+                <Radio className={`w-4 h-4 ${isLiveSync ? 'text-red-500 animate-pulse' : ''}`} />
               )}
               <span>{isLiveSync ? t.liveSyncActive : t.liveSync}</span>
             </button>
             <button
               onClick={onOpenApiKeyModal}
               title={t.apiKeySettings}
-              className="p-2 bg-[#f5f5f7] dark:bg-[#1f2937] border-l border-[#e5e5e7] dark:border-[#374151] text-[#86868b] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white transition-colors cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center"
+              className="p-2.5 bg-[#f5f5f7] dark:bg-[#1f2937] border-l border-[#e5e5e7] dark:border-[#374151] text-[#86868b] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white transition-colors cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center"
             >
-              <Settings2 className="w-3.5 h-3.5" />
+              <Settings2 className="w-4 h-4" />
             </button>
           </div>
 
           {/* Voice Audio Briefing Button */}
           <button
             onClick={handleToggleVoice}
-            className={`p-2 sm:px-3 rounded-xl border transition-all text-xs font-medium flex items-center gap-1.5 shrink-0 cursor-pointer min-h-[36px] ${
+            className={`w-full sm:w-auto px-4 py-2 rounded-xl border transition-all text-xs font-medium flex items-center justify-center gap-2 cursor-pointer min-h-[44px] ${
               isSpeaking
-                ? 'bg-red-600 text-white border-red-600 animate-pulse'
+                ? 'bg-red-600 text-white border-red-600 animate-pulse font-bold'
                 : 'bg-white dark:bg-[#111827] border-[#e5e5e7] dark:border-[#374151] text-[#1d1d1f] dark:text-white hover:bg-[#f5f5f7] dark:hover:bg-[#1f2937]'
             }`}
             title={language === 'id' ? 'Dengarkan Briefing Suara AI' : 'Listen to Audio Situation Briefing'}
           >
-            {isSpeaking ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
-            <span className="hidden xl:inline">{isSpeaking ? t.stopVoice : t.listenVoice}</span>
+            {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            <span>{isSpeaking ? t.stopVoice : t.listenVoice}</span>
           </button>
 
         </div>
       </div>
 
       {/* Segmented View Mode Switcher (Clean, fast, uncluttered) */}
-      <div className="px-4 sm:px-5 py-2.5 bg-[#fbfbfd] dark:bg-[#0f172a] border-t border-[#e5e5e7] dark:border-[#1f2937] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 text-xs">
+      <div className="px-4 sm:px-5 py-3 bg-[#fbfbfd] dark:bg-[#0f172a] border-t border-[#e5e5e7] dark:border-[#1f2937] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 text-xs">
         
         {/* Left: Biome Info & Client-Side Engine Badge */}
-        <div className="flex items-center gap-2 text-[#6e6e73] dark:text-[#9ca3af] truncate flex-wrap">
+        <div className="flex items-center gap-2 text-[#6e6e73] dark:text-[#9ca3af] flex-wrap">
           <span className="font-semibold text-[#1d1d1f] dark:text-white">{selectedAOI.biome}</span>
-          <span className="text-[#86868b] dark:text-[#6b7280] hidden md:inline">&bull;</span>
-          <span className="hidden md:inline text-[#86868b] dark:text-[#9ca3af] truncate">{selectedAOI.description}</span>
+          <span className="text-[#86868b] dark:text-[#6b7280] hidden sm:inline">&bull;</span>
+          <span className="hidden sm:inline text-[#86868b] dark:text-[#9ca3af]">{selectedAOI.description}</span>
           
           <span
             title={t.offlineEngineTooltip}
@@ -169,42 +169,42 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
           </span>
         </div>
 
-        {/* Right: Segmented Tool Switcher */}
-        <div className="flex flex-wrap items-center bg-[#e5e5ea] dark:bg-[#1f2937] rounded-xl p-1 gap-1 shrink-0 scrollbar-none">
+        {/* Right: Segmented Tool Switcher - 100% Equal Width on Mobile */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 bg-[#e5e5ea] dark:bg-[#1f2937] rounded-xl p-1 gap-1 w-full md:w-auto">
           <button
             onClick={() => onSelectView('main')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer min-h-[34px] ${
+            className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[40px] ${
               activeView === 'main'
-                ? 'bg-white dark:bg-[#374151] text-[#1d1d1f] dark:text-white shadow-xs'
+                ? 'bg-white dark:bg-[#374151] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
                 : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
             }`}
           >
-            <Calendar className="w-3.5 h-3.5" />
-            <span>{t.mainIntelCalendar}</span>
+            <Calendar className="w-4 h-4 shrink-0" />
+            <span className="truncate">{t.mainIntelCalendar}</span>
           </button>
 
           <button
             onClick={() => onSelectView('dual_map')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer min-h-[34px] ${
+            className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[40px] ${
               activeView === 'dual_map'
-                ? 'bg-white dark:bg-[#374151] text-[#1d1d1f] dark:text-white shadow-xs'
+                ? 'bg-white dark:bg-[#374151] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
                 : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
             }`}
           >
-            <Split className="w-3.5 h-3.5" />
-            <span>{t.dualMapCompare}</span>
+            <Split className="w-4 h-4 shrink-0" />
+            <span className="truncate">{t.dualMapCompare}</span>
           </button>
 
           <button
             onClick={() => onSelectView('polygon')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer min-h-[34px] ${
+            className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[40px] ${
               activeView === 'polygon'
-                ? 'bg-white dark:bg-[#374151] text-[#1d1d1f] dark:text-white shadow-xs'
+                ? 'bg-white dark:bg-[#374151] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
                 : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
             }`}
           >
-            <MapPin className="w-3.5 h-3.5" />
-            <span>{t.polygonInspector}</span>
+            <MapPin className="w-4 h-4 shrink-0" />
+            <span className="truncate">{t.polygonInspector}</span>
           </button>
         </div>
 

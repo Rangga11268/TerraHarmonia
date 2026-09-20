@@ -204,41 +204,41 @@ export const ScienceTourModal: React.FC<ScienceTourModalProps> = ({
           </button>
         </div>
 
-        {/* Sub Navigation: Briefing vs Shortcuts */}
-        <div className="px-6 pt-3 pb-2 flex gap-2 border-b border-[#e5e5e7] dark:border-[#1f2937] bg-[#fbfbfd] dark:bg-[#151d2f]">
+        {/* Sub Navigation: Briefing vs Shortcuts - Equal Width */}
+        <div className="px-4 sm:px-6 pt-3 pb-2 grid grid-cols-2 gap-2 border-b border-[#e5e5e7] dark:border-[#1f2937] bg-[#fbfbfd] dark:bg-[#151d2f]">
           <button
             onClick={() => setActiveTab('briefing')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
+            className={`px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer text-center min-h-[40px] flex items-center justify-center ${
               activeTab === 'briefing'
-                ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs'
+                ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
                 : 'text-[#86868b] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
             }`}
           >
-            {language === 'id' ? 'Ringkasan Ilmiah (3 Langkah)' : 'Science Briefing (3 Steps)'}
+            {language === 'id' ? 'Ringkasan Ilmiah' : 'Science Briefing'}
           </button>
           <button
             onClick={() => setActiveTab('shortcuts')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer ${
+            className={`px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer text-center min-h-[40px] ${
               activeTab === 'shortcuts'
-                ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs'
+                ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
                 : 'text-[#86868b] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
             }`}
           >
-            <Keyboard className="w-3.5 h-3.5" />
-            <span>{t.shortcutsTitle}</span>
+            <Keyboard className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">{t.shortcutsTitle}</span>
           </button>
         </div>
 
         {/* Content Body */}
-        <div className="p-6 overflow-y-auto space-y-5 flex-1">
+        <div className="p-4 sm:p-6 overflow-y-auto space-y-5 flex-1">
           {activeTab === 'briefing' ? (
             <div className="space-y-4">
               {/* Step indicator */}
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold uppercase text-emerald-700 dark:text-emerald-400 tracking-wider">
+                <span className="text-[11px] sm:text-xs font-mono font-bold uppercase text-emerald-700 dark:text-emerald-400 tracking-wider truncate">
                   Step {slides[currentSlide].step} / 03 &bull; {slides[currentSlide].badge}
                 </span>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 shrink-0 ml-2">
                   {slides.map((_, idx) => (
                     <button
                       key={idx}
@@ -256,7 +256,7 @@ export const ScienceTourModal: React.FC<ScienceTourModalProps> = ({
 
               {/* Title & Description */}
               <div className="space-y-2">
-                <h3 className="text-lg sm:text-xl font-bold text-[#1d1d1f] dark:text-white tracking-tight">
+                <h3 className="text-base sm:text-xl font-bold text-[#1d1d1f] dark:text-white tracking-tight">
                   {slides[currentSlide].title}
                 </h3>
                 <p className="text-xs sm:text-sm text-[#515154] dark:text-[#d1d5db] leading-relaxed">
@@ -291,14 +291,14 @@ export const ScienceTourModal: React.FC<ScienceTourModalProps> = ({
           )}
         </div>
 
-        {/* Footer Controls */}
-        <div className="px-6 py-4 border-t border-[#e5e5e7] dark:border-[#1f2937] flex items-center justify-between bg-[#fbfbfd] dark:bg-[#151d2f]">
+        {/* Footer Controls - Stacked with Equal Width on Mobile */}
+        <div className="px-4 sm:px-6 py-3.5 border-t border-[#e5e5e7] dark:border-[#1f2937] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 bg-[#fbfbfd] dark:bg-[#151d2f]">
           {activeTab === 'briefing' ? (
             <>
               <button
                 onClick={() => setCurrentSlide((prev) => Math.max(prev - 1, 0))}
                 disabled={currentSlide === 0}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-[#1d1d1f] dark:text-white border border-[#e5e5e7] dark:border-[#1f2937] bg-white dark:bg-[#111827] hover:bg-[#f5f5f7] dark:hover:bg-[#1f2937] disabled:opacity-40 disabled:pointer-events-none transition flex items-center gap-1.5 cursor-pointer min-h-[40px]"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-semibold text-[#1d1d1f] dark:text-white border border-[#e5e5e7] dark:border-[#1f2937] bg-white dark:bg-[#111827] hover:bg-[#f5f5f7] dark:hover:bg-[#1f2937] disabled:opacity-40 disabled:pointer-events-none transition flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px]"
               >
                 <ChevronLeft className="w-4 h-4" />
                 <span>{language === 'id' ? 'Sebelumnya' : 'Previous'}</span>
@@ -307,7 +307,7 @@ export const ScienceTourModal: React.FC<ScienceTourModalProps> = ({
               {currentSlide < 2 ? (
                 <button
                   onClick={() => setCurrentSlide((prev) => Math.min(prev + 1, 2))}
-                  className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-[#0071e3] hover:bg-[#0077ed] transition flex items-center gap-1.5 shadow-xs cursor-pointer min-h-[40px]"
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-[#0071e3] hover:bg-[#0077ed] transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer min-h-[44px]"
                 >
                   <span>{language === 'id' ? 'Langkah Berikutnya' : 'Next Step'}</span>
                   <ChevronRight className="w-4 h-4" />
@@ -318,7 +318,7 @@ export const ScienceTourModal: React.FC<ScienceTourModalProps> = ({
                     onClose();
                     if (onSelectTab) onSelectTab('overview');
                   }}
-                  className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition flex items-center gap-1.5 shadow-xs cursor-pointer min-h-[40px]"
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer min-h-[44px]"
                 >
                   <CheckCircle2 className="w-4 h-4" />
                   <span>{language === 'id' ? 'Mulai Eksplorasi Data' : 'Explore Platform'}</span>
@@ -329,7 +329,7 @@ export const ScienceTourModal: React.FC<ScienceTourModalProps> = ({
             <div className="w-full flex justify-end">
               <button
                 onClick={onClose}
-                className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-[#1d1d1f] hover:bg-black dark:bg-emerald-600 dark:hover:bg-emerald-700 transition shadow-xs cursor-pointer min-h-[40px]"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-[#1d1d1f] hover:bg-black dark:bg-emerald-600 dark:hover:bg-emerald-700 transition shadow-xs cursor-pointer min-h-[44px]"
               >
                 {language === 'id' ? 'Tutup Panduan' : 'Close Guide'}
               </button>
