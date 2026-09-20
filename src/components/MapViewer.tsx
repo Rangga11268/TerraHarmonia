@@ -72,9 +72,18 @@ export const MapViewer: React.FC<MapViewerProps> = ({
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
 
+    const INDONESIA_BOUNDS: L.LatLngBoundsExpression = [
+      [-11.5, 94.0],
+      [6.5, 141.5],
+    ];
+
     const map = L.map(mapContainerRef.current, {
       center: selectedAOI.center,
       zoom: selectedAOI.zoom,
+      minZoom: 4,
+      maxZoom: 18,
+      maxBounds: INDONESIA_BOUNDS,
+      maxBoundsViscosity: 1.0,
       zoomControl: false,
       attributionControl: false,
     });

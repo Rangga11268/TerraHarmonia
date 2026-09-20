@@ -57,11 +57,20 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
 
   // Initialize Maps
   useEffect(() => {
+    const INDONESIA_BOUNDS: L.LatLngBoundsExpression = [
+      [-11.5, 94.0],
+      [6.5, 141.5],
+    ];
+
     const timer = setTimeout(() => {
       if (mapARef.current && !leafletMapA.current) {
         const mapA = L.map(mapARef.current, {
           center: selectedAOI.center,
           zoom: selectedAOI.zoom,
+          minZoom: 4,
+          maxZoom: 18,
+          maxBounds: INDONESIA_BOUNDS,
+          maxBoundsViscosity: 1.0,
           zoomControl: false,
           attributionControl: false,
         });
@@ -78,6 +87,10 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
         const mapB = L.map(mapBRef.current, {
           center: selectedAOI.center,
           zoom: selectedAOI.zoom,
+          minZoom: 4,
+          maxZoom: 18,
+          maxBounds: INDONESIA_BOUNDS,
+          maxBoundsViscosity: 1.0,
           zoomControl: false,
           attributionControl: false,
         });
