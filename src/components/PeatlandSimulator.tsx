@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { AOIRegion } from '../engine/harmonizer';
 import { Language, translations } from '../data/translations';
 import {
@@ -19,6 +19,15 @@ interface PeatlandSimulatorProps {
   selectedAOI: AOIRegion;
 }
 
+const REGION_TMAG: Record<string, number> = {
+  riau: -48,
+  kalteng: -55,
+  sumsel: -52,
+  kalsel: -38,
+  kaltim: -30,
+  indonesia: -45,
+};
+
 export const PeatlandSimulator: React.FC<PeatlandSimulatorProps> = ({
   language,
   selectedAOI,
@@ -26,10 +35,17 @@ export const PeatlandSimulator: React.FC<PeatlandSimulatorProps> = ({
   const t = translations[language];
 
   // Parameters
-  const [tmagDepthCm, setTmagDepthCm] = useState<number>(-55); // Groundwater table depth in cm (-80 to 0)
+  const [tmagDepthCm, setTmagDepthCm] = useState<number>(() => REGION_TMAG[selectedAOI.id] || -50);
   const [daysWithoutRain, setDaysWithoutRain] = useState<number>(14); // 0 to 30 days
   const [windSpeedKnots, setWindSpeedKnots] = useState<number>(12); // 0 to 30 knots
-  const [peatDrainageStatus, setPeatDrainageStatus] = useState<'degraded' | 'natural' | 'canal_blocked'>('degraded');
+  const [peatDrainageStatus, setPeatDrainageStatus] = useState<'degraded' | 'natural' | 'canal_blocked'>('canal_blocked');
+
+  // Auto-sync TMAG with AOI
+  useEffect(() => {
+    if (REGION_TMAG[selectedAOI.id]) {
+      setTmagDepthCm(REGION_TMAG[selectedAOI.id]);
+    }
+  }, [selectedAOI]);
 
   // Physics calculation
   const simResults = useMemo(() => {

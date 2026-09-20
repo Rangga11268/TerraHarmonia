@@ -410,6 +410,11 @@ export function App() {
                 onSelectAOI={setSelectedAOI}
                 calendarMatrix={calendarMatrix}
                 totalHotspots={totalEvents}
+                isLiveSync={isLiveSync}
+                liveResult={liveResult}
+                liveHotspots={displayedHotspots}
+                isLoadingLive={isLoadingLive}
+                onRefreshLive={() => loadLiveFeed(selectedAOI, userMapKey)}
               />
             </div>
           </Suspense>
