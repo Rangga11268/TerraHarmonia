@@ -65,7 +65,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({
   const mapInstanceRef = useRef<L.Map | null>(null);
   const layerGroupRef = useRef<L.LayerGroup | null>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
-  const [basemap, setBasemap] = useState<'dark' | 'satellite'>('satellite');
+  const [basemap, setBasemap] = useState<'dark' | 'satellite' | 'nasa_gibs'>('satellite');
   const [isFullMapOpen, setIsFullMapOpen] = useState<boolean>(false);
 
   // Init map once
@@ -98,17 +98,28 @@ export const MapViewer: React.FC<MapViewerProps> = ({
     mapInstanceRef.current = map;
   }, []);
 
-  // Basemap switcher
+  // Basemap switcher with NASA GIBS True-Color Support
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
     if (tileLayerRef.current) map.removeLayer(tileLayerRef.current);
 
-    const url = basemap === 'satellite'
-      ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
-      : 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
-
-    tileLayerRef.current = L.tileLayer(url, { maxZoom: 18 }).addTo(map);
+    if (basemap === 'nasa_gibs') {
+      tileLayerRef.current = L.tileLayer(
+        'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/2024-08-15/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg',
+        { maxZoom: 9, minZoom: 4 }
+      ).addTo(map);
+    } else if (basemap === 'satellite') {
+      tileLayerRef.current = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        { maxZoom: 18 }
+      ).addTo(map);
+    } else {
+      tileLayerRef.current = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+        { maxZoom: 18 }
+      ).addTo(map);
+    }
   }, [basemap]);
 
   // Fly to new AOI
@@ -304,7 +315,19 @@ export const MapViewer: React.FC<MapViewerProps> = ({
                   : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
               }`}
             >
-              {t.satelliteMap}
+              Sat HD
+            </button>
+            <button
+              onClick={() => setBasemap('nasa_gibs')}
+              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1 ${
+                basemap === 'nasa_gibs'
+                  ? 'bg-blue-600 text-white shadow-xs font-bold'
+                  : 'text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200'
+              }`}
+              title="NASA Global Imagery Browse Services (MODIS Corrected Reflectance True Color)"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-300 inline-block" />
+              <span>NASA GIBS</span>
             </button>
           </div>
 

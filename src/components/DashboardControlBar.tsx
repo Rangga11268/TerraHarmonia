@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Language, translations } from '../data/translations';
 import { AOIRegion, PRESET_AOIS } from '../engine/harmonizer';
-import { Radio, RefreshCw, Settings2, ChevronDown, Volume2, VolumeX, Split, MapPin, Calendar } from 'lucide-react';
+import { Radio, RefreshCw, Settings2, ChevronDown, Volume2, VolumeX, Split, MapPin, Calendar, Share2, CheckCircle2, History, Sparkles } from 'lucide-react';
 import { speakSituationBriefing } from '../utils/audioBriefing';
 
 export type OverviewViewMode = 'main' | 'dual_map' | 'polygon';
@@ -20,6 +20,10 @@ interface DashboardControlBarProps {
   onSelectView: (view: OverviewViewMode) => void;
   totalHotspots?: number;
   anomalyCount?: number;
+  activeScenario?: string | null;
+  onSelectScenario?: (id: string | null) => void;
+  onShareLink?: () => void;
+  isLinkCopied?: boolean;
 }
 
 export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
@@ -36,6 +40,10 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
   onSelectView,
   totalHotspots = 0,
   anomalyCount = 0,
+  activeScenario = null,
+  onSelectScenario,
+  onShareLink,
+  isLinkCopied = false,
 }) => {
   const t = translations[language];
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
@@ -148,8 +156,83 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
             <span>{isSpeaking ? t.stopVoice : t.listenVoice}</span>
           </button>
 
+          {/* Shareable Analysis Permalink Button */}
+          {onShareLink && (
+            <button
+              onClick={onShareLink}
+              className={`w-full sm:w-auto px-3 py-2 rounded-xl border transition-all text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px] ${
+                isLinkCopied
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                  : 'bg-white dark:bg-[#111827] border-[#e5e5e7] dark:border-[#374151] text-[#1d1d1f] dark:text-white hover:bg-[#f5f5f7] dark:hover:bg-[#1f2937]'
+              }`}
+              title="Salin Tautan Analisis URL untuk Dibagikan"
+            >
+              {isLinkCopied ? (
+                <>
+                  <CheckCircle2 className="w-4 h-4 text-white" />
+                  <span>{t.shareLinkCopied}</span>
+                </>
+              ) : (
+                <>
+                  <Share2 className="w-4 h-4" />
+                  <span>{t.shareAnalysisLink}</span>
+                </>
+              )}
+            </button>
+          )}
+
         </div>
       </div>
+
+      {/* Historic Disaster Benchmark Case Studies Strip */}
+      {onSelectScenario && (
+        <div className="px-4 sm:px-5 py-2 bg-[#f8fafc] dark:bg-[#111827] border-t border-[#e5e5e7] dark:border-[#1f2937] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-1.5 text-[#86868b] dark:text-[#9ca3af] font-bold text-[11px] uppercase tracking-wider shrink-0">
+            <History className="w-3.5 h-3.5 text-blue-500" />
+            <span>{t.scenariosTitle}</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 flex-1 max-w-2xl">
+            {[
+              {
+                id: 'el_nino_2015',
+                title: t.scenario2015Title,
+                badge: '2015 Peak (Kalteng)',
+                activeBg: 'bg-red-600 text-white border-red-600 font-bold',
+              },
+              {
+                id: 'iod_2019',
+                title: t.scenario2019Title,
+                badge: '2019 IOD+ (Sumsel)',
+                activeBg: 'bg-amber-600 text-white border-amber-600 font-bold',
+              },
+              {
+                id: 'restoration_2023',
+                title: t.scenarioRestorationTitle,
+                badge: '2023 BRGM (Riau)',
+                activeBg: 'bg-emerald-600 text-white border-emerald-600 font-bold',
+              },
+            ].map((sc) => {
+              const isSelected = activeScenario === sc.id;
+              return (
+                <button
+                  key={sc.id}
+                  onClick={() => onSelectScenario(isSelected ? null : sc.id)}
+                  className={`px-3 py-1.5 rounded-xl border text-center transition cursor-pointer min-h-[38px] flex items-center justify-center gap-1 text-xs ${
+                    isSelected
+                      ? `${sc.activeBg} shadow-xs`
+                      : 'bg-white dark:bg-[#151d2f] border-[#e5e5e7] dark:border-[#1f2937] text-[#1d1d1f] dark:text-[#e5e5e7] hover:border-[#0071e3]'
+                  }`}
+                  title={sc.badge}
+                >
+                  <Sparkles className="w-3 h-3 shrink-0" />
+                  <span className="truncate">{sc.title}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Segmented View Mode Switcher (Clean, fast, uncluttered) */}
       <div className="px-4 sm:px-5 py-3 bg-[#fbfbfd] dark:bg-[#0f172a] border-t border-[#e5e5e7] dark:border-[#1f2937] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 text-xs">

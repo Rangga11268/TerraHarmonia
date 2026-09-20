@@ -288,7 +288,23 @@ export const translations = {
     dispatchWhatsApp: 'WhatsApp Dispatch',
     copyCoordinates: 'Copy GPS',
     copiedTooltip: 'Coordinates Copied!',
-    openGmaps: 'Google Maps'
+    openGmaps: 'Google Maps',
+
+    // NASA GIBS & Case Studies
+    nasaGibsSatellite: 'NASA GIBS True-Color',
+    nasaGibsDesc: 'Direct satellite imagery from NASA Global Imagery Browse Services',
+    highResSat: 'Satellite High-Res',
+    canvasDark: 'Dark Canvas',
+    shareAnalysisLink: 'Share Link',
+    shareLinkCopied: 'Analysis Link Copied!',
+    scenariosTitle: 'Historic Case Studies:',
+    allScenarios: 'Custom / All Years',
+    scenario2015Title: 'El Niño 2015 Catastrophe',
+    scenario2015Sub: 'Kalteng Peatland Smoke Crisis (12,400+ MW Peak)',
+    scenario2019Title: 'Positive IOD 2019 Surge',
+    scenario2019Sub: 'Sumsel & OKI Transboundary Haze Surge',
+    scenarioRestorationTitle: '2022–2026 Peat Restoration',
+    scenarioRestorationSub: 'BRGM Hydrological Rewetting & Canal Blocking'
   },
   id: {
     // Header & Navigation
@@ -577,6 +593,22 @@ export const translations = {
     dispatchWhatsApp: 'Disposisi WhatsApp',
     copyCoordinates: 'Salin GPS',
     copiedTooltip: 'Koordinat Disalin!',
-    openGmaps: 'Google Maps'
+    openGmaps: 'Google Maps',
+
+    // NASA GIBS & Case Studies
+    nasaGibsSatellite: 'NASA GIBS True-Color',
+    nasaGibsDesc: 'Citra satelit asli langsung dari server NASA Global Imagery Browse Services',
+    highResSat: 'Satelit Resolusi Tinggi',
+    canvasDark: 'Kanvas Gelap',
+    shareAnalysisLink: 'Bagikan Tautan',
+    shareLinkCopied: 'Tautan Analisis Disalin!',
+    scenariosTitle: 'Studi Kasus Bencana Historis:',
+    allScenarios: 'Kustom / Semua Tahun',
+    scenario2015Title: 'Bencana El Niño 2015',
+    scenario2015Sub: 'Krisis Asap Gambut Kalteng & Riau (Puncak 12,400+ MW)',
+    scenario2019Title: 'Gelombang Api IOD+ 2019',
+    scenario2019Sub: 'Lonjakan Asap Lintas Batas Sumsel & OKI',
+    scenarioRestorationTitle: 'Era Restorasi Gambut 2022–2026',
+    scenarioRestorationSub: 'Pembasahan Hidrologis & Sekat Kanal BRGM'
   }
 };

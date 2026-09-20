@@ -102,12 +102,27 @@ export function App() {
 
   const [activeTab, setActiveTab] = useState<NavTab>('overview');
   const [overviewView, setOverviewView] = useState<OverviewViewMode>('main');
-  const [selectedAOI, setSelectedAOI] = useState<AOIRegion>(PRESET_AOIS[0]);
+  const [selectedAOI, setSelectedAOI] = useState<AOIRegion>(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const aoiParam = params.get('aoi');
+        if (aoiParam) {
+          const found = PRESET_AOIS.find((a) => a.id === aoiParam);
+          if (found) return found;
+        }
+      }
+    } catch (e) {}
+    return PRESET_AOIS[0];
+  });
+
   const [rawMode, setRawMode] = useState<boolean>(false);
   const [selectedKey, setSelectedKey] = useState<string | null>('2015-38');
   const [selectedWeekData, setSelectedWeekData] = useState<HarmonizedWeekData | null>(null);
   const [isNasaModalOpen, setIsNasaModalOpen] = useState<boolean>(false);
   const [isTourModalOpen, setIsTourModalOpen] = useState<boolean>(false);
+  const [activeScenario, setActiveScenario] = useState<string | null>(null);
+  const [isLinkCopied, setIsLinkCopied] = useState<boolean>(false);
 
   const [isLiveSync, setIsLiveSync] = useState<boolean>(false);
   const [isLoadingLive, setIsLoadingLive] = useState<boolean>(false);
@@ -117,6 +132,58 @@ export function App() {
   );
 
   const t = translations[language];
+
+  // 1-Click Historic Disaster Benchmark Case Studies
+  const handleSelectScenario = useCallback((scenarioId: string | null) => {
+    setActiveScenario(scenarioId);
+    if (!scenarioId) return;
+
+    if (scenarioId === 'el_nino_2015') {
+      const kalteng = PRESET_AOIS.find((a) => a.id === 'kalteng') || PRESET_AOIS[1];
+      setSelectedAOI(kalteng);
+      setSelectedKey('2015-38');
+      setRawMode(false);
+      setActiveTab('overview');
+    } else if (scenarioId === 'iod_2019') {
+      const sumsel = PRESET_AOIS.find((a) => a.id === 'sumsel') || PRESET_AOIS[2];
+      setSelectedAOI(sumsel);
+      setSelectedKey('2019-37');
+      setRawMode(false);
+      setActiveTab('overview');
+    } else if (scenarioId === 'restoration_2023') {
+      const riau = PRESET_AOIS.find((a) => a.id === 'riau') || PRESET_AOIS[0];
+      setSelectedAOI(riau);
+      setSelectedKey('2023-30');
+      setRawMode(false);
+      setActiveTab('overview');
+    }
+  }, []);
+
+  // Stateful Shareable Analysis Permalink Generator
+  const handleShareLink = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    url.searchParams.set('aoi', selectedAOI.id);
+    url.searchParams.set('tab', activeTab);
+    url.searchParams.set('mode', rawMode ? 'raw' : 'harmonized');
+    if (selectedKey) url.searchParams.set('key', selectedKey);
+    if (activeScenario) url.searchParams.set('scenario', activeScenario);
+
+    navigator.clipboard.writeText(url.toString());
+    setIsLinkCopied(true);
+    setTimeout(() => setIsLinkCopied(false), 2200);
+  }, [selectedAOI, activeTab, rawMode, selectedKey, activeScenario]);
+
+  // Sync state to URL search params without page reload
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('aoi', selectedAOI.id);
+      url.searchParams.set('tab', activeTab);
+      window.history.replaceState({}, '', url.toString());
+    } catch (e) {}
+  }, [selectedAOI, activeTab]);
 
   const fullDataset = useMemo(() => generateHistoricalFireData(), []);
   const aoiHotspots = useMemo(() => fullDataset[selectedAOI.id] || [], [fullDataset, selectedAOI]);
@@ -238,7 +305,7 @@ export function App() {
         {activeTab === 'overview' && (
           <div className="space-y-6 animate-in fade-in duration-200">
             
-            {/* Control bar with Segmented Tool Switcher */}
+            {/* Control bar with Segmented Tool Switcher & Historic Case Studies */}
             <DashboardControlBar
               language={language}
               selectedAOI={selectedAOI}
@@ -246,6 +313,7 @@ export function App() {
                 setSelectedAOI(aoi);
                 setSelectedKey(null);
                 setSelectedWeekData(null);
+                setActiveScenario(null);
               }}
               rawMode={rawMode}
               setRawMode={setRawMode}
@@ -257,6 +325,10 @@ export function App() {
               onSelectView={setOverviewView}
               totalHotspots={totalEvents}
               anomalyCount={anomalyCount}
+              activeScenario={activeScenario}
+              onSelectScenario={handleSelectScenario}
+              onShareLink={handleShareLink}
+              isLinkCopied={isLinkCopied}
             />
 
             {/* Live sync notification banner */}

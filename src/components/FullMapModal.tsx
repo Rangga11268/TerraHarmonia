@@ -89,7 +89,7 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
   const tileLayerRef = useRef<L.TileLayer | null>(null);
 
   // States
-  const [basemap, setBasemap] = useState<'satellite' | 'dark' | 'topo'>('satellite');
+  const [basemap, setBasemap] = useState<'satellite' | 'dark' | 'topo' | 'nasa_gibs'>('satellite');
   const [selectedYear, setSelectedYear] = useState<number>(2023);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [sensorFilter, setSensorFilter] = useState<'ALL' | 'MODIS' | 'VIIRS'>('ALL');
@@ -124,7 +124,7 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
     }
 
     const timer = setTimeout(() => {
-      if (!mapContainerRef.current || mapInstanceRef.current) return;
+      if (!mapContainerRef.current) return;
 
       const INDONESIA_BOUNDS: L.LatLngBoundsExpression = [
         [-11.5, 94.0],
@@ -143,13 +143,15 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
       });
 
       const tileUrl =
-        basemap === 'satellite'
+        basemap === 'nasa_gibs'
+          ? 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/2024-08-15/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg'
+          : basemap === 'satellite'
           ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
           : basemap === 'dark'
           ? 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}'
           : 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png';
 
-      tileLayerRef.current = L.tileLayer(tileUrl, { maxZoom: 18 }).addTo(map);
+      tileLayerRef.current = L.tileLayer(tileUrl, { maxZoom: basemap === 'nasa_gibs' ? 9 : 18 }).addTo(map);
 
       L.control.zoom({ position: 'topright' }).addTo(map);
       layerGroupRef.current = L.layerGroup().addTo(map);
@@ -175,13 +177,15 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
     if (tileLayerRef.current) map.removeLayer(tileLayerRef.current);
 
     const tileUrl =
-      basemap === 'satellite'
+      basemap === 'nasa_gibs'
+        ? 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/2024-08-15/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg'
+        : basemap === 'satellite'
         ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
         : basemap === 'dark'
         ? 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}'
         : 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png';
 
-    tileLayerRef.current = L.tileLayer(tileUrl, { maxZoom: 18 }).addTo(map);
+    tileLayerRef.current = L.tileLayer(tileUrl, { maxZoom: basemap === 'nasa_gibs' ? 9 : 18 }).addTo(map);
   }, [basemap]);
 
   // Sync AOI camera change
@@ -567,6 +571,15 @@ STATUS RISIKO & REKOMENDASI:
               }`}
             >
               Topo
+            </button>
+            <button
+              onClick={() => setBasemap('nasa_gibs')}
+              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1 ${
+                basemap === 'nasa_gibs' ? 'bg-blue-600 text-white shadow-xs font-bold' : 'text-blue-600 dark:text-blue-400'
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-300 inline-block" />
+              <span>NASA GIBS</span>
             </button>
           </div>
 
