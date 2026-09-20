@@ -1,10 +1,29 @@
-import React, { useState } from 'react';
-import { Download, FileText, Activity, Radio, RefreshCw, ShieldAlert, Droplets, Flame, MapPin, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import {
+  Download,
+  FileText,
+  Activity,
+  Radio,
+  RefreshCw,
+  ShieldAlert,
+  Droplets,
+  Flame,
+  MapPin,
+  CheckCircle2,
+  Thermometer,
+  Wind,
+  CloudRain,
+  ExternalLink,
+  Satellite,
+  Compass
+} from 'lucide-react';
 import { PRESET_AOIS, AOIRegion, HarmonizedWeekData, RawHotspot } from '../engine/harmonizer';
 import { Language, translations } from '../data/translations';
 import { PeatlandSimulator } from './PeatlandSimulator';
 import { ExecutiveReport } from './ExecutiveReport';
 import { LiveSyncResult } from '../services/nasaFirmsApi';
+import { fetchLiveWeather, LiveWeatherData } from '../services/weatherApi';
+import { resolveHotspotLocation } from '../utils/locationResolver';
 
 interface MitigationHubProps {
   language: Language;
@@ -32,9 +51,33 @@ export const MitigationHub: React.FC<MitigationHubProps> = ({
   onRefreshLive,
 }) => {
   const t = translations[language];
-  const [activeSubTab, setActiveSubTab] = useState<'simulator' | 'sitrep'>('simulator');
+  const [activeSubTab, setActiveSubTab] = useState<'simulator' | 'hotspots' | 'sitrep'>('simulator');
   const [selectedTeamUnit, setSelectedTeamUnit] = useState<'manggala_agni' | 'mpa' | 'bpbd'>('manggala_agni');
   const [patrolDate, setPatrolDate] = useState<string>(() => new Date().toISOString().split('T')[0]);
+  const [liveWeather, setLiveWeather] = useState<LiveWeatherData | null>(null);
+  const [isLoadingWeather, setIsLoadingWeather] = useState<boolean>(true);
+
+  // Fetch live weather when AOI changes
+  useEffect(() => {
+    let isMounted = true;
+    setIsLoadingWeather(true);
+
+    fetchLiveWeather(selectedAOI.center[0], selectedAOI.center[1], selectedAOI.id)
+      .then((wData) => {
+        if (isMounted) {
+          setLiveWeather(wData);
+          setIsLoadingWeather(false);
+        }
+      })
+      .catch((err) => {
+        console.warn('Mitigation weather error:', err);
+        if (isMounted) setIsLoadingWeather(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedAOI]);
 
   // Comprehensive Region Peatland Risk & Hydrology Database (BRGM & KLHK Baseline)
   const regionRisks: Record<string, { tmag: number; risk: 'extreme' | 'high' | 'moderate' | 'nominal'; canalBlocks: number; khgName: string; peatDepth: string; fwi: number }> = {
@@ -52,8 +95,14 @@ export const MitigationHub: React.FC<MitigationHubProps> = ({
   const regionLiveSpots = liveHotspots.filter(h => h.aoiId === selectedAOI.id || selectedAOI.id === 'indonesia');
   const activeSpotCount = isLiveSync ? regionLiveSpots.length : totalHotspots;
   const maxLiveFrp = regionLiveSpots.length > 0 ? Math.max(...regionLiveSpots.map(h => h.frp)) : 0;
+  const effectiveFwi = liveWeather ? liveWeather.fwiScore : currentRegionRisk.fwi;
 
   const handleDownloadDispatch = () => {
+    const topHotspots = regionLiveSpots.slice(0, 5).map((h, i) => {
+      const loc = resolveHotspotLocation(h.lat, h.lon, selectedAOI.id, language);
+      return `  ${i + 1}. [${h.instrument} ${h.satellite}] ${loc.regency}, ${loc.district || 'Sektor Gambut'} | Lat/Lon: ${h.lat.toFixed(4)}, ${h.lon.toFixed(4)} | FRP: ${h.frp} MW | Waktu: ${loc.localTimeFormatted}`;
+    }).join('\n');
+
     const memo = `===============================================================
 ${language === 'id' ? 'MEMORANDUM PENUGASAN PATROLI LAPANGAN - TERRA HARMONIA INTELLIGENCE' : 'FIELD PATROL DISPATCH MEMORANDUM - TERRA HARMONIA INTELLIGENCE'}
 NASA Space Apps Jakarta 2026 - ${language === 'id' ? 'Sistem Peringatan Dini Kebakaran Kubah Gambut' : 'Peatland Wildfire Early Warning & Mitigation System'}
@@ -62,12 +111,13 @@ ${language === 'id' ? 'Tanggal Operasi' : 'Operation Date'}  : ${patrolDate}
 ${language === 'id' ? 'Wilayah Target' : 'Target Region'}   : ${selectedAOI.name} (${selectedAOI.country})
 ${language === 'id' ? 'Kesatuan Gambut' : 'Peat Landscape'}  : ${currentRegionRisk.khgName}
 ${language === 'id' ? 'Koordinat Acuan' : 'Reference Coords'}: ${selectedAOI.center[0].toFixed(4)}° N, ${selectedAOI.center[1].toFixed(4)}° E
-${language === 'id' ? 'Status Ancaman' : 'Threat Level'}    : ${currentRegionRisk.risk.toUpperCase()} (Indeks FWI: ${currentRegionRisk.fwi})
+${language === 'id' ? 'Kondisi Cuaca' : 'Live Weather'}    : ${liveWeather ? `${liveWeather.temperature}°C, RH ${liveWeather.relativeHumidity}%, Angin ${liveWeather.windSpeedKmH} km/h` : 'Tersinkronisasi'}
+${language === 'id' ? 'Status Ancaman' : 'Threat Level'}    : ${currentRegionRisk.risk.toUpperCase()} (Indeks FWI: ${effectiveFwi})
 ${language === 'id' ? 'Tinggi Air Tanah' : 'Groundwater Table'}: ${currentRegionRisk.tmag} cm (${language === 'id' ? 'Batas Kritis PP 57/2016' : 'National Limit'}: -40 cm)
 ${language === 'id' ? 'Sekat Kanal Aktif' : 'Canal Blockings'}: ${currentRegionRisk.canalBlocks} ${language === 'id' ? 'Unit Terpasang' : 'Units Installed'}
-${language === 'id' ? 'Titik Api Aktif' : 'Active Hotspots'}: ${activeSpotCount} ${language === 'id' ? 'titik terdeteksi satelit NASA' : 'detections (NASA satellite feed)'}
-${maxLiveFrp > 0 ? `${language === 'id' ? 'Daya Termal Tertinggi' : 'Max Radiative Power'}: ${maxLiveFrp} MW` : ''}
-
+${language === 'id' ? 'Titik Api Terdeteksi' : 'Active Hotspots'}: ${activeSpotCount} ${language === 'id' ? 'titik terdeteksi satelit NASA' : 'detections (NASA satellite feed)'}
+${maxLiveFrp > 0 ? `${language === 'id' ? 'Daya Termal Tertinggi' : 'Max Radiative Power'}: ${maxLiveFrp} MW\n` : ''}
+${topHotspots ? `\n${language === 'id' ? 'KOORDINAT ANOMALI PANAS PRIORITAS TINGGI' : 'HIGH-PRIORITY HOTSPOT TARGETS'}:\n${topHotspots}\n` : ''}
 ${language === 'id' ? 'SATUAN KERJA DITUGASKAN' : 'ASSIGNED PATROL TASKFORCE'}:
 - ${language === 'id' ? 'Unit Komando' : 'Command Unit'} : ${selectedTeamUnit === 'manggala_agni' ? (language === 'id' ? 'Brigade Manggala Agni Daops KLHK' : 'Manggala Agni Brigade (KLHK)') : selectedTeamUnit === 'mpa' ? (language === 'id' ? 'Masyarakat Peduli Api (MPA) Tingkat Desa' : 'Community Fire Patrol (MPA)') : (language === 'id' ? 'Satgas Karhutla BPBD / Damkar Daerah' : 'Disaster Management Agency (BPBD)')}
 
@@ -77,7 +127,7 @@ ${language === 'id' ? 'INSTRUKSI TAKTIS LAPANGAN' : 'TACTICAL FIELD INSTRUCTIONS
 3. ${language === 'id' ? 'Gunakan nozzle suntik gambut untuk memadamkan bara api bawah tanah (smoldering) sedalam 1–3 meter.' : 'Deploy peat injector nozzles to suppress subsurface smoldering fires down to 1–3m depth.'}
 4. ${language === 'id' ? 'Lakukan pendinginan lahan berkala (water bombing/ground cooling) pada titik koordinat anomali panas tinggi.' : 'Execute targeted ground cooling at high-FRP coordinate clusters.'}
 
-${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Algoritma Harmonisasi Terra Harmonia' : 'Data Sources: NASA FIRMS (MODIS 1km / VIIRS 375m) & Terra Harmonia Harmonization Pipeline'}
+${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-Meteo Telemetry Engine' : 'Data Sources: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-Meteo Telemetry Engine'}
 ===============================================================`;
 
     const blob = new Blob([memo], { type: 'text/plain;charset=utf-8;' });
@@ -101,7 +151,7 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Algori
             {isLiveSync ? (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 text-[10px] font-mono font-bold">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span>NASA FIRMS 24-HOUR FEED LIVE</span>
+                <span>NASA FIRMS 24H + OPEN-METEO LIVE</span>
               </span>
             ) : (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/20 text-[10px] font-mono font-bold">
@@ -115,8 +165,8 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Algori
           </h1>
           <p className="text-xs sm:text-sm text-[#6e6e73] dark:text-[#9ca3af] max-w-2xl leading-relaxed">
             {language === 'id'
-              ? 'Sistem aksi mitigasi taktis berbasis data satelit NASA: simulasi hidrologi kubah gambut, pembasahan sekat kanal (canal blocking), dan pembuatan memorandum penugasan patroli Manggala Agni.'
-              : 'Actionable satellite intelligence: peatland hydrology rewetting simulations, canal blocking management, and automated field dispatch memorandums.'}
+              ? 'Sistem aksi mitigasi taktis berbasis data satelit NASA & meteorologi real-time: simulasi hidrologi kubah gambut, pemantauan sekat kanal (canal blocking), dan pembuatan memorandum penugasan patroli Manggala Agni.'
+              : 'Actionable satellite & meteorological intelligence: peatland hydrology rewetting simulations, canal blocking management, and automated field dispatch memorandums.'}
           </p>
         </div>
 
@@ -132,6 +182,23 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Algori
           >
             <Activity className="w-3.5 h-3.5" />
             <span>{t.subTabSimulator}</span>
+          </button>
+
+          <button
+            onClick={() => setActiveSubTab('hotspots')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer min-h-[36px] ${
+              activeSubTab === 'hotspots'
+                ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs'
+                : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
+            }`}
+          >
+            <Flame className="w-3.5 h-3.5" />
+            <span>{language === 'id' ? 'Titik Api Aktif' : 'Active Hotspots'}</span>
+            {regionLiveSpots.length > 0 && (
+              <span className="px-1.5 py-0.2 rounded-full bg-rose-500 text-white text-[9px] font-bold">
+                {regionLiveSpots.length}
+              </span>
+            )}
           </button>
 
           <button
@@ -189,8 +256,8 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Algori
 
         </div>
 
-        {/* 4 Live Tactical Metrics */}
-        <div className="mt-4 pt-4 border-t border-[#e5e5e7] dark:border-[#1f2937] grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+        {/* Live Weather & Hydrological Strip */}
+        <div className="mt-4 pt-4 border-t border-[#e5e5e7] dark:border-[#1f2937] grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
           
           <div className="p-3 rounded-xl bg-[#f8fafc] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937]">
             <span className="text-[10px] text-[#86868b] dark:text-[#9ca3af] uppercase font-bold tracking-wider block">
@@ -201,14 +268,14 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Algori
                 {activeSpotCount.toLocaleString()}
               </strong>
               <span className="text-[10px] text-[#6e6e73] dark:text-[#9ca3af]">
-                {isLiveSync ? (language === 'id' ? '24 Jam Live' : '24h Live') : (language === 'id' ? 'Rerata Musiman' : 'Seasonal Avg')}
+                {isLiveSync ? (language === 'id' ? '24 Jam Live' : '24h Live') : (language === 'id' ? 'Rerata' : 'Avg')}
               </span>
             </div>
           </div>
 
           <div className="p-3 rounded-xl bg-[#f8fafc] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937]">
             <span className="text-[10px] text-[#86868b] dark:text-[#9ca3af] uppercase font-bold tracking-wider block">
-              {language === 'id' ? 'Tinggi Air Tanah Gambut' : 'Peat Groundwater Table'}
+              {language === 'id' ? 'TMA Gambut' : 'Peat Water Table'}
             </span>
             <div className="flex items-baseline gap-1.5 mt-1">
               <strong className={`text-lg font-bold num ${currentRegionRisk.tmag <= -40 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
@@ -222,11 +289,25 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Algori
 
           <div className="p-3 rounded-xl bg-[#f8fafc] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937]">
             <span className="text-[10px] text-[#86868b] dark:text-[#9ca3af] uppercase font-bold tracking-wider block">
+              {language === 'id' ? 'Suhu & Lembap Udara' : 'Temp & Humidity'}
+            </span>
+            <div className="flex items-baseline gap-1.5 mt-1">
+              <strong className="text-lg font-bold text-[#1d1d1f] dark:text-white num">
+                {isLoadingWeather ? '...' : `${liveWeather?.temperature ?? 32}°C`}
+              </strong>
+              <span className="text-[10px] text-[#6e6e73] dark:text-[#9ca3af]">
+                RH {liveWeather?.relativeHumidity ?? 62}%
+              </span>
+            </div>
+          </div>
+
+          <div className="p-3 rounded-xl bg-[#f8fafc] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937]">
+            <span className="text-[10px] text-[#86868b] dark:text-[#9ca3af] uppercase font-bold tracking-wider block">
               {language === 'id' ? 'Indeks Bahaya Api (FWI)' : 'Fire Weather Index (FWI)'}
             </span>
             <div className="flex items-baseline gap-1.5 mt-1">
               <strong className="text-lg font-bold text-amber-600 dark:text-amber-400 num">
-                {currentRegionRisk.fwi}
+                {effectiveFwi}
               </strong>
               <span className="text-[10px] uppercase font-bold text-amber-700 dark:text-amber-300">
                 {currentRegionRisk.risk}
@@ -243,7 +324,7 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Algori
                 {currentRegionRisk.canalBlocks}
               </strong>
               <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold">
-                {language === 'id' ? 'Unit Terpasang' : 'Active Units'}
+                {language === 'id' ? 'Unit' : 'Units'}
               </span>
             </div>
           </div>
@@ -255,8 +336,8 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Algori
       {activeSubTab === 'simulator' && (
         <div className="space-y-6 animate-in fade-in duration-150">
           
-          {/* Peatland Simulator Component */}
-          <PeatlandSimulator language={language} selectedAOI={selectedAOI} />
+          {/* Peatland Simulator Component with Live Weather Feed */}
+          <PeatlandSimulator language={language} selectedAOI={selectedAOI} liveWeather={liveWeather} />
 
           {/* Quick Dispatch Order Generator Card */}
           <div className="bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
@@ -325,7 +406,108 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Algori
         </div>
       )}
 
-      {/* Sub-View 2: Executive Situation Report Dossier (A4 Print Ready) */}
+      {/* Sub-View 2: Active Hotspots & Dispatch List */}
+      {activeSubTab === 'hotspots' && (
+        <div className="bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4 animate-in fade-in duration-150">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#e5e5e7] dark:border-[#1f2937]">
+            <div>
+              <h3 className="font-bold text-base text-[#1d1d1f] dark:text-white">
+                {language === 'id' ? 'Daftar Anomali Panas Satelit & Koordinat Penugasan' : 'Satellite Hotspots & Field Dispatch Targets'}
+              </h3>
+              <p className="text-xs text-[#6e6e73] dark:text-[#9ca3af] mt-0.5">
+                {language === 'id'
+                  ? `Resolusi spasial dan administrasi wilayah untuk seluruh titik panas terdeteksi di ${selectedAOI.name}.`
+                  : `Spatial and administrative resolution for all detected hotspots in ${selectedAOI.name}.`}
+              </p>
+            </div>
+
+            <span className="text-xs font-mono font-bold px-3 py-1 rounded-lg bg-[#f5f5f7] dark:bg-[#151d2f] text-[#1d1d1f] dark:text-white border border-[#e5e5e7] dark:border-[#1f2937]">
+              {regionLiveSpots.length} {language === 'id' ? 'Titik Terdeteksi' : 'Detections'}
+            </span>
+          </div>
+
+          {regionLiveSpots.length === 0 ? (
+            <div className="text-center py-10 text-xs text-[#86868b] dark:text-[#9ca3af]">
+              {language === 'id'
+                ? 'Tidak ada anomali titik panas aktif terdeteksi di sektor ini pada jendela observasi 24 jam.'
+                : 'No active thermal anomalies detected in this sector during the 24-hour observation window.'}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {regionLiveSpots.map((spot) => {
+                const loc = resolveHotspotLocation(spot.lat, spot.lon, selectedAOI.id, language);
+                const isHighFRP = spot.frp >= 25;
+
+                return (
+                  <div
+                    key={spot.id}
+                    className="p-3.5 rounded-xl border border-[#e5e5e7] dark:border-[#1f2937] bg-[#fbfbfd] dark:bg-[#151d2f] hover:border-[#0071e3] transition-all space-y-2"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className={`w-2 h-2 rounded-full ${isHighFRP ? 'bg-rose-500 animate-ping' : 'bg-amber-500'}`} />
+                          <h4 className="font-bold text-xs text-[#1d1d1f] dark:text-white">
+                            {loc.regency}{loc.district ? `, ${loc.district}` : ''}
+                          </h4>
+                        </div>
+                        <span className="text-[10px] text-[#86868b] dark:text-[#9ca3af] block mt-0.5">
+                          {loc.landscape}
+                        </span>
+                      </div>
+
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] text-[#1d1d1f] dark:text-white">
+                        {spot.instrument} ({spot.satellite})
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-1 text-[11px] pt-1.5 border-t border-[#e5e5e7] dark:border-[#1f2937]">
+                      <div>
+                        <span className="text-[9px] text-[#86868b] block">{language === 'id' ? 'Radiasi Termal' : 'FRP'}</span>
+                        <strong className={`font-mono ${isHighFRP ? 'text-rose-600 dark:text-rose-400 font-bold' : 'text-[#1d1d1f] dark:text-white'}`}>
+                          {spot.frp} MW
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span className="text-[9px] text-[#86868b] block">{language === 'id' ? 'Keyakinan' : 'Confidence'}</span>
+                        <strong className="font-mono text-[#1d1d1f] dark:text-white">
+                          {spot.confidence}%
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span className="text-[9px] text-[#86868b] block">{language === 'id' ? 'Waktu Deteksi' : 'Acquired'}</span>
+                        <strong className="font-mono text-[#1d1d1f] dark:text-white text-[10px]">
+                          {loc.localTimeFormatted}
+                        </strong>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 flex items-center justify-between text-[10px] border-t border-[#e5e5e7] dark:border-[#1f2937]">
+                      <span className="font-mono text-[#6e6e73] dark:text-[#9ca3af]">
+                        {spot.lat.toFixed(4)}°, {spot.lon.toFixed(4)}°
+                      </span>
+
+                      <a
+                        href={loc.googleMapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[#0071e3] dark:text-[#38bdf8] hover:underline font-semibold"
+                      >
+                        <span>Google Maps</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Sub-View 3: Executive Situation Report Dossier (A4 Print Ready) */}
       {activeSubTab === 'sitrep' && (
         <div className="animate-in fade-in duration-150">
           <ExecutiveReport
