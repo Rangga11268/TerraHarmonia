@@ -331,24 +331,34 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
       <div className="print:hidden bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl p-4 sm:p-5 shadow-xs">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           
-          {/* Streamlined Horizontal Pill Region Selector */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+          {/* Streamlined Responsive Region Badges (No horizontal scrollbar slider) */}
+          <div className="flex flex-wrap items-center gap-1.5 flex-1">
             <span className="text-xs font-bold text-[#86868b] dark:text-[#9ca3af] mr-1 uppercase shrink-0">
               {language === 'id' ? 'Sektor:' : 'Sector:'}
             </span>
             {PRESET_AOIS.map((aoi) => {
               const isSelected = selectedAOI.id === aoi.id;
+              const shortLabels: Record<string, { id: string; en: string }> = {
+                indonesia: { id: 'Seluruh Indonesia', en: 'National' },
+                riau: { id: 'Riau & Sumatera', en: 'Riau & Sumatra' },
+                kalteng: { id: 'Kalteng (Ex-PLG)', en: 'C. Kalimantan' },
+                sumsel: { id: 'Sumsel (OKI)', en: 'S. Sumatra' },
+                kalsel: { id: 'Kalsel (Barito)', en: 'S. Kalimantan' },
+                kaltim: { id: 'Kaltim (IKN)', en: 'E. Kalimantan' },
+              };
+              const label = shortLabels[aoi.id] ? (language === 'id' ? shortLabels[aoi.id].id : shortLabels[aoi.id].en) : aoi.name;
               return (
                 <button
                   key={aoi.id}
                   onClick={() => onSelectAOI(aoi)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer whitespace-nowrap shrink-0 min-h-[34px] ${
+                  title={aoi.name}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer whitespace-nowrap min-h-[34px] ${
                     isSelected
                       ? 'bg-[#1d1d1f] dark:bg-white text-white dark:text-[#111827] shadow-xs'
                       : 'bg-[#f5f5f7] dark:bg-[#151d2f] text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white border border-[#e5e5e7] dark:border-[#1f2937]'
                   }`}
                 >
-                  {aoi.name}
+                  {label}
                 </button>
               );
             })}
@@ -572,7 +582,7 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
           <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5 text-xs">
             
             {/* Quick Filter Pill Chips */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+            <div className="flex flex-wrap items-center gap-1.5 scrollbar-none">
               {[
                 { id: 'all', label: language === 'id' ? 'Semua' : 'All' },
                 { id: 'extreme_frp', label: language === 'id' ? 'FRP Ekstrem (≥50MW)' : 'Extreme (≥50MW)' },

@@ -197,73 +197,204 @@ export const PeatlandSimulator: React.FC<PeatlandSimulatorProps> = ({
             </button>
           </div>
 
-          {/* Slider 1: TMAG Groundwater Depth */}
-          <div className="space-y-1.5">
+          {/* Control 1: TMAG Groundwater Depth */}
+          <div className="space-y-2 bg-white dark:bg-[#111827] p-3.5 rounded-xl border border-[#e5e5e7] dark:border-[#1f2937]">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-medium text-[#1d1d1f] dark:text-[#e5e5e7]">{t.tmagDepth}</span>
-              <span className={`font-bold num ${simResults.isCritical ? 'text-red-600 dark:text-red-400' : 'text-emerald-700 dark:text-emerald-400'}`}>
-                {simResults.effectiveTmag} cm {simResults.isCritical ? t.tmagCriticalBadge : t.tmagSafeBadge}
+              <span className="font-semibold text-[#1d1d1f] dark:text-[#e5e5e7]">{t.tmagDepth}</span>
+              <div className="flex items-center gap-1.5">
+                <span className={`font-bold text-sm num ${simResults.isCritical ? 'text-red-600 dark:text-red-400' : 'text-emerald-700 dark:text-emerald-400'}`}>
+                  {simResults.effectiveTmag} cm
+                </span>
+                <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                  simResults.isCritical 
+                    ? 'bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-300' 
+                    : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                }`}>
+                  {simResults.isCritical ? t.tmagCriticalBadge : t.tmagSafeBadge}
+                </span>
+              </div>
+            </div>
+
+            {/* Stepper + Presets */}
+            <div className="flex items-center gap-1.5">
+              <div className="grid grid-cols-4 gap-1 flex-1">
+                {[
+                  { val: -15, label: language === 'id' ? 'Alami (-15)' : 'Natural (-15)' },
+                  { val: -35, label: language === 'id' ? 'Waspada (-35)' : 'Caution (-35)' },
+                  { val: -45, label: language === 'id' ? 'Kritis (-45)' : 'Critical (-45)' },
+                  { val: -65, label: language === 'id' ? 'Darurat (-65)' : 'Severe (-65)' },
+                ].map((preset) => (
+                  <button
+                    key={preset.val}
+                    type="button"
+                    onClick={() => setTmagDepthCm(preset.val)}
+                    className={`py-1 px-1.5 rounded-lg text-[10.5px] font-medium transition-all text-center cursor-pointer ${
+                      tmagDepthCm === preset.val
+                        ? 'bg-[#1d1d1f] text-white dark:bg-emerald-600 dark:text-white font-bold shadow-xs'
+                        : 'bg-[#f5f5f7] dark:bg-[#1a2333] text-[#6e6e73] dark:text-[#9ca3af] hover:bg-[#e5e5ea] dark:hover:bg-[#253248]'
+                    }`}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setTmagDepthCm(Math.max(-80, tmagDepthCm - 5))}
+                  className="w-7 h-7 rounded-lg bg-[#f5f5f7] dark:bg-[#1a2333] text-[#1d1d1f] dark:text-white hover:bg-[#e5e5ea] dark:hover:bg-[#253248] text-xs font-bold flex items-center justify-center cursor-pointer transition-colors"
+                  title="-5 cm"
+                >
+                  -5
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTmagDepthCm(Math.min(0, tmagDepthCm + 5))}
+                  className="w-7 h-7 rounded-lg bg-[#f5f5f7] dark:bg-[#1a2333] text-[#1d1d1f] dark:text-white hover:bg-[#e5e5ea] dark:hover:bg-[#253248] text-xs font-bold flex items-center justify-center cursor-pointer transition-colors"
+                  title="+5 cm"
+                >
+                  +5
+                </button>
+              </div>
+            </div>
+
+            {/* Visual Level Gauge (Non-slider) */}
+            <div className="space-y-1 pt-1">
+              <div className="w-full h-2 bg-[#e5e5ea] dark:bg-[#1f2937] rounded-full overflow-hidden relative">
+                {/* 40cm critical mark */}
+                <div className="absolute top-0 bottom-0 left-[50%] w-0.5 bg-red-500 z-10" title={t.brgmLimit} />
+                {/* Water level fill */}
+                <div
+                  className={`h-full transition-all duration-300 ${
+                    simResults.isCritical ? 'bg-red-500' : 'bg-emerald-500'
+                  }`}
+                  style={{ width: `${Math.max(0, Math.min(100, (1 - Math.abs(simResults.effectiveTmag) / 80) * 100))}%` }}
+                />
+              </div>
+              <div className="flex justify-between text-[9.5px] text-[#86868b] dark:text-[#9ca3af]">
+                <span>-80 cm ({language === 'id' ? 'Kering' : 'Dry'})</span>
+                <span className="font-semibold text-red-500 dark:text-red-400">| {t.brgmLimit} (-40 cm)</span>
+                <span>0 cm ({language === 'id' ? 'Basah' : 'Wet'})</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Control 2: Days without Rain (HTH) */}
+          <div className="space-y-2 bg-white dark:bg-[#111827] p-3.5 rounded-xl border border-[#e5e5e7] dark:border-[#1f2937]">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-semibold text-[#1d1d1f] dark:text-[#e5e5e7]">{t.dryDaysLabel}</span>
+              <span className="font-bold text-sm text-[#1d1d1f] dark:text-white num">
+                {daysWithoutRain} {language === 'id' ? 'Hari' : 'Days'}
               </span>
             </div>
-            <input
-              type="range"
-              min="-80"
-              max="0"
-              step="1"
-              value={tmagDepthCm}
-              onChange={(e) => setTmagDepthCm(parseInt(e.target.value))}
-              className="w-full h-1.5 bg-[#e5e5ea] dark:bg-[#1f2937] rounded-lg appearance-none cursor-pointer accent-[#1d1d1f] dark:accent-emerald-400"
-            />
-            <div className="flex justify-between text-[10px] text-[#86868b] dark:text-[#9ca3af]">
-              <span>-80 cm ({language === 'id' ? 'Kering Parah' : 'Severe Dry'})</span>
-              <span className="font-semibold text-red-500 dark:text-red-400">{t.brgmLimit}</span>
-              <span>0 cm ({language === 'id' ? 'Banjir' : 'Inundated'})</span>
+
+            <div className="flex items-center gap-1.5">
+              <div className="grid grid-cols-4 gap-1 flex-1">
+                {[
+                  { val: 0, label: language === 'id' ? 'Hujan (0)' : 'Rain (0)' },
+                  { val: 5, label: language === 'id' ? 'Normal (5)' : 'Normal (5)' },
+                  { val: 12, label: language === 'id' ? 'Kering (12)' : 'Dry (12)' },
+                  { val: 20, label: language === 'id' ? 'Kemarau (20)' : 'Drought (20)' },
+                ].map((preset) => (
+                  <button
+                    key={preset.val}
+                    type="button"
+                    onClick={() => {
+                      setDaysWithoutRain(preset.val);
+                      setUseLiveSync(false);
+                    }}
+                    className={`py-1 px-1.5 rounded-lg text-[10.5px] font-medium transition-all text-center cursor-pointer ${
+                      daysWithoutRain === preset.val
+                        ? 'bg-[#1d1d1f] text-white dark:bg-emerald-600 dark:text-white font-bold shadow-xs'
+                        : 'bg-[#f5f5f7] dark:bg-[#1a2333] text-[#6e6e73] dark:text-[#9ca3af] hover:bg-[#e5e5ea] dark:hover:bg-[#253248]'
+                    }`}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDaysWithoutRain(Math.max(0, daysWithoutRain - 1));
+                    setUseLiveSync(false);
+                  }}
+                  className="w-7 h-7 rounded-lg bg-[#f5f5f7] dark:bg-[#1a2333] text-[#1d1d1f] dark:text-white hover:bg-[#e5e5ea] dark:hover:bg-[#253248] text-xs font-bold flex items-center justify-center cursor-pointer transition-colors"
+                >
+                  -1
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDaysWithoutRain(Math.min(30, daysWithoutRain + 1));
+                    setUseLiveSync(false);
+                  }}
+                  className="w-7 h-7 rounded-lg bg-[#f5f5f7] dark:bg-[#1a2333] text-[#1d1d1f] dark:text-white hover:bg-[#e5e5ea] dark:hover:bg-[#253248] text-xs font-bold flex items-center justify-center cursor-pointer transition-colors"
+                >
+                  +1
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Slider 2: Days without Rain (HTH) */}
-          <div className="space-y-1.5">
+          {/* Control 3: Wind Speed */}
+          <div className="space-y-2 bg-white dark:bg-[#111827] p-3.5 rounded-xl border border-[#e5e5e7] dark:border-[#1f2937]">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-medium text-[#1d1d1f] dark:text-[#e5e5e7]">{t.dryDaysLabel}</span>
-              <span className="font-bold text-[#1d1d1f] dark:text-white num">{daysWithoutRain} {language === 'id' ? 'Hari' : 'Days'}</span>
+              <span className="font-semibold text-[#1d1d1f] dark:text-[#e5e5e7]">{t.windSpeedLabel}</span>
+              <span className="font-bold text-sm text-[#1d1d1f] dark:text-white num">
+                {windSpeedKnots} Knots ({Math.round(windSpeedKnots * 1.852)} km/h)
+              </span>
             </div>
-            <input
-              type="range"
-              min="0"
-              max="30"
-              step="1"
-              value={daysWithoutRain}
-              onChange={(e) => {
-                setDaysWithoutRain(parseInt(e.target.value));
-                setUseLiveSync(false);
-              }}
-              className="w-full h-1.5 bg-[#e5e5ea] dark:bg-[#1f2937] rounded-lg appearance-none cursor-pointer accent-[#1d1d1f] dark:accent-emerald-400"
-            />
-            <div className="flex justify-between text-[10px] text-[#86868b] dark:text-[#9ca3af]">
-              <span>0 {language === 'id' ? 'Hari (Hujan)' : 'Days (Rain)'}</span>
-              <span>15 {language === 'id' ? 'Hari (Kering)' : 'Days (Dry)'}</span>
-              <span>30 {language === 'id' ? 'Hari (Kemarau)' : 'Days (Drought)'}</span>
-            </div>
-          </div>
 
-          {/* Slider 3: Wind Speed */}
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-medium text-[#1d1d1f] dark:text-[#e5e5e7]">{t.windSpeedLabel}</span>
-              <span className="font-bold text-[#1d1d1f] dark:text-white num">{windSpeedKnots} Knots ({Math.round(windSpeedKnots * 1.852)} km/h)</span>
+            <div className="flex items-center gap-1.5">
+              <div className="grid grid-cols-4 gap-1 flex-1">
+                {[
+                  { val: 5, label: language === 'id' ? 'Tenang (5)' : 'Light (5)' },
+                  { val: 12, label: language === 'id' ? 'Sedang (12)' : 'Mod (12)' },
+                  { val: 20, label: language === 'id' ? 'Kencang (20)' : 'High (20)' },
+                  { val: 28, label: language === 'id' ? 'Ekstrem (28)' : 'Gale (28)' },
+                ].map((preset) => (
+                  <button
+                    key={preset.val}
+                    type="button"
+                    onClick={() => {
+                      setWindSpeedKnots(preset.val);
+                      setUseLiveSync(false);
+                    }}
+                    className={`py-1 px-1.5 rounded-lg text-[10.5px] font-medium transition-all text-center cursor-pointer ${
+                      windSpeedKnots === preset.val
+                        ? 'bg-[#1d1d1f] text-white dark:bg-emerald-600 dark:text-white font-bold shadow-xs'
+                        : 'bg-[#f5f5f7] dark:bg-[#1a2333] text-[#6e6e73] dark:text-[#9ca3af] hover:bg-[#e5e5ea] dark:hover:bg-[#253248]'
+                    }`}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setWindSpeedKnots(Math.max(0, windSpeedKnots - 2));
+                    setUseLiveSync(false);
+                  }}
+                  className="w-7 h-7 rounded-lg bg-[#f5f5f7] dark:bg-[#1a2333] text-[#1d1d1f] dark:text-white hover:bg-[#e5e5ea] dark:hover:bg-[#253248] text-xs font-bold flex items-center justify-center cursor-pointer transition-colors"
+                >
+                  -2
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setWindSpeedKnots(Math.min(40, windSpeedKnots + 2));
+                    setUseLiveSync(false);
+                  }}
+                  className="w-7 h-7 rounded-lg bg-[#f5f5f7] dark:bg-[#1a2333] text-[#1d1d1f] dark:text-white hover:bg-[#e5e5ea] dark:hover:bg-[#253248] text-xs font-bold flex items-center justify-center cursor-pointer transition-colors"
+                >
+                  +2
+                </button>
+              </div>
             </div>
-            <input
-              type="range"
-              min="0"
-              max="30"
-              step="1"
-              value={windSpeedKnots}
-              onChange={(e) => {
-                setWindSpeedKnots(parseInt(e.target.value));
-                setUseLiveSync(false);
-              }}
-              className="w-full h-1.5 bg-[#e5e5ea] dark:bg-[#1f2937] rounded-lg appearance-none cursor-pointer accent-[#1d1d1f] dark:accent-emerald-400"
-            />
           </div>
 
           {/* Drainage Condition Mode */}
@@ -294,24 +425,49 @@ export const PeatlandSimulator: React.FC<PeatlandSimulatorProps> = ({
 
           {/* Canal Block Counter (if canal_blocked is active) */}
           {peatDrainageStatus === 'canal_blocked' && (
-            <div className="space-y-1.5 pt-2 border-t border-[#e5e5e7] dark:border-[#1f2937]">
+            <div className="space-y-2 bg-white dark:bg-[#111827] p-3 rounded-xl border border-[#e5e5e7] dark:border-[#1f2937]">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-medium text-[#1d1d1f] dark:text-[#e5e5e7]">
-                  {language === 'id' ? 'Jumlah Sekat Kanal Aktif:' : 'Active Canal Blocks:'}
+                  {language === 'id' ? 'Jumlah Sekat Kanal:' : 'Canal Blocks:'}
                 </span>
                 <span className="font-bold text-emerald-600 dark:text-emerald-400 num">
                   {installedCanalBlocks} Unit (+{simResults.canalBoost} cm TMA)
                 </span>
               </div>
-              <input
-                type="range"
-                min="0"
-                max="300"
-                step="10"
-                value={installedCanalBlocks}
-                onChange={(e) => setInstalledCanalBlocks(parseInt(e.target.value))}
-                className="w-full h-1.5 bg-[#e5e5ea] dark:bg-[#1f2937] rounded-lg appearance-none cursor-pointer accent-emerald-600"
-              />
+              <div className="flex items-center gap-1.5">
+                <div className="grid grid-cols-4 gap-1 flex-1">
+                  {[0, 50, 120, 200].map((val) => (
+                    <button
+                      key={val}
+                      type="button"
+                      onClick={() => setInstalledCanalBlocks(val)}
+                      className={`py-1 px-1.5 rounded-lg text-[10.5px] font-medium transition-all text-center cursor-pointer ${
+                        installedCanalBlocks === val
+                          ? 'bg-emerald-600 text-white font-bold shadow-xs'
+                          : 'bg-[#f5f5f7] dark:bg-[#1a2333] text-[#6e6e73] dark:text-[#9ca3af] hover:bg-[#e5e5ea] dark:hover:bg-[#253248]'
+                      }`}
+                    >
+                      {val} {language === 'id' ? 'Unit' : 'Units'}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setInstalledCanalBlocks(Math.max(0, installedCanalBlocks - 10))}
+                    className="w-7 h-7 rounded-lg bg-[#f5f5f7] dark:bg-[#1a2333] text-[#1d1d1f] dark:text-white hover:bg-[#e5e5ea] dark:hover:bg-[#253248] text-xs font-bold flex items-center justify-center cursor-pointer transition-colors"
+                  >
+                    -10
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setInstalledCanalBlocks(Math.min(300, installedCanalBlocks + 10))}
+                    className="w-7 h-7 rounded-lg bg-[#f5f5f7] dark:bg-[#1a2333] text-[#1d1d1f] dark:text-white hover:bg-[#e5e5ea] dark:hover:bg-[#253248] text-xs font-bold flex items-center justify-center cursor-pointer transition-colors"
+                  >
+                    +10
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
