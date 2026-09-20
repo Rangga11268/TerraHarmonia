@@ -226,8 +226,8 @@ export const translations = {
 
     // Team & Philosophy
     teamHeroDesc: 'Unifying 26 years of NASA satellite observations from Terra, Aqua, Suomi-NPP, and NOAA-20 into an un-biased, continuous climatology for Indonesian tropical peatland preservation.',
-    teamShowcaseTitle: 'Cross-Disciplinary Collaboration',
-    teamShowcaseSubtitle: 'A synergy of satellite remote sensing, space data science, peatland hydrology, and modern software engineering.',
+    teamShowcaseTitle: 'Solo Creator & Full-Stack Innovation',
+    teamShowcaseSubtitle: 'Independently architected and engineered by Rangga spanning satellite remote sensing, space data science, peatland hydrology, and modern web GIS.',
     teamProblemTitle: 'Why is MODIS & VIIRS Harmonization Crucial?',
     teamProblemDesc: 'Prior to 2012, active fire detection relied on MODIS (1 km). The addition of VIIRS (375 m) in 2012 introduced an artificial surge in raw fire counts due to superior spatial acuity rather than an actual increase in burning.',
     teamSolutionTitle: 'The Terra Harmonia Solution',
@@ -248,8 +248,8 @@ export const translations = {
     flameDesc: 'Represents satellite-monitored Fire Radiative Power (MW) captured in real-time from Low Earth Orbit.',
     orbitRingTitle: 'Dual Satellite Orbit Rings',
     orbitRingDesc: 'Illustrates the synchronized orbital paths of MODIS and VIIRS constellations encircling the globe.',
-    humanCapitalTitle: 'Human Capital & Disciplines',
-    teamCompTitle: 'Team Composition & Core Disciplines',
+    humanCapitalTitle: 'Solo Architect & Competencies',
+    teamCompTitle: 'Solo Creator Profile & 4 Technical Disciplines',
     methodologyTitle: 'Scientific Methodology',
     fourInnovationsTitle: '4 Core Scientific Innovations of Terra Harmonia',
     binningInnovationTitle: 'Spatial Equal-Area Binning (5.5 km)',
@@ -531,8 +531,8 @@ export const translations = {
 
     // Team & Philosophy
     teamHeroDesc: 'Menghubungkan 26 tahun pengamatan satelit NASA Terra, Aqua, Suomi-NPP, dan NOAA-20 menjadi satu deret waktu konsisten tanpa bias sensor untuk perlindungan ekosistem lahan gambut Indonesia.',
-    teamShowcaseTitle: 'Kolaborasi Multi-Disiplin',
-    teamShowcaseSubtitle: 'Sinergi data sains antariksa, penginderaan jauh geospasial, hidrologi lahan gambut tropis, dan rekayasa perangkat lunak modern.',
+    teamShowcaseTitle: 'Pengembang Tunggal (Solo Creator)',
+    teamShowcaseSubtitle: 'Dirancang dan dikembangkan secara mandiri oleh Rangga mencakup penginderaan jauh satelit, data sains antariksa, hidrologi gambut, dan rekayasa web GIS full-stack.',
     teamProblemTitle: 'Mengapa Harmonisasi MODIS & VIIRS Sangat Krusial?',
     teamProblemDesc: 'Sebelum 2012, pemantauan kebakaran hutan global mengandalkan sensor MODIS (resolusi 1 km). Saat sensor VIIRS (resolusi 375 m) beroperasi pada 2012, jumlah titik api mentah melonjak tajam bukan karena kebakaran bertambah, melainkan karena resolusi sensor yang jauh lebih tajam mampu mendeteksi api kecil yang dulunya luput.',
     teamSolutionTitle: 'Solusi Terra Harmonia',
@@ -553,8 +553,8 @@ export const translations = {
     flameDesc: 'Merepresentasikan energi radiatif api (Fire Radiative Power) yang dipantau sensor satelit secara real-time dari orbit luar angkasa.',
     orbitRingTitle: 'Cincin Orbit Satelit Ganda',
     orbitRingDesc: 'Menggambarkan perpaduan orbit konstelasi MODIS dan VIIRS yang mengelilingi Bumi dalam sinkronisasi matematis yang harmonis.',
-    humanCapitalTitle: 'Sumber Daya Manusia',
-    teamCompTitle: 'Komposisi & Peran Anggota Tim',
+    humanCapitalTitle: 'Keahlian Pengembang Mandiri',
+    teamCompTitle: 'Profil Rangga & 4 Pilar Keahlian Teknis',
     methodologyTitle: 'Arsitektur Metodologi Ilmiah',
     fourInnovationsTitle: '4 Inovasi Ilmiah Utama Terra Harmonia',
     binningInnovationTitle: 'Spatial Equal-Area Binning (5.5 km)',

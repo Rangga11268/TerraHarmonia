@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Language, translations } from '../data/translations';
 import {
-  Users,
+  User,
   Award,
   Globe,
   Database,
@@ -15,67 +15,79 @@ import {
   Compass,
   Check,
   Copy,
-  Eye,
   Satellite,
   Orbit,
-  Maximize2
+  CheckCircle2,
+  MapPin,
+  Terminal,
+  GitBranch
 } from 'lucide-react';
 
 interface TeamPageProps {
   language: Language;
 }
 
-interface TeamMember {
-  name: string;
-  roleId: string;
-  roleEn: string;
-  focusId: string;
-  focusEn: string;
+interface DisciplinePillar {
+  titleId: string;
+  titleEn: string;
+  subtitleId: string;
+  subtitleEn: string;
+  descId: string;
+  descEn: string;
   tags: string[];
-  avatarBg: string;
-  initials: string;
+  icon: React.ElementType;
+  accentColor: string;
+  badgeBg: string;
 }
 
-const TEAM_MEMBERS: TeamMember[] = [
+const SOLO_DISCIPLINES: DisciplinePillar[] = [
   {
-    name: 'Rangga',
-    roleId: 'Pemimpin Tim & Arsitek Geospasial',
-    roleEn: 'Team Lead & Geospatial Architect',
-    focusId: 'Perancangan arsitektur harmonisasi spasial 5.5 km, pipeline kalibrasi FRP multi-satelit, dan rekayasa antarmuka web client-side berkinerja tinggi.',
-    focusEn: 'Spatial 5.5 km binning architecture design, FRP cross-sensor calibration pipeline, and high-performance client-side web engineering.',
-    tags: ['MODIS & VIIRS', 'GIS / Leaflet', 'React / TypeScript', 'Stefan-Boltzmann Calibration'],
-    avatarBg: 'bg-blue-600 text-white',
-    initials: 'RA',
+    titleId: 'Arsitektur Geospasial & Rekayasa GIS',
+    titleEn: 'Geospatial & GIS Engineering',
+    subtitleId: 'Spatial Binning 5.5 km & Peta Interaktif',
+    subtitleEn: '5.5 km Equal-Area Binning & Map Engine',
+    descId: 'Merancang algoritma spatial equal-area binning 5.5 km, integrasi multi-layer Leaflet, layer satelit asli NASA GIBS WMTS, dan ekspor GeoJSON standar RFC 7946 untuk QGIS/ArcGIS.',
+    descEn: 'Engineered the 5.5 km spatial equal-area binning algorithm, multi-layer Leaflet GIS, authentic NASA GIBS WMTS tile pipeline, and standard RFC 7946 GeoJSON export for QGIS/ArcGIS.',
+    tags: ['5.5 km Grid', 'Leaflet GIS', 'NASA GIBS WMTS', 'GeoJSON RFC 7946'],
+    icon: Database,
+    accentColor: 'text-blue-600 dark:text-blue-400',
+    badgeBg: 'bg-blue-50 dark:bg-blue-950/60 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300',
   },
   {
-    name: 'Data Science & Remote Sensing Division',
-    roleId: 'Spesialis Penginderaan Jauh & Data Satelit',
-    roleEn: 'Remote Sensing & Satellite Data Scientist',
-    focusId: 'Analisis statistik deret waktu 26 tahun (2000–2026), normalisasi degradasi sensor Terra/Aqua, dan integrasi ingestion API NASA FIRMS harian.',
-    focusEn: '26-year time-series statistical analysis (2000–2026), sensor degradation normalization, and NASA FIRMS daily API ingestion pipeline.',
-    tags: ['NASA FIRMS', 'Python / GeoPandas', 'Statistical Climatology', 'Z-Score Analysis'],
-    avatarBg: 'bg-emerald-600 text-white',
-    initials: 'DS',
+    titleId: 'Sains Data Satelit & Penginderaan Jauh',
+    titleEn: 'Satellite Data Science & Remote Sensing',
+    subtitleId: 'Deret Waktu 26 Tahun & NASA FIRMS Live',
+    subtitleEn: '26-Year Time-Series & NASA FIRMS Ingestion',
+    descId: 'Memproses dan menormalkan dataset pengamatan bumi 26 tahun (2000–2026), mengeliminasi bias resolusi sensor MODIS vs VIIRS, dan membangun pipeline sinkronisasi API NASA FIRMS harian.',
+    descEn: 'Processed and normalized 26 years of Earth observation data (2000–2026), eliminated MODIS vs VIIRS sensor resolution bias, and built the daily NASA FIRMS live API ingestion pipeline.',
+    tags: ['MODIS & VIIRS', 'NASA FIRMS API', 'Z-Score Anomaly', 'Climatology'],
+    icon: Satellite,
+    accentColor: 'text-emerald-600 dark:text-emerald-400',
+    badgeBg: 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300',
   },
   {
-    name: 'Peatland Hydrology & Ecology Division',
-    roleId: 'Peneliti Ekologi Gambut & Mitigasi Lapangan',
-    roleEn: 'Peatland Hydrologist & Fire Ecology Researcher',
-    focusId: 'Pemodelan dinamika muka air tanah gambut (TMAG < -40 cm), perhitungan emisi karbon CO2e gambut, dan integrasi standar restorasi hidrologis BRGM.',
-    focusEn: 'Groundwater table (TMAG < -40 cm) dynamics modeling, peat CO2e carbon accounting, and BRGM hydrological restoration integration.',
-    tags: ['TMAG < -40cm', 'Canal Blocking', 'Carbon Accounting', 'Manggala Agni SOP'],
-    avatarBg: 'bg-amber-600 text-white',
-    initials: 'PH',
+    titleId: 'Fisika Termal & Hidrologi Gambut',
+    titleEn: 'Thermal Physics & Peatland Hydrology',
+    subtitleId: 'Kalibrasi FRP & Ambang Kritis BRGM',
+    subtitleEn: 'FRP Calibration & BRGM Water Table Thresholds',
+    descId: 'Menerapkan model radiasi Stefan-Boltzmann untuk menstandarkan Fire Radiative Power (MW) serta mengintegrasikan ambang batas muka air tanah gambut BRGM (TMAG < -40 cm) untuk mitigasi kebakaran.',
+    descEn: 'Applied Stefan-Boltzmann radiation transfer models to standardize Fire Radiative Power (MW) and integrated BRGM peat groundwater statutory thresholds (TMAG < -40 cm) for fire mitigation.',
+    tags: ['Stefan-Boltzmann', 'FRP Calibration', 'TMAG < -40cm', 'Carbon CO2e'],
+    icon: Flame,
+    accentColor: 'text-red-600 dark:text-red-400',
+    badgeBg: 'bg-red-50 dark:bg-red-950/60 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300',
   },
   {
-    name: 'Human-Centered Interface & UX Division',
-    roleId: 'Desainer Antarmuka & Aksesibilitas Geospasial',
-    roleEn: 'UI/UX & Geospatial Interface Designer',
-    focusId: 'Penerapan estetika Apple-clean tanpa AI-slop, kontras WCAG 2.1 AA 100%, sistem token desain, dan responsivitas penuh bagi operator lapangan.',
-    focusEn: 'Apple-clean aesthetic without AI slop, 100% WCAG 2.1 AA contrast compliance, token design system, and full mobile field responsiveness.',
-    tags: ['WCAG AA', 'Design Tokens', 'Tailwind CSS', 'Mobile First GIS'],
-    avatarBg: 'bg-purple-600 text-white',
-    initials: 'UX',
+    titleId: 'Rekayasa Full-Stack & Desain Antarmuka',
+    titleEn: 'Full-Stack Web Engineering & UI/UX',
+    subtitleId: 'Mesin Klien Zero-Latency & Aksesibilitas',
+    subtitleEn: 'Zero-Latency Client Engine & WCAG AA Design',
+    descId: 'Membangun arsitektur web client-side 100% offline-ready tanpa ketergantungan server pusat, estetika Apple-clean tanpa AI slop, dan kepatuhan aksesibilitas kontras 100% WCAG 2.1 AA.',
+    descEn: 'Architected the 100% client-side zero-latency offline-ready engine, crafted Apple-clean aesthetics without AI slop, and ensured 100% WCAG 2.1 AA contrast compliance.',
+    tags: ['React / TypeScript', 'Tailwind CSS', 'Zero-Latency Client', 'WCAG 2.1 AA'],
+    icon: Cpu,
+    accentColor: 'text-purple-600 dark:text-purple-400',
+    badgeBg: 'bg-purple-50 dark:bg-purple-950/60 border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300',
   },
 ];
 
@@ -129,7 +141,7 @@ export const TeamPage: React.FC<TeamPageProps> = ({ language }) => {
         <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#e5e5e7] dark:border-[#1f2937]">
           <div className="flex items-center gap-2 text-xs font-semibold text-[#86868b] dark:text-[#9ca3af] uppercase tracking-wider">
             <Award className="w-4 h-4 text-[#1d1d1f] dark:text-white" />
-            <span>NASA Space Apps Challenge 2026 &bull; Global Hackathon</span>
+            <span>NASA Space Apps Challenge 2026 &bull; Solo Participant Submission</span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -161,42 +173,55 @@ export const TeamPage: React.FC<TeamPageProps> = ({ language }) => {
             </div>
             <div className="p-4 rounded-2xl bg-[#fbfbfd] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937]">
               <span className="text-[10px] font-bold uppercase text-[#86868b] dark:text-[#9ca3af] tracking-wider block">
-                {t.spatialResolution}
+                {language === 'id' ? 'Status Proyek' : 'Project Status'}
               </span>
-              <strong className="text-2xl font-bold text-[#1d1d1f] dark:text-white num mt-1 block">5.5 km</strong>
-              <span className="text-[11px] text-[#6e6e73] dark:text-[#9ca3af]">Equal-Area Binning</span>
+              <strong className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 block">Solo</strong>
+              <span className="text-[11px] text-[#6e6e73] dark:text-[#9ca3af]">100% Independently Built</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 2. Full-Width Team Showcase & Mission Statement */}
+      {/* 2. SOLO CREATOR SPOTLIGHT & MISSION STATEMENT */}
       <div className="w-full bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-3xl overflow-hidden shadow-xs grid grid-cols-1 lg:grid-cols-12 gap-0">
         
-        {/* Left: High-Res Team Photo */}
-        <div className="lg:col-span-7 relative min-h-[360px] sm:min-h-[480px] bg-[#1d1d1f] overflow-hidden">
+        {/* Left: High-Res Creator Visual Card */}
+        <div className="lg:col-span-7 relative min-h-[360px] sm:min-h-[440px] bg-[#1d1d1f] overflow-hidden">
           <img
             src="/team_photo.jpg"
-            alt="Team Terra Harmonia"
+            alt="Creator Rangga"
             className="w-full h-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
           
-          <div className="absolute bottom-6 left-6 right-6 text-white space-y-2">
+          <div className="absolute bottom-6 left-6 right-6 text-white space-y-2.5">
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-semibold">
               <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              <span>Team Terra Harmonia &bull; Indonesia</span>
+              <span>Solo Creator &bull; Indonesia</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-bold tracking-tight">
-              {t.teamShowcaseTitle}
+              Rangga
             </h2>
-            <p className="text-xs sm:text-sm text-white/85 max-w-xl leading-relaxed">
-              {t.teamShowcaseSubtitle}
+            <p className="text-xs sm:text-sm text-white/90 max-w-xl leading-relaxed">
+              {language === 'id'
+                ? 'Kreator Tunggal, Arsitek Geospasial & Pengembang Full-Stack Terra Harmonia untuk NASA Space Apps Challenge 2026.'
+                : 'Solo Creator, Geospatial Architect & Full-Stack Engineer of Terra Harmonia for NASA Space Apps Challenge 2026.'}
             </p>
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px]">
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 font-medium">
+                100% Solo Built
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full bg-blue-500/30 text-blue-200 border border-blue-400/30 font-medium">
+                Full-Stack GIS &amp; Data Science
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full bg-purple-500/30 text-purple-200 border border-purple-400/30 font-medium">
+                Open Science MIT
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Right: Problem Statement & Project Mission */}
+        {/* Right: Problem Statement & Solo Project Rationale */}
         <div className="lg:col-span-5 p-6 sm:p-10 flex flex-col justify-between space-y-6 bg-white dark:bg-[#111827]">
           <div className="space-y-4">
             <div>
@@ -224,14 +249,17 @@ export const TeamPage: React.FC<TeamPageProps> = ({ language }) => {
           </div>
 
           <div className="pt-4 border-t border-[#e5e5e7] dark:border-[#1f2937] flex items-center justify-between text-xs text-[#86868b] dark:text-[#9ca3af]">
-            <span>{language === 'id' ? 'Lokasi: Jakarta, Indonesia' : 'Location: Jakarta, Indonesia'}</span>
+            <span className="flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-red-500" />
+              <span>{language === 'id' ? 'Indonesia' : 'Indonesia'}</span>
+            </span>
             <span>NASA Space Apps 2026</span>
           </div>
         </div>
 
       </div>
 
-      {/* 3. HERO BRAND IDENTITY & LARGE LOGO SHOWCASE (Redesigned & Expanded) */}
+      {/* 3. HERO BRAND IDENTITY & LARGE LOGO SHOWCASE */}
       <div className="w-full bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-3xl p-6 sm:p-10 shadow-xs space-y-8">
         
         {/* Section Header */}
@@ -369,7 +397,7 @@ export const TeamPage: React.FC<TeamPageProps> = ({ language }) => {
 
         </div>
 
-        {/* 4. DEDICATED VISUAL BREAKDOWN PER LOGO COMPONENT (Gambar & Visual per Komponen) */}
+        {/* 4. DEDICATED VISUAL BREAKDOWN PER LOGO COMPONENT */}
         <div className="pt-6 border-t border-[#e5e5e7] dark:border-[#1f2937] space-y-6">
           <div>
             <span className="text-xs font-bold text-[#1d1d1f] dark:text-white uppercase tracking-wider flex items-center gap-2">
@@ -607,9 +635,9 @@ export const TeamPage: React.FC<TeamPageProps> = ({ language }) => {
 
       </div>
 
-      {/* 6. Full-Width Section: Komposisi & Spesialisasi Anggota Tim */}
+      {/* 6. SOLO CREATOR 4 TECHNICAL PILLARS (Dikerjakan Mandiri oleh Rangga) */}
       <div className="w-full bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-3xl p-6 sm:p-10 shadow-xs space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#e5e5e7] dark:border-[#1f2937]">
           <div>
             <div className="text-xs font-semibold uppercase tracking-wider text-[#86868b] dark:text-[#9ca3af]">
               {t.humanCapitalTitle}
@@ -617,56 +645,64 @@ export const TeamPage: React.FC<TeamPageProps> = ({ language }) => {
             <h2 className="text-2xl sm:text-3xl font-bold text-[#1d1d1f] dark:text-white tracking-tight mt-0.5">
               {t.teamCompTitle}
             </h2>
+            <p className="text-xs text-[#6e6e73] dark:text-[#9ca3af] mt-1">
+              {language === 'id'
+                ? 'Seluruh aspek rekayasa sistem Terra Harmonia dikembangkan secara mandiri oleh Rangga melalui 4 pilar kompetensi lintas disiplin:'
+                : 'All engineering aspects of Terra Harmonia were independently architected by Rangga across 4 core multidisciplinary pillars:'}
+            </p>
           </div>
-          <span className="text-xs font-semibold text-[#86868b] dark:text-[#9ca3af] bg-[#f5f5f7] dark:bg-[#151d2f] px-3.5 py-1.5 rounded-full border border-[#e5e5e7] dark:border-[#1f2937] shrink-0">
-            {language === 'id' ? '4 Bidang Keahlian' : '4 Core Disciplines'}
+          <span className="text-xs font-semibold text-[#86868b] dark:text-[#9ca3af] bg-[#f5f5f7] dark:bg-[#151d2f] px-3.5 py-1.5 rounded-full border border-[#e5e5e7] dark:border-[#1f2937] shrink-0 self-start sm:self-auto">
+            {language === 'id' ? 'Kreator Mandiri (Solo Developer)' : 'Solo Creator & Architect'}
           </span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {TEAM_MEMBERS.map((member, index) => (
-            <div
-              key={index}
-              className="bg-[#fbfbfd] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl p-6 shadow-xs hover:border-[#1d1d1f]/40 dark:hover:border-white/40 transition-all flex flex-col justify-between space-y-4"
-            >
-              <div className="space-y-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-11 h-11 rounded-2xl ${member.avatarBg} font-bold text-sm flex items-center justify-center shadow-xs shrink-0`}>
-                      {member.initials}
+          {SOLO_DISCIPLINES.map((pillar, index) => {
+            const Icon = pillar.icon;
+            return (
+              <div
+                key={index}
+                className="bg-[#fbfbfd] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl p-6 shadow-xs hover:border-[#1d1d1f]/40 dark:hover:border-white/40 transition-all flex flex-col justify-between space-y-4"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 rounded-2xl bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] shadow-xs shrink-0">
+                        <Icon className={`w-5 h-5 ${pillar.accentColor}`} />
+                      </div>
+                      <div>
+                        <h3 className="text-base font-bold text-[#1d1d1f] dark:text-white leading-tight">
+                          {language === 'id' ? pillar.titleId : pillar.titleEn}
+                        </h3>
+                        <p className="text-xs font-bold text-blue-700 dark:text-blue-400 mt-0.5">
+                          {language === 'id' ? pillar.subtitleId : pillar.subtitleEn}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-base sm:text-lg font-bold text-[#1d1d1f] dark:text-white leading-tight">
-                        {member.name}
-                      </h3>
-                      <p className="text-xs font-bold text-blue-700 dark:text-blue-400 mt-0.5">
-                        {language === 'id' ? member.roleId : member.roleEn}
-                      </p>
-                    </div>
+
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0 ${pillar.badgeBg}`}>
+                      Pilar {index + 1}
+                    </span>
                   </div>
 
-                  <div className="p-2 bg-white dark:bg-[#111827] rounded-xl border border-[#e5e5e7] dark:border-[#1f2937] text-[#86868b] dark:text-[#9ca3af] shrink-0">
-                    <Users className="w-4 h-4" />
-                  </div>
+                  <p className="text-xs text-[#515154] dark:text-[#d1d5db] leading-relaxed pt-1">
+                    {language === 'id' ? pillar.descId : pillar.descEn}
+                  </p>
                 </div>
 
-                <p className="text-xs text-[#515154] dark:text-[#d1d5db] leading-relaxed pt-1">
-                  {language === 'id' ? member.focusId : member.focusEn}
-                </p>
+                <div className="flex flex-wrap gap-1.5 pt-3 border-t border-[#e5e5e7] dark:border-[#1f2937]">
+                  {pillar.tags.map((tag, tIdx) => (
+                    <span
+                      key={tIdx}
+                      className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-[#e5e5e7] border border-[#e5e5e7] dark:border-[#1f2937]"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
               </div>
-
-              <div className="flex flex-wrap gap-1.5 pt-3 border-t border-[#e5e5e7] dark:border-[#1f2937]">
-                {member.tags.map((tag, tIdx) => (
-                  <span
-                    key={tIdx}
-                    className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-[#e5e5e7] border border-[#e5e5e7] dark:border-[#1f2937]"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
