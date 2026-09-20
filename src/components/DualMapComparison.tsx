@@ -146,16 +146,16 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
       const localTime = getIndonesianLocalTime(h.date, h.time, h.lon);
 
       circle.bindPopup(
-        `<div style="font-family:system-ui,sans-serif;font-size:12px;min-width:220px;padding:2px;line-height:1.4">
-          <div style="font-weight:700;color:#0f172a;font-size:12.5px;margin-bottom:2px;">${h.instrument} (${h.satellite})</div>
-          <div style="color:#0071e3;font-weight:600;font-size:11px;margin-bottom:3px;">${loc.regency}</div>
-          <div style="font-size:10.5px;color:#059669;margin-bottom:4px;">${loc.landscape}</div>
-          <div style="background:#f8fafc;padding:5px;border-radius:6px;font-size:11px;margin-bottom:4px;">
-            <div><b>${language === 'id' ? 'Koordinat' : 'Coords'}:</b> <span style="font-family:monospace">${h.lat.toFixed(4)}&deg;, ${h.lon.toFixed(4)}&deg;</span></div>
-            <div><b>${language === 'id' ? 'Waktu' : 'Time'}:</b> ${localTime.timeFormatted} (${h.date})</div>
-            <div><b>${language === 'id' ? 'Daya Termal' : 'Thermal Power'}:</b> ${Math.round(h.frp)} MW</div>
+        `<div class="hotspot-popup">
+          <div class="hotspot-popup-title" style="margin-bottom:2px;">${h.instrument} (${h.satellite})</div>
+          <div class="hotspot-popup-regency" style="margin-bottom:3px;">${loc.regency}</div>
+          <div class="hotspot-popup-landscape" style="margin-bottom:4px;">${loc.landscape}</div>
+          <div class="hotspot-popup-card" style="font-size:11px;margin-bottom:4px;padding:6px;">
+            <div class="hotspot-popup-text-strong"><b>${language === 'id' ? 'Koordinat' : 'Coords'}:</b> <span style="font-family:monospace">${h.lat.toFixed(4)}&deg;, ${h.lon.toFixed(4)}&deg;</span></div>
+            <div class="hotspot-popup-text-muted"><b>${language === 'id' ? 'Waktu' : 'Time'}:</b> ${localTime.timeFormatted} (${h.date})</div>
+            <div class="hotspot-popup-text-strong"><b>${language === 'id' ? 'Daya Termal' : 'Thermal Power'}:</b> ${Math.round(h.frp)} MW</div>
           </div>
-          <a href="${loc.googleMapsUrl}" target="_blank" rel="noopener noreferrer" style="color:#0071e3;text-decoration:underline;font-size:10.5px;font-weight:600;">
+          <a href="${loc.googleMapsUrl}" target="_blank" rel="noopener noreferrer" class="hotspot-popup-link" style="font-size:10.5px;">
             ${language === 'id' ? 'Buka di Google Maps' : 'Open in Google Maps'}
           </a>
         </div>`,
@@ -186,16 +186,16 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
       const localTime = getIndonesianLocalTime(h.date, h.time, h.lon);
 
       circle.bindPopup(
-        `<div style="font-family:system-ui,sans-serif;font-size:12px;min-width:220px;padding:2px;line-height:1.4">
-          <div style="font-weight:700;color:#0f172a;font-size:12.5px;margin-bottom:2px;">${h.instrument} (${h.satellite})</div>
-          <div style="color:#0071e3;font-weight:600;font-size:11px;margin-bottom:3px;">${loc.regency}</div>
-          <div style="font-size:10.5px;color:#059669;margin-bottom:4px;">${loc.landscape}</div>
-          <div style="background:#f8fafc;padding:5px;border-radius:6px;font-size:11px;margin-bottom:4px;">
-            <div><b>${language === 'id' ? 'Koordinat' : 'Coords'}:</b> <span style="font-family:monospace">${h.lat.toFixed(4)}&deg;, ${h.lon.toFixed(4)}&deg;</span></div>
-            <div><b>${language === 'id' ? 'Waktu' : 'Time'}:</b> ${localTime.timeFormatted} (${h.date})</div>
-            <div><b>${language === 'id' ? 'Daya Termal' : 'Thermal Power'}:</b> ${Math.round(h.frp)} MW</div>
+        `<div class="hotspot-popup">
+          <div class="hotspot-popup-title" style="margin-bottom:2px;">${h.instrument} (${h.satellite})</div>
+          <div class="hotspot-popup-regency" style="margin-bottom:3px;">${loc.regency}</div>
+          <div class="hotspot-popup-landscape" style="margin-bottom:4px;">${loc.landscape}</div>
+          <div class="hotspot-popup-card" style="font-size:11px;margin-bottom:4px;padding:6px;">
+            <div class="hotspot-popup-text-strong"><b>${language === 'id' ? 'Koordinat' : 'Coords'}:</b> <span style="font-family:monospace">${h.lat.toFixed(4)}&deg;, ${h.lon.toFixed(4)}&deg;</span></div>
+            <div class="hotspot-popup-text-muted"><b>${language === 'id' ? 'Waktu' : 'Time'}:</b> ${localTime.timeFormatted} (${h.date})</div>
+            <div class="hotspot-popup-text-strong"><b>${language === 'id' ? 'Daya Termal' : 'Thermal Power'}:</b> ${Math.round(h.frp)} MW</div>
           </div>
-          <a href="${loc.googleMapsUrl}" target="_blank" rel="noopener noreferrer" style="color:#0071e3;text-decoration:underline;font-size:10.5px;font-weight:600;">
+          <a href="${loc.googleMapsUrl}" target="_blank" rel="noopener noreferrer" class="hotspot-popup-link" style="font-size:10.5px;">
             ${language === 'id' ? 'Buka di Google Maps' : 'Open in Google Maps'}
           </a>
         </div>`,
