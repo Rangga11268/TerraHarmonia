@@ -9,6 +9,7 @@ import { CriticalAlerts } from './components/CriticalAlerts';
 import { RiskForecast } from './components/RiskForecast';
 import { Footer } from './components/Footer';
 import { NasaApiKeyModal } from './components/NasaApiKeyModal';
+import { ScienceTourModal } from './components/ScienceTourModal';
 import { PRESET_AOIS, AOIRegion, RawHotspot, HarmonizedWeekData, harmonizeHotspots } from './engine/harmonizer';
 import { generateHistoricalFireData } from './data/generator';
 import { fetchLiveNASAHotspots, LiveSyncResult } from './services/nasaFirmsApi';
@@ -106,6 +107,7 @@ export function App() {
   const [selectedKey, setSelectedKey] = useState<string | null>('2015-38');
   const [selectedWeekData, setSelectedWeekData] = useState<HarmonizedWeekData | null>(null);
   const [isNasaModalOpen, setIsNasaModalOpen] = useState<boolean>(false);
+  const [isTourModalOpen, setIsTourModalOpen] = useState<boolean>(false);
 
   const [isLiveSync, setIsLiveSync] = useState<boolean>(false);
   const [isLoadingLive, setIsLoadingLive] = useState<boolean>(false);
@@ -131,11 +133,13 @@ export function App() {
     }
   }, []);
 
-  const handleToggleLiveSync = () => {
-    const next = !isLiveSync;
-    setIsLiveSync(next);
-    if (next) loadLiveFeed(selectedAOI, userMapKey);
-  };
+  const handleToggleLiveSync = useCallback(() => {
+    setIsLiveSync((prev) => {
+      const next = !prev;
+      if (next) loadLiveFeed(selectedAOI, userMapKey);
+      return next;
+    });
+  }, [loadLiveFeed, selectedAOI, userMapKey]);
 
   const handleSaveMapKey = (key: string) => {
     setUserMapKey(key);
@@ -146,6 +150,43 @@ export function App() {
   useEffect(() => {
     if (isLiveSync) loadLiveFeed(selectedAOI, userMapKey);
   }, [selectedAOI, isLiveSync, loadLiveFeed, userMapKey]);
+
+  // Global power-user keyboard shortcuts for live pitch presentation (1-5, L, T, ?)
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT' ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+
+      if (e.key === '1') {
+        setActiveTab('overview');
+      } else if (e.key === '2') {
+        setActiveTab('lab');
+      } else if (e.key === '3') {
+        setActiveTab('mitigation');
+      } else if (e.key === '4') {
+        setActiveTab('data-hub');
+      } else if (e.key === '5') {
+        setActiveTab('team');
+      } else if (e.key === 'l' || e.key === 'L') {
+        handleToggleLiveSync();
+      } else if (e.key === 't' || e.key === 'T') {
+        toggleTheme();
+      } else if (e.key === '?' || e.key === 'h' || e.key === 'H') {
+        setIsTourModalOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [handleToggleLiveSync, toggleTheme]);
 
   const displayedHotspots = useMemo(() => {
     if (isLiveSync && liveResult?.hotspots && liveResult.hotspots.length > 0) return liveResult.hotspots;
@@ -186,6 +227,7 @@ export function App() {
         activeTab={activeTab}
         onSelectTab={setActiveTab}
         onOpenTeam={() => setActiveTab('team')}
+        onOpenTour={() => setIsTourModalOpen(true)}
         isLiveSync={isLiveSync}
       />
 
@@ -464,6 +506,14 @@ export function App() {
             ? (language === 'id' ? 'Terhubung: NASA FIRMS API Resmi' : 'Connected: NASA FIRMS Authorized API')
             : undefined
         }
+      />
+
+      {/* 30-Second Science Briefing & Pitching Shortcuts Modal */}
+      <ScienceTourModal
+        language={language}
+        isOpen={isTourModalOpen}
+        onClose={() => setIsTourModalOpen(false)}
+        onSelectTab={setActiveTab}
       />
     </div>
   );

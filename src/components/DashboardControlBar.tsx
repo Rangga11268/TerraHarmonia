@@ -154,11 +154,19 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
       {/* Segmented View Mode Switcher (Clean, fast, uncluttered) */}
       <div className="px-4 sm:px-5 py-2.5 bg-[#fbfbfd] dark:bg-[#0f172a] border-t border-[#e5e5e7] dark:border-[#1f2937] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 text-xs">
         
-        {/* Left: Biome Info */}
-        <div className="flex items-center gap-2 text-[#6e6e73] dark:text-[#9ca3af] truncate">
+        {/* Left: Biome Info & Client-Side Engine Badge */}
+        <div className="flex items-center gap-2 text-[#6e6e73] dark:text-[#9ca3af] truncate flex-wrap">
           <span className="font-semibold text-[#1d1d1f] dark:text-white">{selectedAOI.biome}</span>
           <span className="text-[#86868b] dark:text-[#6b7280] hidden md:inline">&bull;</span>
           <span className="hidden md:inline text-[#86868b] dark:text-[#9ca3af] truncate">{selectedAOI.description}</span>
+          
+          <span
+            title={t.offlineEngineTooltip}
+            className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 shrink-0"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span>{t.offlineEngineBadge}</span>
+          </span>
         </div>
 
         {/* Right: Segmented Tool Switcher */}

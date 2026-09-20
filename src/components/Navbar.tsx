@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Logo } from './Logo';
 import { Language, translations } from '../data/translations';
-import { Menu, X, Sun, Moon, Monitor } from 'lucide-react';
+import { Menu, X, Sun, Moon, Sparkles } from 'lucide-react';
 
 export type NavTab = 'overview' | 'lab' | 'mitigation' | 'data-hub' | 'team';
 export type ThemeMode = 'system' | 'light' | 'dark';
@@ -12,6 +12,7 @@ interface NavbarProps {
   activeTab: NavTab;
   onSelectTab: (tab: NavTab) => void;
   onOpenTeam?: () => void;
+  onOpenTour?: () => void;
   isLiveSync?: boolean;
   theme?: 'light' | 'dark';
   onToggleTheme?: () => void;
@@ -23,6 +24,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   onSelectTab,
   onOpenTeam,
+  onOpenTour,
   isLiveSync = false,
   theme = 'light',
   onToggleTheme,
@@ -127,6 +129,21 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             </div>
 
+            {/* 30-Sec Science Briefing Tour Button */}
+            {onOpenTour && (
+              <button
+                onClick={onOpenTour}
+                className="hidden lg:inline-flex items-center gap-1.5 text-[12px] font-semibold px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900 transition-all cursor-pointer shadow-2xs"
+                title={language === 'id' ? 'Buka Ringkasan Ilmiah 30 Detik (Pintasan: ?)' : 'Open 30-Second Science Briefing (Shortcut: ?)'}
+              >
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span>{t.scienceTourBtn}</span>
+                <kbd className="hidden xl:inline text-[9px] font-mono px-1 py-0.2 rounded bg-white dark:bg-[#111827] border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200">
+                  ?
+                </kbd>
+              </button>
+            )}
+
             {/* Team Tab Quick Link */}
             <button
               onClick={() => onSelectTab('team')}
@@ -155,7 +172,25 @@ export const Navbar: React.FC<NavbarProps> = ({
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-[1001] md:hidden bg-black/40 backdrop-blur-xs pt-14 flex flex-col">
           <div className="bg-white dark:bg-[#111827] border-b border-[#e5e5e7] dark:border-[#1f2937] p-4 space-y-3 shadow-xl animate-in slide-in-from-top-2 duration-150">
-            {/* Nav Items */}
+            {/* Tour & Nav Items */}
+            {onOpenTour && (
+              <button
+                onClick={() => {
+                  onOpenTour();
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-semibold transition min-h-[40px] cursor-pointer bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <span>{t.scienceTourBtn}</span>
+                </div>
+                <span className="text-[10px] uppercase font-mono font-bold tracking-wider">
+                  {language === 'id' ? 'Ringkasan 30 Detik' : '30-Sec Briefing'}
+                </span>
+              </button>
+            )}
+
             <div className="space-y-1">
               {navItems.map((item) => {
                 const isActive = activeTab === item.id;

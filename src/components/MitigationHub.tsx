@@ -25,7 +25,9 @@ import {
   ArrowUpDown,
   Sparkles,
   Zap,
-  RotateCcw
+  RotateCcw,
+  Copy,
+  MessageSquare
 } from 'lucide-react';
 import { PRESET_AOIS, AOIRegion, HarmonizedWeekData, RawHotspot } from '../engine/harmonizer';
 import { Language, translations } from '../data/translations';
@@ -76,6 +78,14 @@ export const MitigationHub: React.FC<MitigationHubProps> = ({
   const [activeFilterPill, setActiveFilterPill] = useState<FilterPill>('all');
   const [sortOrder, setSortOrder] = useState<'frp_desc' | 'confidence_desc' | 'time_desc'>('frp_desc');
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleCopyCoord = (spotId: string, lat: number, lon: number) => {
+    const text = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+    navigator.clipboard.writeText(text);
+    setCopiedId(spotId);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   // Fetch live weather when AOI changes
   useEffect(() => {
@@ -707,20 +717,62 @@ ${language === 'id' ? 'Sumber Data: NASA FIRMS (MODIS 1km / VIIRS 375m) & Open-M
                       </div>
                     </div>
 
-                    <div className="pt-2 flex items-center justify-between text-[10px] border-t border-[#e5e5e7] dark:border-[#1f2937]">
-                      <span className="font-mono text-[#6e6e73] dark:text-[#9ca3af]">
-                        {spot.lat.toFixed(4)}°, {spot.lon.toFixed(4)}°
-                      </span>
-
-                      <a
-                        href={loc.googleMapsUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[#0071e3] dark:text-[#38bdf8] hover:underline font-semibold"
+                    <div className="pt-2 flex items-center justify-between gap-1 text-[10px] border-t border-[#e5e5e7] dark:border-[#1f2937]">
+                      <button
+                        onClick={() => handleCopyCoord(spot.id, spot.lat, spot.lon)}
+                        className={`inline-flex items-center gap-1 font-mono px-2 py-1 rounded-md border transition cursor-pointer ${
+                          copiedId === spot.id
+                            ? 'bg-emerald-500 text-white border-emerald-500 font-bold'
+                            : 'bg-white dark:bg-[#111827] text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white border-[#e5e5e7] dark:border-[#1f2937]'
+                        }`}
+                        title="Salin Koordinat GPS"
                       >
-                        <span>Google Maps</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
+                        {copiedId === spot.id ? (
+                          <>
+                            <CheckCircle2 className="w-3 h-3 text-white" />
+                            <span>{t.copiedTooltip}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3" />
+                            <span>{spot.lat.toFixed(4)}°, {spot.lon.toFixed(4)}°</span>
+                          </>
+                        )}
+                      </button>
+
+                      <div className="flex items-center gap-1.5">
+                        {/* WhatsApp Dispatch Button */}
+                        <a
+                          href={`https://wa.me/?text=${encodeURIComponent(
+                            `🚨 *DISPOSISI DARURAT TITIK PANAS TERRA HARMONIA*\n` +
+                            `Wilayah: ${selectedAOI.name} (${loc.regency}${loc.district ? `, ${loc.district}` : ''})\n` +
+                            `Koordinat: ${spot.lat.toFixed(5)}, ${spot.lon.toFixed(5)}\n` +
+                            `FRP: ${spot.frp} MW | Sensor: ${spot.instrument} (${spot.satellite})\n` +
+                            `Keyakinan: ${spot.confidence}% | Waktu: ${loc.localTimeFormatted}\n` +
+                            `Google Maps: ${loc.googleMapsUrl}\n` +
+                            `Instruksi: Segera kerahkan tim pemadaman darat Manggala Agni / MPA ke lokasi.`
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900 border border-emerald-200 dark:border-emerald-800 font-semibold transition cursor-pointer"
+                          title="Kirim Disposisi WhatsApp"
+                        >
+                          <MessageSquare className="w-3 h-3" />
+                          <span>WA</span>
+                        </a>
+
+                        {/* Google Maps Link */}
+                        <a
+                          href={loc.googleMapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[#0071e3]/10 dark:bg-[#38bdf8]/10 text-[#0071e3] dark:text-[#38bdf8] hover:bg-[#0071e3]/20 border border-[#0071e3]/20 font-semibold transition"
+                          title="Buka Navigasi Google Maps"
+                        >
+                          <span>Maps</span>
+                          <ExternalLink className="w-2.5 h-2.5" />
+                        </a>
+                      </div>
                     </div>
                   </div>
                 );
