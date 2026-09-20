@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AOIRegion, HarmonizedWeekData, RawHotspot } from '../engine/harmonizer';
 import { Language, translations } from '../data/translations';
-import { Printer, FileText, Download, ShieldCheck, CheckCircle2, QrCode, ExternalLink, Globe } from 'lucide-react';
+import { Printer, FileText, Download, ShieldCheck, CheckCircle2, QrCode, ExternalLink, Loader2 } from 'lucide-react';
 import { LiveWeatherData } from '../services/weatherApi';
 import { resolveHotspotLocation } from '../utils/locationResolver';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 interface ExecutiveReportProps {
   language: Language;
@@ -22,7 +24,7 @@ export const ExecutiveReport: React.FC<ExecutiveReportProps> = ({
   liveWeather = null,
   liveHotspots = [],
 }) => {
-  const t = translations[language];
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   const today = new Date();
   const reportDateFormatted = today.toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', {
@@ -49,198 +51,65 @@ export const ExecutiveReport: React.FC<ExecutiveReportProps> = ({
   const topSpots = liveHotspots.slice(0, 5);
 
   /**
-   * Opens an isolated, standalone printable window containing ONLY the official document
-   * with pure print styles and zero surrounding website UI.
+   * Direct PDF Generator: Renders document to crisp high-res canvas and saves directly as a PDF file
    */
-  const handlePrintIsolated = () => {
-    const docElement = document.getElementById('official-sitrep-document');
-    if (!docElement) {
-      window.print();
-      return;
-    }
-
-    const printWindow = window.open('', '_blank', 'width=900,height=1100');
-    if (!printWindow) {
-      window.print();
-      return;
-    }
-
-    const htmlContent = `
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <title>${docRegNumber} - Official Situation Report</title>
-  <style>
-    @page {
-      size: A4 portrait;
-      margin: 10mm 14mm;
-    }
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      color: #111827;
-      background: #ffffff;
-      font-size: 11px;
-      line-height: 1.5;
-      padding: 12px 18px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 8px 0;
-    }
-    th, td {
-      border: 1px solid #d1d5db;
-      padding: 6px 8px;
-      text-align: left;
-      font-size: 10.5px;
-    }
-    th {
-      background-color: #f3f4f6;
-      font-weight: 700;
-      text-transform: uppercase;
-      font-size: 9.5px;
-    }
-    .header-border {
-      border-bottom: 2.5px solid #111827;
-      padding-bottom: 12px;
-      margin-bottom: 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .badge {
-      display: inline-block;
-      padding: 3px 8px;
-      border: 1px solid #be123c;
-      background-color: #fff1f2;
-      color: #be123c;
-      font-weight: 800;
-      font-size: 9px;
-      border-radius: 4px;
-      text-transform: uppercase;
-    }
-    .meta-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      background-color: #f9fafb;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 14px;
-    }
-    .section-title {
-      font-size: 11.5px;
-      font-weight: 800;
-      text-transform: uppercase;
-      border-bottom: 1px solid #e5e7eb;
-      padding-bottom: 4px;
-      margin-top: 14px;
-      margin-bottom: 6px;
-      display: flex;
-      justify-content: space-between;
-    }
-    .text-justify {
-      text-align: justify;
-    }
-    .sig-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      margin-top: 24px;
-      padding-top: 16px;
-      border-top: 2px solid #111827;
-      text-align: center;
-      page-break-inside: avoid;
-    }
-    .sig-stamp {
-      height: 55px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 8px 0;
-    }
-    .stamp-box {
-      border: 1.5px solid #059669;
-      background: #ecfdf5;
-      color: #065f46;
-      font-weight: 800;
-      font-size: 9px;
-      padding: 4px 10px;
-      border-radius: 4px;
-      display: inline-block;
-    }
-    @media print {
-      body {
-        padding: 0;
-      }
-      .no-print {
-        display: none !important;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="no-print" style="margin-bottom: 15px; padding: 10px; background: #f3f4f6; border-radius: 8px; text-align: center;">
-    <button onclick="window.print()" style="padding: 8px 18px; font-weight: bold; background: #111827; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">
-      🖨️ Cetak / Simpan PDF Sekarang
-    </button>
-  </div>
-  ${docElement.innerHTML}
-  <script>
-    window.onload = function() {
-      setTimeout(function() {
-        window.print();
-      }, 400);
-    };
-  </script>
-</body>
-</html>
-    `;
-
-    printWindow.document.open();
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
-  };
-
-  /**
-   * Direct download of the official document as a standalone offline HTML file
-   */
-  const handleDownloadStandaloneHTML = () => {
+  const handleDownloadDirectPDF = async () => {
     const docElement = document.getElementById('official-sitrep-document');
     if (!docElement) return;
 
-    const fileContent = `<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <title>${docRegNumber}</title>
-  <style>
-    @page { size: A4 portrait; margin: 12mm 15mm; }
-    body { font-family: sans-serif; color: #111827; background: #fff; font-size: 11px; line-height: 1.5; padding: 20px; max-width: 850px; margin: 0 auto; }
-    table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-    th, td { border: 1px solid #d1d5db; padding: 6px 8px; font-size: 10.5px; }
-    th { background: #f3f4f6; font-weight: bold; }
-    .badge { border: 1px solid #be123c; background: #fff1f2; color: #be123c; font-weight: bold; padding: 2px 6px; }
-  </style>
-</head>
-<body>
-  ${docElement.innerHTML}
-</body>
-</html>`;
+    try {
+      setIsGeneratingPdf(true);
 
-    const blob = new Blob([fileContent], { type: 'text/html;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `SITREP_${selectedAOI.id.toUpperCase()}_${today.toISOString().split('T')[0]}.html`;
-    link.click();
+      // Create high-resolution canvas of the document
+      const canvas = await html2canvas(docElement, {
+        scale: 2.5, // 2.5x scale for sharp text and clean lines
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        windowWidth: 850,
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pdfWidth - 16; // 8mm margins left/right
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      let heightLeft = imgHeight;
+      let position = 8; // 8mm top margin
+
+      // First page
+      pdf.addImage(imgData, 'PNG', 8, position, imgWidth, imgHeight);
+      heightLeft -= (pdfHeight - 16);
+
+      // Subsequent pages if content overflows 1 page
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight + 8;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 8, position, imgWidth, imgHeight);
+        heightLeft -= (pdfHeight - 16);
+      }
+
+      pdf.save(`SITREP_${selectedAOI.id.toUpperCase()}_${today.toISOString().split('T')[0]}.pdf`);
+    } catch (err) {
+      console.error('PDF generation error:', err);
+      window.print();
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
+
+  /**
+   * Print Handler: Invokes native browser print dialog with styled A4 rules
+   */
+  const handlePrint = () => {
+    window.print();
   };
 
   return (
@@ -263,247 +132,331 @@ export const ExecutiveReport: React.FC<ExecutiveReportProps> = ({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {/* Direct Download Button */}
+          {/* Direct PDF Download Button */}
           <button
-            onClick={handleDownloadStandaloneHTML}
-            className="px-3.5 py-2.5 rounded-xl bg-[#f5f5f7] hover:bg-[#e5e5ea] text-[#1d1d1f] text-xs font-semibold flex items-center gap-1.5 border border-[#e5e5e7] transition cursor-pointer min-h-[40px]"
-            title="Unduh Dokumen Mandiri (.html)"
+            onClick={handleDownloadDirectPDF}
+            disabled={isGeneratingPdf}
+            className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-2 shadow-xs transition cursor-pointer min-h-[40px] disabled:opacity-50"
           >
-            <Download className="w-4 h-4 text-[#86868b]" />
-            <span>{language === 'id' ? 'Unduh Dokumen (.html)' : 'Download Doc (.html)'}</span>
+            {isGeneratingPdf ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>{language === 'id' ? 'Membuat File PDF...' : 'Generating PDF...'}</span>
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4" />
+                <span>{language === 'id' ? 'Unduh PDF Langsung' : 'Download PDF Direct'}</span>
+              </>
+            )}
           </button>
 
-          {/* Isolated Clean Window Print Button */}
+          {/* Browser Print Button */}
           <button
-            onClick={handlePrintIsolated}
+            onClick={handlePrint}
             className="px-4 py-2.5 rounded-xl bg-[#1d1d1f] hover:bg-black text-white text-xs font-semibold flex items-center gap-2 shadow-xs transition cursor-pointer min-h-[40px]"
           >
             <Printer className="w-4 h-4 text-emerald-400" />
-            <span>{language === 'id' ? 'Cetak / Unduh PDF Resmi' : 'Print / Export Official PDF'}</span>
+            <span>{language === 'id' ? 'Cetak / Print A4' : 'Print A4'}</span>
           </button>
         </div>
       </div>
 
-      {/* Official Printable Document Container (A4 Proportional) */}
-      <div
-        id="official-sitrep-document"
-        className="p-6 sm:p-12 space-y-7 bg-white text-[#111827] max-w-4xl mx-auto print:p-0 print:m-0 print:max-w-full"
-      >
+      {/* Official Printable Document Container */}
+      <div className="p-4 sm:p-10 bg-white text-[#111827] max-w-4xl mx-auto print:p-0 print:m-0 print:max-w-full">
         
-        {/* 1. Official Government & NASA Letterhead (Kop Surat Resmi) */}
-        <div className="border-b-2 border-[#111827] pb-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            {/* National Coat / NASA Meatball Logo */}
-            <div className="w-16 h-16 flex items-center justify-center shrink-0">
-              <img
-                src="/nasa_meatball.svg"
-                alt="NASA Insignia"
-                className="w-14 h-14 object-contain"
-                onError={(e) => {
-                  (e.target as HTMLElement).style.display = 'none';
-                }}
-              />
-            </div>
-            <div>
-              <h2 className="text-[11px] font-extrabold uppercase tracking-widest text-[#4b5563]">
-                REPUBLIK INDONESIA &bull; NASA SPACE APPS JAKARTA 2026
-              </h2>
-              <h1 className="text-sm sm:text-base font-black tracking-tight text-[#111827] uppercase leading-snug">
-                PUSAT PENGENDALIAN OPERASI &amp; SISTEM MONITORING SATELIT TERRA HARMONIA
-              </h1>
-              <p className="text-[10px] text-[#6b7280] tracking-wide mt-0.5">
-                Integrasi Sensor MODIS (Terra/Aqua 1km) &amp; VIIRS (Suomi-NPP/NOAA-20 375m) &bull; SK Badan Restorasi Gambut &amp; KLHK
-              </p>
-            </div>
-          </div>
-
-          <div className="text-right shrink-0">
-            <span className="inline-block px-2.5 py-1 rounded border border-rose-600 bg-rose-50 text-rose-700 text-[9px] font-mono font-black uppercase tracking-wider">
-              OPERASIONAL TERBATAS
-            </span>
-            <div className="text-[9px] font-mono text-[#6b7280] mt-1.5">{docRegNumber}</div>
-          </div>
-        </div>
-
-        {/* 2. Document Identification & Meta Box */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 bg-[#f9fafb] border border-[#e5e7eb] rounded-xl text-xs">
-          <div>
-            <span className="text-[9px] font-bold text-[#6b7280] uppercase block">Wilayah Sasaran</span>
-            <strong className="text-sm font-bold text-[#111827] block mt-0.5">{selectedAOI.name}</strong>
-            <span className="text-[10px] text-[#4b5563]">{selectedAOI.country}</span>
-          </div>
-
-          <div>
-            <span className="text-[9px] font-bold text-[#6b7280] uppercase block">Koordinat Acuan</span>
-            <strong className="text-xs font-mono font-bold text-[#111827] block mt-0.5">
-              {selectedAOI.center[0].toFixed(4)}° N, {selectedAOI.center[1].toFixed(4)}° E
-            </strong>
-            <span className="text-[10px] text-[#4b5563]">{selectedAOI.biome}</span>
-          </div>
-
-          <div>
-            <span className="text-[9px] font-bold text-[#6b7280] uppercase block">Tanggal Observasi</span>
-            <strong className="text-xs font-bold text-[#111827] block mt-0.5">{reportDateFormatted}</strong>
-            <span className="text-[10px] text-emerald-700 font-semibold">Satelit 24H Feed Synced</span>
-          </div>
-
-          <div>
-            <span className="text-[9px] font-bold text-[#6b7280] uppercase block">Status Ancaman Karhutla</span>
-            <strong className={`text-xs font-black block mt-0.5 ${effectiveFwi >= 50 ? 'text-rose-600' : 'text-amber-600'}`}>
-              {threatLevel}
-            </strong>
-            <span className="text-[10px] text-[#4b5563]">Indeks FWI: {effectiveFwi}/100</span>
-          </div>
-        </div>
-
-        {/* 3. Executive Situation Synthesis */}
-        <div className="space-y-1.5">
-          <h3 className="text-xs font-black uppercase tracking-wider text-[#111827] border-b border-[#e5e7eb] pb-1 flex items-center justify-between">
-            <span>I. Ringkasan Eksekutif &amp; Analisis Kerentanan Spasial</span>
-            <span className="text-[10px] font-mono text-[#6b7280]">MODIS/VIIRS HARMONIZATION PIPELINE</span>
-          </h3>
-          <p className="text-xs text-[#374151] leading-relaxed text-justify">
-            Berdasarkan harmonisasi komputasi 26 tahun rekaman satelit NASA Terra, Aqua, Suomi-NPP, dan NOAA-20 yang dikompilasikan ke dalam grid klaster 5.5 km dengan faktor kalibrasi energi (MODIS 1.04 / VIIRS 0.88), wilayah <strong>{selectedAOI.name}</strong> saat ini berada pada status <strong>{threatLevel}</strong>. Parameter Muka Air Tanah Gambut (TMAT) terpantau di angka <strong>{currentTmat} cm</strong>, yang mana telah melampaui ambang batas kritis nasional PP No. 57/2016 (-40 cm), mengindikasikan tingginya ancaman kebakaran bawah permukaan (*subsurface peat smoldering*).
-          </p>
-        </div>
-
-        {/* 4. Hydrology & Environmental Telemetry Matrix */}
-        <div className="space-y-2">
-          <h3 className="text-xs font-black uppercase tracking-wider text-[#111827] border-b border-[#e5e7eb] pb-1">
-            II. Matriks Telemetri Hidrologis Gambut &amp; Cuaca Lapangan (BRGM &amp; Open-Meteo)
-          </h3>
-          <table className="w-full text-left text-xs border border-[#e5e7eb] rounded-lg overflow-hidden">
-            <thead className="bg-[#f3f4f6] text-[#374151] font-bold text-[10px] uppercase border-b border-[#e5e7eb]">
-              <tr>
-                <th className="py-2 px-3">Parameter Observasi</th>
-                <th className="py-2 px-3">Nilai Lapangan Aktual</th>
-                <th className="py-2 px-3">Batas Kritis / Standar</th>
-                <th className="py-2 px-3">Evaluasi Status Risiko</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#e5e7eb] text-[11px]">
-              <tr>
-                <td className="py-2 px-3 font-semibold">Tinggi Muka Air Tanah (TMAT)</td>
-                <td className="py-2 px-3 font-mono font-bold text-rose-600">{currentTmat} cm</td>
-                <td className="py-2 px-3 text-[#6b7280]">-40 cm (PP No. 57/2016 &amp; BRGM)</td>
-                <td className="py-2 px-3 font-bold text-rose-600">KRITIS &bull; MELEWATI BATAS</td>
-              </tr>
-              <tr>
-                <td className="py-2 px-3 font-semibold">Indeks Bahaya Cuaca Api (FWI)</td>
-                <td className="py-2 px-3 font-mono font-bold text-amber-600">{effectiveFwi}</td>
-                <td className="py-2 px-3 text-[#6b7280]">Ambang Siaga: &ge; 48</td>
-                <td className="py-2 px-3 font-bold text-amber-600">POTENSI PERAMBATAN TINGGI</td>
-              </tr>
-              <tr>
-                <td className="py-2 px-3 font-semibold">Suhu Udara &amp; Kelembapan (RH)</td>
-                <td className="py-2 px-3 font-mono">{liveWeather?.temperature ?? 32}°C &bull; RH {liveWeather?.relativeHumidity ?? 62}%</td>
-                <td className="py-2 px-3 text-[#6b7280]">RH Kering: &lt; 65%</td>
-                <td className="py-2 px-3 font-semibold text-[#374151]">Serasah Cepat Mengering</td>
-              </tr>
-              <tr>
-                <td className="py-2 px-3 font-semibold">Hari Tanpa Hujan (HTH)</td>
-                <td className="py-2 px-3 font-mono">{liveWeather?.dryDaysCount ?? 9} Hari</td>
-                <td className="py-2 px-3 text-[#6b7280]">&gt; 7 Hari (Drought Watch)</td>
-                <td className="py-2 px-3 font-bold text-amber-600">WASPADA DEHIDRASI KUBAH</td>
-              </tr>
-              <tr>
-                <td className="py-2 px-3 font-semibold">Kadar Air Gambut (KAG) Bawah Permukaan</td>
-                <td className="py-2 px-3 font-mono">115%</td>
-                <td className="py-2 px-3 text-[#6b7280]">&lt; 100% (Titik Sulut Api Gambut)</td>
-                <td className="py-2 px-3 font-semibold text-rose-600">Rentan Bara Api Bawah Tanah</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        {/* 5. Active Hotspot Surveillance Targets */}
-        <div className="space-y-2">
-          <h3 className="text-xs font-black uppercase tracking-wider text-[#111827] border-b border-[#e5e7eb] pb-1 flex items-center justify-between">
-            <span>III. Koordinat Sasaran Penugasan Anomali Panas Satelit</span>
-            <span className="text-[10px] text-[#6b7280]">FIRMS NRT ACTIVE DETECTIONS</span>
-          </h3>
+        <div
+          id="official-sitrep-document"
+          className="bg-white p-6 sm:p-8 border border-[#d1d5db] print:border-none space-y-6 text-[#111827] leading-relaxed"
+          style={{ width: '100%', maxWidth: '820px', margin: '0 auto', boxSizing: 'border-box' }}
+        >
           
-          {topSpots.length === 0 ? (
-            <div className="p-3 rounded-lg border border-[#e5e7eb] bg-[#f9fafb] text-center text-xs text-[#6b7280]">
-              Tidak terdapat titik panas berdaya tinggi yang terdeteksi pada jendela satelit 24 jam terakhir di sektor ini.
-            </div>
-          ) : (
-            <table className="w-full text-left text-xs border border-[#e5e7eb] rounded-lg overflow-hidden">
-              <thead className="bg-[#f3f4f6] text-[#374151] font-bold text-[10px] uppercase border-b border-[#e5e7eb]">
-                <tr>
-                  <th className="py-2 px-2.5">No</th>
-                  <th className="py-2 px-2.5">Wilayah &amp; Lanskap KHG</th>
-                  <th className="py-2 px-2.5">Koordinat (Lat, Lon)</th>
-                  <th className="py-2 px-2.5">Sensor Satelit</th>
-                  <th className="py-2 px-2.5">FRP (MW)</th>
-                  <th className="py-2 px-2.5">Waktu Akuisisi</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#e5e7eb] text-[10.5px]">
-                {topSpots.map((spot, idx) => {
-                  const loc = resolveHotspotLocation(spot.lat, spot.lon, selectedAOI.id, language);
-                  return (
-                    <tr key={spot.id}>
-                      <td className="py-2 px-2.5 font-bold">{idx + 1}</td>
-                      <td className="py-2 px-2.5 font-semibold">
-                        {loc.regency}{loc.district ? `, ${loc.district}` : ''}
-                        <span className="text-[9px] text-[#6b7280] block font-normal">{loc.landscape}</span>
-                      </td>
-                      <td className="py-2 px-2.5 font-mono">{spot.lat.toFixed(4)}°, {spot.lon.toFixed(4)}°</td>
-                      <td className="py-2 px-2.5 font-mono">{spot.instrument} ({spot.satellite})</td>
-                      <td className="py-2 px-2.5 font-mono font-bold text-rose-600">{spot.frp} MW</td>
-                      <td className="py-2 px-2.5 font-mono">{loc.localTimeFormatted}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
-        </div>
+          {/* 1. Official Government & NASA Letterhead (Kop Surat Resmi) */}
+          <div
+            className="border-b-2 border-[#111827] pb-4 flex items-center justify-between gap-4"
+            style={{ borderBottom: '2.5px solid #111827', paddingBottom: '12px' }}
+          >
+            <div className="flex items-center gap-3.5">
+              {/* NASA Logo with Fixed Invariant Dimensions */}
+              <div style={{ width: '52px', height: '52px', minWidth: '52px', maxWidth: '52px', flexShrink: 0 }}>
+                <img
+                  src="/nasa_meatball.svg"
+                  alt="NASA"
+                  style={{ width: '52px', height: '52px', objectFit: 'contain', display: 'block' }}
+                />
+              </div>
 
-        {/* 6. Tactical Directives for Brigade & Taskforces */}
-        <div className="space-y-1.5">
-          <h3 className="text-xs font-black uppercase tracking-wider text-[#111827] border-b border-[#e5e7eb] pb-1">
-            IV. Instruksi Taktis Operasional (SOP Brigade Manggala Agni / BPBD / MPA)
-          </h3>
-          <ol className="list-decimal list-inside text-xs text-[#374151] space-y-1 leading-relaxed text-justify">
-            <li><strong>Penutupan Sekat Kanal:</strong> Lakukan inspeksi menyeluruh pada pintu sekat kanal BRGM di sekitar KHG terdampak untuk menahan air dan menaikkan kembali muka air tanah &gt; -40 cm.</li>
-            <li><strong>Patroli Darat &amp; Nozzle Gambut:</strong> Kerahkan regu pemadaman darat Manggala Agni Daops menggunakan *peat injector nozzle* untuk menyuntikkan air ke lapisan organik sedalam 1–3 meter.</li>
-            <li><strong>Pemantauan Malam Hari (Night Passes):</strong> Pantau lintasan satelit malam hari NOAA-20 / Suomi-NPP untuk mendeteksi *smoldering combustion* tanpa gangguan pantulan sinar matahari.</li>
-            <li><strong>Water Bombing Standby:</strong> Siagakan helikopter pemadam water bombing apabila klaster titik panas memiliki FRP kumulatif &gt; 120 MW di zona non-aksesibilitas darat.</li>
-          </ol>
-        </div>
-
-        {/* 7. Official Endorsement & Formal Signature Block */}
-        <div className="pt-6 border-t-2 border-[#111827] grid grid-cols-2 gap-8 text-xs text-center">
-          <div className="space-y-1">
-            <p className="text-[10px] font-bold text-[#6b7280] uppercase">Diverifikasi &amp; Disiapkan Oleh</p>
-            <p className="font-bold text-[#111827]">Koordinator Sistem Telemetri Satelit</p>
-            <div className="h-16 flex items-center justify-center">
-              <div className="px-3 py-1.5 border border-emerald-600 rounded bg-emerald-50 text-emerald-800 font-mono text-[9px] font-bold uppercase tracking-wider flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>DIGITALLY VERIFIED BY TERRA HARMONIA ENGINE</span>
+              <div>
+                <div style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#4b5563' }}>
+                  REPUBLIK INDONESIA &bull; NASA SPACE APPS JAKARTA 2026
+                </div>
+                <div style={{ fontSize: '13.5px', fontWeight: 900, textTransform: 'uppercase', color: '#111827', letterSpacing: '-0.01em', marginTop: '1px' }}>
+                  PUSAT PENGENDALIAN OPERASI &amp; SISTEM MONITORING SATELIT TERRA HARMONIA
+                </div>
+                <div style={{ fontSize: '9.5px', color: '#6b7280', marginTop: '1px' }}>
+                  Integrasi Sensor MODIS (Terra/Aqua 1km) &amp; VIIRS (Suomi-NPP/NOAA-20 375m) &bull; Standar BRGM &amp; KLHK
+                </div>
               </div>
             </div>
-            <p className="font-mono font-bold text-[#111827] text-xs">TERRA HARMONIA INTELLIGENCE TEAM</p>
-            <p className="text-[9px] text-[#6b7280]">NASA Space Apps Challenge Jakarta 2026</p>
-          </div>
 
-          <div className="space-y-1">
-            <p className="text-[10px] font-bold text-[#6b7280] uppercase">Mengetahui &amp; Mengesahkan</p>
-            <p className="font-bold text-[#111827]">Komandan Posko Pengendalian Karhutla</p>
-            <div className="h-16 flex items-center justify-center font-serif italic text-sm text-[#4b5563]">
-              ( Tanda Tangan &amp; Cap Stempel Posko )
+            <div className="text-right shrink-0" style={{ textAlign: 'right' }}>
+              <span
+                style={{
+                  display: 'inline-block',
+                  padding: '2px 8px',
+                  border: '1px solid #be123c',
+                  backgroundColor: '#fff1f2',
+                  color: '#be123c',
+                  fontSize: '9px',
+                  fontWeight: 800,
+                  borderRadius: '4px',
+                  textTransform: 'uppercase',
+                }}
+              >
+                OPERASIONAL TERBATAS
+              </span>
+              <div style={{ fontSize: '8.5px', fontFamily: 'monospace', color: '#6b7280', marginTop: '4px' }}>
+                {docRegNumber}
+              </div>
             </div>
-            <p className="font-bold text-[#111827] text-xs">SATGAS PENGENDALIAN KARHUTLA &amp; BRGM</p>
-            <p className="text-[9px] text-[#6b7280]">Kementerian Lingkungan Hidup dan Kehutanan</p>
           </div>
-        </div>
 
-        {/* Footer Legal & Security Bar */}
-        <div className="pt-3 border-t border-[#e5e7eb] flex items-center justify-between text-[9px] text-[#9ca3af] font-mono">
-          <span>DOKUMEN INI SAH DAN MEMILIKI KEKUATAN VERIFIKASI MULTI-SATELIT NASA</span>
-          <span>HALAMAN 1 DARI 1 &bull; KODE: TH-NASA-SITREP-2026</span>
+          {/* 2. Document Identification & Metadata Box */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: '8px',
+              backgroundColor: '#f9fafb',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              padding: '10px 12px',
+              fontSize: '11px',
+            }}
+          >
+            <div>
+              <span style={{ fontSize: '9px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', display: 'block' }}>Wilayah Sasaran</span>
+              <strong style={{ fontSize: '12px', fontWeight: 800, color: '#111827', display: 'block', marginTop: '2px' }}>{selectedAOI.name}</strong>
+              <span style={{ fontSize: '9.5px', color: '#4b5563' }}>{selectedAOI.country}</span>
+            </div>
+
+            <div>
+              <span style={{ fontSize: '9px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', display: 'block' }}>Koordinat Acuan</span>
+              <strong style={{ fontSize: '11px', fontFamily: 'monospace', fontWeight: 700, color: '#111827', display: 'block', marginTop: '2px' }}>
+                {selectedAOI.center[0].toFixed(4)}° N, {selectedAOI.center[1].toFixed(4)}° E
+              </strong>
+              <span style={{ fontSize: '9.5px', color: '#4b5563' }}>{selectedAOI.biome}</span>
+            </div>
+
+            <div>
+              <span style={{ fontSize: '9px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', display: 'block' }}>Tanggal Observasi</span>
+              <strong style={{ fontSize: '11px', fontWeight: 700, color: '#111827', display: 'block', marginTop: '2px' }}>{reportDateFormatted}</strong>
+              <span style={{ fontSize: '9.5px', color: '#059669', fontWeight: 600 }}>Satelit 24H Feed Synced</span>
+            </div>
+
+            <div>
+              <span style={{ fontSize: '9px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', display: 'block' }}>Status Bahaya Karhutla</span>
+              <strong style={{ fontSize: '11px', fontWeight: 900, color: effectiveFwi >= 50 ? '#be123c' : '#d97706', display: 'block', marginTop: '2px' }}>
+                {threatLevel}
+              </strong>
+              <span style={{ fontSize: '9.5px', color: '#4b5563' }}>Indeks FWI: {effectiveFwi}/100</span>
+            </div>
+          </div>
+
+          {/* 3. Executive Situation Synthesis */}
+          <div className="space-y-1.5" style={{ marginTop: '12px' }}>
+            <div
+              style={{
+                fontSize: '11px',
+                fontWeight: 800,
+                textTransform: 'uppercase',
+                borderBottom: '1px solid #e5e7eb',
+                paddingBottom: '3px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                color: '#111827',
+              }}
+            >
+              <span>I. Ringkasan Eksekutif &amp; Analisis Kerentanan Spasial</span>
+              <span style={{ fontSize: '9px', fontFamily: 'monospace', color: '#6b7280' }}>MODIS/VIIRS 5.5KM HARMONIZATION</span>
+            </div>
+            <p style={{ fontSize: '11px', color: '#374151', textAlign: 'justify', lineHeight: 1.55 }}>
+              Berdasarkan harmonisasi komputasi 26 tahun rekaman satelit NASA Terra, Aqua, Suomi-NPP, dan NOAA-20 yang dikompilasikan ke dalam grid klaster 5.5 km dengan faktor kalibrasi energi (MODIS 1.04 / VIIRS 0.88), wilayah <strong>{selectedAOI.name}</strong> saat ini berada pada status <strong>{threatLevel}</strong>. Parameter Muka Air Tanah Gambut (TMAT) terpantau di angka <strong>{currentTmat} cm</strong>, yang mana telah melampaui ambang batas kritis nasional PP No. 57/2016 (-40 cm), mengindikasikan tingginya ancaman kebakaran bawah permukaan (*subsurface peat smoldering*).
+            </p>
+          </div>
+
+          {/* 4. Hydrology & Environmental Telemetry Matrix */}
+          <div className="space-y-2" style={{ marginTop: '12px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #e5e7eb', paddingBottom: '3px', color: '#111827' }}>
+              II. Matriks Telemetri Hidrologis Gambut &amp; Cuaca Lapangan (BRGM &amp; Open-Meteo)
+            </div>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10.5px' }}>
+              <thead>
+                <tr style={{ backgroundColor: '#f3f4f6', textTransform: 'uppercase', fontSize: '9px', color: '#374151' }}>
+                  <th style={{ border: '1px solid #d1d5db', padding: '6px 8px', textAlign: 'left' }}>Parameter Observasi</th>
+                  <th style={{ border: '1px solid #d1d5db', padding: '6px 8px', textAlign: 'left' }}>Nilai Lapangan Aktual</th>
+                  <th style={{ border: '1px solid #d1d5db', padding: '6px 8px', textAlign: 'left' }}>Batas Kritis / Standar</th>
+                  <th style={{ border: '1px solid #d1d5db', padding: '6px 8px', textAlign: 'left' }}>Evaluasi Status Risiko</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style={{ border: '1px solid #d1d5db', padding: '5px 8px', fontWeight: 600 }}>Tinggi Muka Air Tanah (TMAT)</td>
+                  <td style={{ border: '1px solid #d1d5db', padding: '5px 8px', fontFamily: 'monospace', fontWeight: 800, color: '#be123c' }}>{currentTmat} cm</td>
+                  <td style={{ border: '1px solid #d1d5db', padding: '5px 8px', color: '#6b7280' }}>-40 cm (PP No. 57/2016 &amp; BRGM)</td>
+                  <td style={{ border: '1px solid #d1d5db', padding: '5px 8px', fontWeight: 800, color: '#be123c' }}>KRITIS &bull; MELEWATI BATAS</td>
+                </tr>
+                <tr style={{ backgroundColor: '#fafafa' }}>
+                  <td style={{ border: '1px solid #d1d5db', padding: '5px 8px', fontWeight: 600 }}>Indeks Bahaya Cuaca Api (FWI)</td>
+                  <td style={{ border: '1px solid #d1d5db', padding: '5px 8px', fontFamily: 'monospace', fontWeight: 800, color: '#d97706' }}>{effectiveFwi}</td>
+                  <td style={{ border: '1px solid #d1d5db', padding: '5px 8px', color: '#6b7280' }}>Ambang Siaga: &ge; 48</td>
+                  <td style={{ border: '1px solid #d1d5db', padding: '5px 8px', fontWeight: 700, color: '#d97706' }}>POTENSI PERAMBATAN TINGGI</td>
+                </tr>
+                <tr>
+                  <td style={{ border: '1px solid #d1d5db', padding: '5px 8px', fontWeight: 600 }}>Suhu Udara &amp; Kelembapan (RH)</td>
+                  <td style={{ border: '1px solid #d1d5db', padding: '5px 8px', fontFamily: 'monospace' }}>{liveWeather?.temperature ?? 32}°C &bull; RH {liveWeather?.relativeHumidity ?? 62}%</td>
+                  <td style={{ border: '1px solid #d1d5db', padding: '5px 8px', color: '#6b7280' }}>RH Kering: &lt; 65%</td>
+                  <td style={{ border: '1px solid #d1d5db', padding: '5px 8px', fontWeight: 600, color: '#374151' }}>Serasah Cepat Mengering</td>
+                </tr>
+                <tr style={{ backgroundColor: '#fafafa' }}>
+                  <td style={{ border: '1px solid #d1d5db', padding: '5px 8px', fontWeight: 600 }}>Hari Tanpa Hujan (HTH)</td>
+                  <td style={{ border: '1px solid #d1d5db', padding: '5px 8px', fontFamily: 'monospace' }}>{liveWeather?.dryDaysCount ?? 9} Hari</td>
+                  <td style={{ border: '1px solid #d1d5db', padding: '5px 8px', color: '#6b7280' }}>&gt; 7 Hari (Drought Watch)</td>
+                  <td style={{ border: '1px solid #d1d5db', padding: '5px 8px', fontWeight: 700, color: '#d97706' }}>WASPADA DEHIDRASI KUBAH</td>
+                </tr>
+                <tr>
+                  <td style={{ border: '1px solid #d1d5db', padding: '5px 8px', fontWeight: 600 }}>Kadar Air Gambut (KAG) Bawah Permukaan</td>
+                  <td style={{ border: '1px solid #d1d5db', padding: '5px 8px', fontFamily: 'monospace' }}>115%</td>
+                  <td style={{ border: '1px solid #d1d5db', padding: '5px 8px', color: '#6b7280' }}>&lt; 100% (Titik Sulut Api Gambut)</td>
+                  <td style={{ border: '1px solid #d1d5db', padding: '5px 8px', fontWeight: 700, color: '#be123c' }}>Rentan Bara Api Bawah Tanah</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* 5. Active Hotspot Surveillance Targets */}
+          <div className="space-y-2" style={{ marginTop: '12px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #e5e7eb', paddingBottom: '3px', display: 'flex', justifyContent: 'space-between', color: '#111827' }}>
+              <span>III. Koordinat Sasaran Penugasan Anomali Panas Satelit</span>
+              <span style={{ fontSize: '9px', color: '#6b7280' }}>FIRMS NRT ACTIVE DETECTIONS</span>
+            </div>
+            
+            {topSpots.length === 0 ? (
+              <div style={{ padding: '8px', border: '1px solid #e5e7eb', backgroundColor: '#f9fafb', textAlign: 'center', fontSize: '10.5px', color: '#6b7280', borderRadius: '6px' }}>
+                Tidak terdapat titik panas berdaya tinggi yang terdeteksi pada jendela satelit 24 jam terakhir di sektor ini.
+              </div>
+            ) : (
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px' }}>
+                <thead>
+                  <tr style={{ backgroundColor: '#f3f4f6', textTransform: 'uppercase', fontSize: '9px', color: '#374151' }}>
+                    <th style={{ border: '1px solid #d1d5db', padding: '5px 6px', textAlign: 'left', width: '28px' }}>No</th>
+                    <th style={{ border: '1px solid #d1d5db', padding: '5px 6px', textAlign: 'left' }}>Wilayah &amp; Lanskap KHG</th>
+                    <th style={{ border: '1px solid #d1d5db', padding: '5px 6px', textAlign: 'left' }}>Koordinat (Lat, Lon)</th>
+                    <th style={{ border: '1px solid #d1d5db', padding: '5px 6px', textAlign: 'left' }}>Sensor Satelit</th>
+                    <th style={{ border: '1px solid #d1d5db', padding: '5px 6px', textAlign: 'left' }}>FRP (MW)</th>
+                    <th style={{ border: '1px solid #d1d5db', padding: '5px 6px', textAlign: 'left' }}>Waktu Akuisisi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {topSpots.map((spot, idx) => {
+                    const loc = resolveHotspotLocation(spot.lat, spot.lon, selectedAOI.id, language);
+                    return (
+                      <tr key={spot.id} style={{ backgroundColor: idx % 2 === 1 ? '#fafafa' : '#fff' }}>
+                        <td style={{ border: '1px solid #d1d5db', padding: '5px 6px', fontWeight: 800 }}>{idx + 1}</td>
+                        <td style={{ border: '1px solid #d1d5db', padding: '5px 6px', fontWeight: 600 }}>
+                          {loc.regency}{loc.district ? `, ${loc.district}` : ''}
+                          <div style={{ fontSize: '8.5px', color: '#6b7280', fontWeight: 'normal' }}>{loc.landscape}</div>
+                        </td>
+                        <td style={{ border: '1px solid #d1d5db', padding: '5px 6px', fontFamily: 'monospace' }}>{spot.lat.toFixed(4)}°, {spot.lon.toFixed(4)}°</td>
+                        <td style={{ border: '1px solid #d1d5db', padding: '5px 6px', fontFamily: 'monospace' }}>{spot.instrument} ({spot.satellite})</td>
+                        <td style={{ border: '1px solid #d1d5db', padding: '5px 6px', fontFamily: 'monospace', fontWeight: 800, color: '#be123c' }}>{spot.frp} MW</td>
+                        <td style={{ border: '1px solid #d1d5db', padding: '5px 6px', fontFamily: 'monospace' }}>{loc.localTimeFormatted}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          {/* 6. Tactical Directives for Brigade & Taskforces */}
+          <div className="space-y-1.5" style={{ marginTop: '12px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #e5e7eb', paddingBottom: '3px', color: '#111827' }}>
+              IV. Instruksi Taktis Operasional (SOP Brigade Manggala Agni / BPBD / MPA)
+            </div>
+            <ol style={{ fontSize: '10.5px', color: '#374151', paddingLeft: '16px', lineHeight: 1.5 }}>
+              <li><strong>Penutupan Sekat Kanal:</strong> Lakukan inspeksi menyeluruh pada pintu sekat kanal BRGM di sekitar KHG terdampak untuk menahan air dan menaikkan kembali muka air tanah &gt; -40 cm.</li>
+              <li><strong>Patroli Darat &amp; Nozzle Gambut:</strong> Kerahkan regu pemadaman darat Manggala Agni Daops menggunakan *peat injector nozzle* untuk menyuntikkan air ke lapisan organik sedalam 1–3 meter.</li>
+              <li><strong>Pemantauan Malam Hari (Night Passes):</strong> Pantau lintasan satelit malam hari NOAA-20 / Suomi-NPP untuk mendeteksi *smoldering combustion* tanpa gangguan pantulan sinar matahari.</li>
+              <li><strong>Water Bombing Standby:</strong> Siagakan helikopter pemadam water bombing apabila klaster titik panas memiliki FRP kumulatif &gt; 120 MW di zona non-aksesibilitas darat.</li>
+            </ol>
+          </div>
+
+          {/* 7. Official Endorsement & Formal Signature Block */}
+          <div
+            style={{
+              marginTop: '18px',
+              paddingTop: '12px',
+              borderTop: '2px solid #111827',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '20px',
+              textAlign: 'center',
+              fontSize: '10.5px',
+              pageBreakInside: 'avoid',
+            }}
+          >
+            <div>
+              <div style={{ fontSize: '9px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>Diverifikasi &amp; Disiapkan Oleh</div>
+              <div style={{ fontWeight: 800, color: '#111827', marginTop: '2px' }}>Koordinator Sistem Telemetri Satelit</div>
+              <div style={{ height: '45px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '4px 0' }}>
+                <div
+                  style={{
+                    padding: '3px 8px',
+                    border: '1px solid #059669',
+                    borderRadius: '4px',
+                    backgroundColor: '#ecfdf5',
+                    color: '#065f46',
+                    fontFamily: 'monospace',
+                    fontSize: '8.5px',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  DIGITALLY VERIFIED BY TERRA HARMONIA ENGINE
+                </div>
+              </div>
+              <div style={{ fontFamily: 'monospace', fontWeight: 800, color: '#111827', fontSize: '11px' }}>TERRA HARMONIA INTELLIGENCE TEAM</div>
+              <div style={{ fontSize: '8.5px', color: '#6b7280' }}>NASA Space Apps Challenge Jakarta 2026</div>
+            </div>
+
+            <div>
+              <div style={{ fontSize: '9px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>Mengetahui &amp; Mengesahkan</div>
+              <div style={{ fontWeight: 800, color: '#111827', marginTop: '2px' }}>Komandan Posko Pengendalian Karhutla</div>
+              <div style={{ height: '45px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'serif', fontStyle: 'italic', fontSize: '12px', color: '#6b7280' }}>
+                ( Tanda Tangan &amp; Cap Stempel Posko )
+              </div>
+              <div style={{ fontWeight: 800, color: '#111827', fontSize: '11px' }}>SATGAS PENGENDALIAN KARHUTLA &amp; BRGM</div>
+              <div style={{ fontSize: '8.5px', color: '#6b7280' }}>Kementerian Lingkungan Hidup dan Kehutanan</div>
+            </div>
+          </div>
+
+          {/* Footer Security Note */}
+          <div
+            style={{
+              paddingTop: '8px',
+              borderTop: '1px solid #e5e7eb',
+              display: 'flex',
+              justifyContent: 'space-between',
+              fontSize: '8px',
+              color: '#9ca3af',
+              fontFamily: 'monospace',
+            }}
+          >
+            <span>DOKUMEN INI SAH DAN MEMILIKI KEKUATAN VERIFIKASI MULTI-SATELIT NASA</span>
+            <span>HALAMAN 1 DARI 1 &bull; KODE: TH-NASA-SITREP-2026</span>
+          </div>
+
         </div>
 
       </div>
