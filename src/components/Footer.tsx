@@ -47,6 +47,7 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
 
   // Live UTC Space Clock
   const [utcTime, setUtcTime] = useState<string>(() => new Date().toUTCString().slice(17, 25));
+  const [selectedSat, setSelectedSat] = useState<'terra' | 'viirs'>('terra');
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -250,33 +251,58 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
 
         </div>
 
-        {/* 2. DEDICATED CINEMATIC ORBITAL FLIGHT DECK (Unobstructed Story Stage) */}
+        {/* 2. DEDICATED CINEMATIC ORBITAL FLIGHT DECK (Fluid Aerospace Telemetry) */}
         <div className="relative w-full rounded-3xl border border-[#e5e5e7] dark:border-[#1f2937] bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0] dark:from-[#080d1a] dark:via-[#0c1222] dark:to-[#050811] shadow-xs overflow-hidden">
           
           {/* Header Bar inside Orbital Stage */}
-          <div className="relative z-10 px-5 sm:px-8 pt-5 pb-2 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/80 dark:bg-[#151d2f]/80 backdrop-blur-md border border-[#e5e5e7] dark:border-[#1f2937] text-xs font-semibold text-[#1d1d1f] dark:text-white shadow-2xs">
-                <Orbit className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 animate-spin" style={{ animationDuration: '20s' }} />
+          <div className="relative z-10 px-5 sm:px-8 pt-5 pb-3 flex flex-wrap items-center justify-between gap-3 border-b border-[#e5e5e7]/60 dark:border-[#1f2937]/60 backdrop-blur-md">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 dark:bg-[#151d2f]/90 backdrop-blur-md border border-[#e5e5e7] dark:border-[#1f2937] text-xs font-bold text-[#1d1d1f] dark:text-white shadow-2xs">
+                <Orbit className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 animate-spin" style={{ animationDuration: '24s' }} />
                 <span>NASA Earth Observing System (EOS) &bull; Planetary Flight Deck</span>
               </span>
-              <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs font-mono font-bold">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>ACTIVE SCANNING: INDONESIAN PEATLANDS</span>
-              </span>
+
+              {/* Satellite Spacecraft Mode Selector */}
+              <div className="inline-flex rounded-full bg-[#e5e5ea] dark:bg-[#1f2937] p-0.5 text-xs font-semibold">
+                <button
+                  type="button"
+                  onClick={() => setSelectedSat('terra')}
+                  className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
+                    selectedSat === 'terra'
+                      ? 'bg-white dark:bg-[#374151] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
+                      : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
+                  }`}
+                >
+                  NASA Terra (MODIS 1km)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedSat('viirs')}
+                  className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
+                    selectedSat === 'viirs'
+                      ? 'bg-white dark:bg-[#374151] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
+                      : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
+                  }`}
+                >
+                  Suomi-NPP (VIIRS 375m)
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center gap-3 text-xs font-mono text-[#6e6e73] dark:text-[#9ca3af]">
+              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>ACTIVE SCANNING</span>
+              </span>
               <span className="flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5 text-[#0071e3] dark:text-[#38bdf8]" />
                 <strong className="text-[#1d1d1f] dark:text-white num">{utcTime} UTC</strong>
               </span>
-              <span className="hidden md:inline text-[11px] text-[#86868b]">&bull; NORAD 25994</span>
             </div>
           </div>
 
-          {/* Panoramic Orbital Sky Window where NASA Terra orbits completely unobstructed */}
-          <div className="relative w-full h-[240px] sm:h-[280px] overflow-hidden select-none">
+          {/* Panoramic Orbital Sky Window */}
+          <div className="relative w-full h-[260px] sm:h-[300px] overflow-hidden select-none bg-[#050b18]">
             <svg
               viewBox="0 0 1440 320"
               preserveAspectRatio="xMidYMid meet"
@@ -300,29 +326,36 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
                   <stop offset="100%" stopColor="#92400e" />
                 </linearGradient>
 
-                {/* Dynamic Multispectral MODIS Sensor Thermal Cone Beam */}
-                <linearGradient id="modisSwathBeam" x1="50%" y1="0%" x2="50%" y2="100%">
-                  <stop offset="0%" stopColor="#10b981" stopOpacity="0.65" />
-                  <stop offset="35%" stopColor="#06b6d4" stopOpacity="0.35" />
-                  <stop offset="75%" stopColor="#10b981" stopOpacity="0.12" />
-                  <stop offset="100%" stopColor="#059669" stopOpacity="0" />
+                {/* Silver / White Thermal Radiator Shield Gradient */}
+                <linearGradient id="orbitSilverFoil" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#ffffff" />
+                  <stop offset="50%" stopColor="#cbd5e1" />
+                  <stop offset="100%" stopColor="#64748b" />
+                </linearGradient>
+
+                {/* Dynamic Multispectral Sensor Swath Beam */}
+                <linearGradient id="swathBeamGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+                  <stop offset="0%" stopColor={selectedSat === 'terra' ? '#10b981' : '#06b6d4'} stopOpacity="0.75" />
+                  <stop offset="40%" stopColor={selectedSat === 'terra' ? '#059669' : '#0284c7'} stopOpacity="0.35" />
+                  <stop offset="85%" stopColor={selectedSat === 'terra' ? '#10b981' : '#38bdf8'} stopOpacity="0.12" />
+                  <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
                 </linearGradient>
 
                 {/* Orbit Trajectory Arc Gradient */}
                 <linearGradient id="orbitPathGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#0071e3" stopOpacity="0.05" />
-                  <stop offset="20%" stopColor="#0071e3" stopOpacity="0.6" />
-                  <stop offset="50%" stopColor="#10b981" stopOpacity="0.8" />
-                  <stop offset="80%" stopColor="#0071e3" stopOpacity="0.6" />
-                  <stop offset="100%" stopColor="#0071e3" stopOpacity="0.05" />
+                  <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.1" />
+                  <stop offset="30%" stopColor="#0ea5e9" stopOpacity="0.7" />
+                  <stop offset="60%" stopColor="#10b981" stopOpacity="0.9" />
+                  <stop offset="90%" stopColor="#38bdf8" stopOpacity="0.6" />
+                  <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.1" />
                 </linearGradient>
 
                 {/* Atmosphere Limb Horizon Glow */}
                 <radialGradient id="earthAtmosphereLimb" cx="50%" cy="115%" r="75%">
-                  <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.32" />
-                  <stop offset="45%" stopColor="#10b981" stopOpacity="0.16" />
-                  <stop offset="85%" stopColor="#0ea5e9" stopOpacity="0.04" />
-                  <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+                  <stop offset="0%" stopColor="#0284c7" stopOpacity="0.45" />
+                  <stop offset="35%" stopColor="#0ea5e9" stopOpacity="0.25" />
+                  <stop offset="70%" stopColor="#06b6d4" stopOpacity="0.1" />
+                  <stop offset="100%" stopColor="#020617" stopOpacity="0" />
                 </radialGradient>
 
                 {/* Curved Orbital Ground Track */}
@@ -332,38 +365,44 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
                 />
               </defs>
 
+              {/* Deep Space Background Glow */}
+              <rect x="0" y="0" width="1440" height="320" fill="#040814" />
+
               {/* Earth Curvature Horizon Limb at bottom of sky */}
-              <ellipse cx="720" cy="385" rx="940" ry="145" fill="url(#earthAtmosphereLimb)" />
+              <ellipse cx="720" cy="390" rx="980" ry="150" fill="url(#earthAtmosphereLimb)" />
               <path
-                d="M -100 310 Q 720 230 1540 310"
+                d="M -100 310 Q 720 225 1540 310"
                 fill="none"
                 stroke="#38bdf8"
-                strokeWidth="1.8"
-                strokeOpacity="0.45"
+                strokeWidth="2"
+                strokeOpacity="0.6"
               />
 
-              {/* Celestial Coordinate Grid */}
-              <g opacity="0.25" stroke="#94a3b8" strokeWidth="0.5" strokeDasharray="3 6">
-                <line x1="0" y1="90" x2="1440" y2="90" />
-                <line x1="0" y1="180" x2="1440" y2="180" />
-                <line x1="360" y1="0" x2="360" y2="320" />
-                <line x1="720" y1="0" x2="720" y2="320" />
-                <line x1="1080" y1="0" x2="1080" y2="320" />
+              {/* Celestial Coordinate Grid Lines */}
+              <g opacity="0.18" stroke="#64748b" strokeWidth="0.5" strokeDasharray="4 6">
+                <line x1="0" y1="80" x2="1440" y2="80" />
+                <line x1="0" y1="160" x2="1440" y2="160" />
+                <line x1="280" y1="0" x2="280" y2="320" />
+                <line x1="560" y1="0" x2="560" y2="320" />
+                <line x1="840" y1="0" x2="840" y2="320" />
+                <line x1="1120" y1="0" x2="1120" y2="320" />
               </g>
 
               {/* Celestial Starfield */}
-              <g fill="#94a3b8" opacity="0.55">
-                <circle cx="120" cy="40" r="1.2" />
-                <circle cx="280" cy="110" r="0.9" />
-                <circle cx="450" cy="30" r="1.1" />
-                <circle cx="620" cy="85" r="0.8" />
-                <circle cx="790" cy="35" r="1.3" />
-                <circle cx="950" cy="105" r="1" />
-                <circle cx="1120" cy="45" r="0.9" />
-                <circle cx="1310" cy="95" r="1.2" />
+              <g fill="#e2e8f0" opacity="0.75">
+                <circle cx="120" cy="35" r="1.2" />
+                <circle cx="280" cy="95" r="0.9" />
+                <circle cx="450" cy="25" r="1.3" />
+                <circle cx="620" cy="70" r="0.8" />
+                <circle cx="790" cy="30" r="1.4" />
+                <circle cx="950" cy="85" r="1" />
+                <circle cx="1120" cy="40" r="0.9" />
+                <circle cx="1310" cy="80" r="1.2" />
+                <circle cx="360" cy="130" r="0.7" />
+                <circle cx="890" cy="140" r="0.8" />
               </g>
 
-              {/* Glowing Curved Orbit Ground Track (Dashed) */}
+              {/* Glowing Curved Orbit Ground Track */}
               <use
                 href="#stageFlightTrack"
                 fill="none"
@@ -381,46 +420,45 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
                     className="cursor-pointer transition-all"
                     onClick={() => setActiveTarget(target)}
                   >
-                    {/* Pulsing Radar Ring */}
+                    {/* Radar Pulse Beacon */}
                     <circle
                       cx={target.cx}
                       cy={target.cy}
-                      r={isSelected ? 10 : 6}
+                      r={isSelected ? 14 : 8}
                       fill={target.color}
-                      fillOpacity={isSelected ? 0.25 : 0.12}
+                      fillOpacity={isSelected ? 0.3 : 0.15}
                     >
                       <animate
                         attributeName="r"
-                        values={isSelected ? '6;14;6' : '4;9;4'}
-                        dur="2s"
+                        values={isSelected ? '8;18;8' : '5;11;5'}
+                        dur="1.8s"
                         repeatCount="indefinite"
                       />
                       <animate
                         attributeName="opacity"
-                        values="0.8;0.2;0.8"
-                        dur="2s"
+                        values="0.9;0.2;0.9"
+                        dur="1.8s"
                         repeatCount="indefinite"
                       />
                     </circle>
 
-                    {/* Central Target Dot */}
+                    {/* Central Target Landmark */}
                     <circle
                       cx={target.cx}
                       cy={target.cy}
-                      r={isSelected ? 4 : 3}
+                      r={isSelected ? 4.5 : 3}
                       fill={target.color}
                       stroke="#ffffff"
-                      strokeWidth={isSelected ? 1.5 : 1}
+                      strokeWidth={isSelected ? 2 : 1}
                     />
 
-                    {/* Label */}
+                    {/* Coordinate Tag */}
                     <text
                       x={target.cx}
-                      y={target.cy + 17}
+                      y={target.cy + 18}
                       textAnchor="middle"
-                      fill={isSelected ? '#0f172a' : '#64748b'}
-                      className="dark:fill-slate-300"
-                      fontSize={isSelected ? '9' : '8'}
+                      fill={isSelected ? '#38bdf8' : '#94a3b8'}
+                      fontSize={isSelected ? '9.5' : '8.5'}
                       fontWeight={isSelected ? 'bold' : 'normal'}
                       fontFamily="monospace"
                     >
@@ -430,10 +468,10 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
                 );
               })}
 
-              {/* THE REALISTIC NASA TERRA (EOS AM-1) SPACECRAFT IN ORBIT */}
+              {/* REALISTIC HIGH-PRECISION SPACECRAFT ASSEMBLY IN ORBIT */}
               <g>
                 <animateMotion
-                  dur="24s"
+                  dur="22s"
                   repeatCount="indefinite"
                   rotate="auto"
                   calcMode="linear"
@@ -441,167 +479,174 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
                   <mpath href="#stageFlightTrack" />
                 </animateMotion>
 
-                {/* Active MODIS Multispectral Sensor Swath Beam down to Earth */}
+                {/* Dynamic Oscillating Swath Scan Radar Beam */}
                 <polygon
-                  points="0,8 -90,200 90,200"
-                  fill="url(#modisSwathBeam)"
-                />
-                {/* Ground Scan Footprint Ellipse */}
+                  points="0,10 -110,215 110,215"
+                  fill="url(#swathBeamGrad)"
+                >
+                  <animate
+                    attributeName="points"
+                    values="0,10 -100,215 100,215; 0,10 -120,215 90,215; 0,10 -90,215 120,215; 0,10 -100,215 100,215"
+                    dur="3.6s"
+                    repeatCount="indefinite"
+                  />
+                </polygon>
+
+                {/* Ground Swath Footprint Ellipse */}
                 <ellipse
                   cx="0"
-                  cy="200"
-                  rx="90"
-                  ry="13"
+                  cy="215"
+                  rx="105"
+                  ry="14"
                   fill="#10b981"
-                  fillOpacity="0.22"
-                  stroke="#059669"
-                  strokeWidth="1.2"
+                  fillOpacity="0.25"
+                  stroke="#34d399"
+                  strokeWidth="1.5"
                   strokeDasharray="4 4"
-                />
+                >
+                  <animate
+                    attributeName="rx"
+                    values="95;115;95"
+                    dur="3.6s"
+                    repeatCount="indefinite"
+                  />
+                </ellipse>
 
-                {/* Spacecraft Vector Assembly */}
-                <g transform="scale(0.95)">
-                  {/* Central Bus Structure (Gold MLI Thermal Foil) */}
+                {/* Dynamic Cross-Track Laser Scanline */}
+                <line x1="-80" y1="215" x2="80" y2="215" stroke="#ffffff" strokeWidth="1.5" opacity="0.85">
+                  <animate
+                    attributeName="x1"
+                    values="-80;80;-80"
+                    dur="1.8s"
+                    repeatCount="indefinite"
+                  />
+                  <animate
+                    attributeName="x2"
+                    values="-40;110;-40"
+                    dur="1.8s"
+                    repeatCount="indefinite"
+                  />
+                </line>
+
+                {/* DETAILED AEROSPACE SPACECRAFT BODY */}
+                <g transform="scale(1.05)">
+                  
+                  {/* MLI Gold Thermal Insulation Main Bus */}
                   <rect
-                    x="-18"
-                    y="-13"
-                    width="36"
-                    height="26"
+                    x="-20"
+                    y="-15"
+                    width="40"
+                    height="30"
                     rx="3"
-                    fill="url(#orbitGoldFoil)"
-                    stroke="#b45309"
-                    strokeWidth="1"
-                    filter="drop-shadow(0 4px 8px rgba(0,0,0,0.35))"
+                    fill={selectedSat === 'terra' ? 'url(#orbitGoldFoil)' : 'url(#orbitSilverFoil)'}
+                    stroke="#92400e"
+                    strokeWidth="1.2"
+                    filter="drop-shadow(0 6px 12px rgba(0,0,0,0.6))"
                   />
 
-                  {/* MLI Foil Texture Grid */}
-                  <line x1="-18" y1="-4" x2="18" y2="-4" stroke="#78350f" strokeWidth="0.5" opacity="0.6" />
-                  <line x1="-18" y1="5" x2="18" y2="5" stroke="#78350f" strokeWidth="0.5" opacity="0.6" />
-                  <line x1="-6" y1="-13" x2="-6" y2="13" stroke="#78350f" strokeWidth="0.5" opacity="0.6" />
-                  <line x1="6" y1="-13" x2="6" y2="13" stroke="#78350f" strokeWidth="0.5" opacity="0.6" />
+                  {/* MLI Multi-Layer Thermal Quilting Texture */}
+                  <line x1="-20" y1="-5" x2="20" y2="-5" stroke="#78350f" strokeWidth="0.6" opacity="0.7" />
+                  <line x1="-20" y1="5" x2="20" y2="5" stroke="#78350f" strokeWidth="0.6" opacity="0.7" />
+                  <line x1="-7" y1="-15" x2="-7" y2="15" stroke="#78350f" strokeWidth="0.6" opacity="0.7" />
+                  <line x1="7" y1="-15" x2="7" y2="15" stroke="#78350f" strokeWidth="0.6" opacity="0.7" />
 
-                  {/* MODIS Sensor Optical Bay (Pointing Nadir Downward) */}
+                  {/* Nadir Instrument Optical Deck (Pointing Downward to Earth) */}
                   <rect
-                    x="-10"
-                    y="11"
-                    width="20"
-                    height="9"
+                    x="-12"
+                    y="13"
+                    width="24"
+                    height="10"
                     rx="2"
-                    fill="#1e293b"
-                    stroke="#0f172a"
-                    strokeWidth="0.8"
+                    fill="#0f172a"
+                    stroke="#334155"
+                    strokeWidth="1"
                   />
-                  {/* MODIS Active Thermal Sensor Lens (Glowing Emerald) */}
-                  <circle cx="-4" cy="15.5" r="2.5" fill="#10b981" stroke="#047857" strokeWidth="0.6">
-                    <animate attributeName="opacity" values="0.7;1;0.7" dur="1.6s" repeatCount="indefinite" />
-                  </circle>
-                  {/* ASTER & CERES Instrument Apertures */}
-                  <circle cx="4" cy="15.5" r="1.8" fill="#38bdf8" stroke="#0284c7" strokeWidth="0.5" />
 
-                  {/* High Gain Communication Antenna Dish (Pointing to TDRSS Space Network) */}
-                  <line x1="0" y1="-13" x2="0" y2="-24" stroke="#64748b" strokeWidth="1.5" />
+                  {/* Primary Thermal IR Sensor Aperture (Pulsing Active Lenses) */}
+                  <circle cx="-5" cy="18" r="3" fill="#10b981" stroke="#047857" strokeWidth="0.8">
+                    <animate attributeName="opacity" values="0.7;1;0.7" dur="1.2s" repeatCount="indefinite" />
+                  </circle>
+                  <circle cx="5" cy="18" r="2.2" fill="#38bdf8" stroke="#0284c7" strokeWidth="0.6">
+                    <animate attributeName="opacity" values="1;0.6;1" dur="1.2s" repeatCount="indefinite" />
+                  </circle>
+
+                  {/* High-Gain Tracking Parabolic Antenna (TDRSS Space Network) */}
+                  <line x1="0" y1="-15" x2="0" y2="-28" stroke="#475569" strokeWidth="2" />
                   <path
-                    d="M -9 -24 Q 0 -30 9 -24 Z"
+                    d="M -11 -28 Q 0 -35 11 -28 Z"
                     fill="#f8fafc"
                     stroke="#94a3b8"
-                    strokeWidth="0.8"
+                    strokeWidth="1"
                   />
-                  {/* Pulsing Communication Ring */}
-                  <circle cx="0" cy="-27" r="1.5" fill="#22c55e">
-                    <animate attributeName="opacity" values="0.4;1;0.4" dur="1s" repeatCount="indefinite" />
+                  {/* Antenna Downlink Feedhorn */}
+                  <circle cx="0" cy="-31" r="1.8" fill="#22c55e">
+                    <animate attributeName="opacity" values="0.3;1;0.3" dur="0.9s" repeatCount="indefinite" />
                   </circle>
 
-                  {/* Solar Array Booms */}
-                  <line x1="-18" y1="0" x2="-26" y2="0" stroke="#334155" strokeWidth="3" />
-                  <line x1="18" y1="0" x2="26" y2="0" stroke="#334155" strokeWidth="3" />
+                  {/* Solar Array Wing Booms */}
+                  <line x1="-20" y1="0" x2="-28" y2="0" stroke="#1e293b" strokeWidth="3.5" />
+                  <line x1="20" y1="0" x2="28" y2="0" stroke="#1e293b" strokeWidth="3.5" />
 
-                  {/* PORT / LEFT SOLAR ARRAY WING (Blue High-Efficiency Photovoltaic Cells) */}
-                  <g transform="translate(-26, 0)">
+                  {/* PORT / LEFT SOLAR ARRAY WING (Photovoltaic Blue Cells) */}
+                  <g transform="translate(-28, 0)">
                     <rect
-                      x="-38"
-                      y="-16"
-                      width="38"
-                      height="32"
-                      rx="1.5"
+                      x="-42"
+                      y="-18"
+                      width="42"
+                      height="36"
+                      rx="2"
                       fill="url(#orbitSolarGrad)"
                       stroke="#1e40af"
-                      strokeWidth="1"
+                      strokeWidth="1.2"
                     />
-                    {/* Solar Panel Cells Grid */}
-                    <line x1="-28" y1="-16" x2="-28" y2="16" stroke="#93c5fd" strokeWidth="0.4" opacity="0.8" />
-                    <line x1="-19" y1="-16" x2="-19" y2="16" stroke="#93c5fd" strokeWidth="0.4" opacity="0.8" />
-                    <line x1="-9" y1="-16" x2="-9" y2="16" stroke="#93c5fd" strokeWidth="0.4" opacity="0.8" />
-                    <line x1="-38" y1="-8" x2="0" y2="-8" stroke="#93c5fd" strokeWidth="0.4" opacity="0.8" />
-                    <line x1="-38" y1="0" x2="0" y2="0" stroke="#bfdbfe" strokeWidth="0.6" opacity="0.95" />
-                    <line x1="-38" y1="8" x2="0" y2="8" stroke="#93c5fd" strokeWidth="0.4" opacity="0.8" />
+                    {/* Photovoltaic Grid Network */}
+                    <line x1="-31" y1="-18" x2="-31" y2="18" stroke="#93c5fd" strokeWidth="0.5" opacity="0.85" />
+                    <line x1="-21" y1="-18" x2="-21" y2="18" stroke="#93c5fd" strokeWidth="0.5" opacity="0.85" />
+                    <line x1="-10" y1="-18" x2="-10" y2="18" stroke="#93c5fd" strokeWidth="0.5" opacity="0.85" />
+                    <line x1="-42" y1="-9" x2="0" y2="-9" stroke="#93c5fd" strokeWidth="0.5" opacity="0.85" />
+                    <line x1="-42" y1="0" x2="0" y2="0" stroke="#dbeafe" strokeWidth="0.8" opacity="0.95" />
+                    <line x1="-42" y1="9" x2="0" y2="9" stroke="#93c5fd" strokeWidth="0.5" opacity="0.85" />
                   </g>
 
                   {/* STARBOARD / RIGHT SOLAR ARRAY WING */}
-                  <g transform="translate(26, 0)">
+                  <g transform="translate(28, 0)">
                     <rect
                       x="0"
-                      y="-16"
-                      width="38"
-                      height="32"
-                      rx="1.5"
+                      y="-18"
+                      width="42"
+                      height="36"
+                      rx="2"
                       fill="url(#orbitSolarGrad)"
                       stroke="#1e40af"
-                      strokeWidth="1"
+                      strokeWidth="1.2"
                     />
-                    {/* Solar Panel Cells Grid */}
-                    <line x1="9" y1="-16" x2="9" y2="16" stroke="#93c5fd" strokeWidth="0.4" opacity="0.8" />
-                    <line x1="19" y1="-16" x2="19" y2="16" stroke="#93c5fd" strokeWidth="0.4" opacity="0.8" />
-                    <line x1="28" y1="-16" x2="28" y2="16" stroke="#93c5fd" strokeWidth="0.4" opacity="0.8" />
-                    <line x1="0" y1="-8" x2="38" y2="-8" stroke="#93c5fd" strokeWidth="0.4" opacity="0.8" />
-                    <line x1="0" y1="0" x2="38" y2="0" stroke="#bfdbfe" strokeWidth="0.6" opacity="0.95" />
-                    <line x1="0" y1="8" x2="38" y2="8" stroke="#93c5fd" strokeWidth="0.4" opacity="0.8" />
+                    {/* Photovoltaic Grid Network */}
+                    <line x1="10" y1="-18" x2="10" y2="18" stroke="#93c5fd" strokeWidth="0.5" opacity="0.85" />
+                    <line x1="21" y1="-18" x2="21" y2="18" stroke="#93c5fd" strokeWidth="0.5" opacity="0.85" />
+                    <line x1="31" y1="-18" x2="31" y2="18" stroke="#93c5fd" strokeWidth="0.5" opacity="0.85" />
+                    <line x1="0" y1="-9" x2="42" y2="-9" stroke="#93c5fd" strokeWidth="0.5" opacity="0.85" />
+                    <line x1="0" y1="0" x2="42" y2="0" stroke="#dbeafe" strokeWidth="0.8" opacity="0.95" />
+                    <line x1="0" y1="9" x2="42" y2="9" stroke="#93c5fd" strokeWidth="0.5" opacity="0.85" />
                   </g>
 
-                  {/* Spacecraft Attitude Thruster Pods */}
-                  <circle cx="-16" cy="-11" r="1.2" fill="#475569" />
-                  <circle cx="16" cy="-11" r="1.2" fill="#475569" />
-                  <circle cx="-16" cy="11" r="1.2" fill="#475569" />
-                  <circle cx="16" cy="11" r="1.2" fill="#475569" />
+                  {/* Attitude Control Micro-Thrusters */}
+                  <circle cx="-18" cy="-13" r="1.4" fill="#64748b" />
+                  <circle cx="18" cy="-13" r="1.4" fill="#64748b" />
+                  <circle cx="-18" cy="13" r="1.4" fill="#64748b" />
+                  <circle cx="18" cy="13" r="1.4" fill="#64748b" />
 
-                  {/* Telemetry Heartbeat LED */}
-                  <circle cx="0" cy="0" r="1.8" fill="#22c55e">
-                    <animate attributeName="opacity" values="0.3;1;0.3" dur="1.2s" repeatCount="indefinite" />
+                  {/* Mission Status Telemetry LED */}
+                  <circle cx="0" cy="0" r="2.2" fill="#22c55e">
+                    <animate attributeName="opacity" values="0.4;1;0.4" dur="1s" repeatCount="indefinite" />
                   </circle>
                 </g>
 
-                {/* Floating HUD Spacecraft Tag */}
-                <g transform="translate(0, -42)">
-                  <rect
-                    x="-52"
-                    y="-11"
-                    width="104"
-                    height="20"
-                    rx="10"
-                    fill="#020617"
-                    fillOpacity="0.9"
-                    stroke="#10b981"
-                    strokeWidth="1"
-                    filter="drop-shadow(0 2px 4px rgba(0,0,0,0.4))"
-                  />
-                  <text
-                    x="0"
-                    y="3"
-                    textAnchor="middle"
-                    fill="#f8fafc"
-                    fontSize="9"
-                    fontWeight="bold"
-                    fontFamily="system-ui, sans-serif"
-                    letterSpacing="0.6"
-                  >
-                    NASA TERRA (EOS AM-1)
-                  </text>
-                </g>
               </g>
             </svg>
           </div>
 
-          {/* Active Target Peatland Station Insight Bar */}
-          <div className="relative z-10 px-5 sm:px-8 py-3 bg-white/70 dark:bg-[#0f172a]/70 border-t border-[#e5e5e7] dark:border-[#1f2937] backdrop-blur-md flex flex-wrap items-center justify-between gap-4 text-xs">
+          {/* Active Target Peatland Station Telemetry Bar */}
+          <div className="relative z-10 px-5 sm:px-8 py-3 bg-white/80 dark:bg-[#0f172a]/80 border-t border-[#e5e5e7] dark:border-[#1f2937] backdrop-blur-md flex flex-wrap items-center justify-between gap-4 text-xs">
             <div className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
               <div>
@@ -635,7 +680,7 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
             </div>
           </div>
 
-          {/* Integrated Mission Telemetry Deck (Docked at bottom of stage with high contrast) */}
+          {/* Integrated Mission Telemetry Deck */}
           <div className="relative z-10 p-5 sm:p-7 border-t border-[#e5e5e7] dark:border-[#1f2937] bg-white/95 dark:bg-[#0c1324]/95 backdrop-blur-md">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
               
@@ -643,16 +688,20 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
               <div className="lg:col-span-5 space-y-1.5">
                 <div className="flex items-center gap-2">
                   <h3 className="text-base sm:text-lg font-bold text-[#1d1d1f] dark:text-white tracking-tight">
-                    NASA Terra (EOS AM-1) Spacecraft
+                    {selectedSat === 'terra' ? 'NASA Terra (EOS AM-1) Spacecraft' : 'Suomi-NPP (NASA / NOAA) Satellite'}
                   </h3>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#f5f5f7] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937] text-[#6e6e73] dark:text-[#9ca3af]">
-                    NORAD 25994
+                    {selectedSat === 'terra' ? 'NORAD 25994' : 'NORAD 37849'}
                   </span>
                 </div>
                 <p className="text-xs text-[#515154] dark:text-[#9ca3af] leading-relaxed">
-                  {language === 'id'
-                    ? 'Satelit unggulan NASA diluncurkan pada 18 Desember 1999 pada orbit Sun-Synchronous 705 km. Sensor MODIS menjadi tulang punggung pengamatan deret waktu 26 tahun Terra Harmonia.'
-                    : 'NASA’s flagship Earth observation satellite launched on Dec 18, 1999 into a 705 km Sun-Synchronous orbit. Its MODIS sensor anchors Terra Harmonia’s 26-year baseline.'}
+                  {selectedSat === 'terra'
+                    ? (language === 'id'
+                      ? 'Satelit unggulan NASA diluncurkan pada 18 Desember 1999 pada orbit Sun-Synchronous 705 km. Sensor MODIS menjadi tulang punggung pengamatan deret waktu 26 tahun Terra Harmonia.'
+                      : 'NASA flagship Earth observation satellite launched on Dec 18, 1999 into a 705 km Sun-Synchronous orbit. Its MODIS sensor anchors Terra Harmonia 26-year baseline.')
+                    : (language === 'id'
+                      ? 'Diluncurkan pada 28 Oktober 2011 oleh NASA/NOAA pada orbit 824 km. Sensor VIIRS membawa pita resolusi tinggi 375m yang diselaraskan oleh algoritma Terra Harmonia.'
+                      : 'Launched on Oct 28, 2011 by NASA/NOAA into an 824 km orbit. Its VIIRS sensor delivers 375m high-resolution bands harmonized by Terra Harmonia.')}
                 </p>
               </div>
 
@@ -662,7 +711,9 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
                   <span className="text-[10px] text-[#86868b] dark:text-[#9ca3af] uppercase font-bold tracking-wider block">
                     {language === 'id' ? 'Ketinggian Orbit' : 'Orbit Altitude'}
                   </span>
-                  <strong className="text-base font-bold text-[#1d1d1f] dark:text-white block mt-0.5 num">705 km</strong>
+                  <strong className="text-base font-bold text-[#1d1d1f] dark:text-white block mt-0.5 num">
+                    {selectedSat === 'terra' ? '705 km' : '824 km'}
+                  </strong>
                   <span className="text-[10px] text-[#6e6e73] dark:text-[#9ca3af]">Sun-Synchronous</span>
                 </div>
 
@@ -670,8 +721,12 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
                   <span className="text-[10px] text-[#86868b] dark:text-[#9ca3af] uppercase font-bold tracking-wider block">
                     {language === 'id' ? 'Kecepatan Orbit' : 'Velocity'}
                   </span>
-                  <strong className="text-base font-bold text-[#1d1d1f] dark:text-white block mt-0.5 num">7.5 km/s</strong>
-                  <span className="text-[10px] text-[#6e6e73] dark:text-[#9ca3af]">27,000 km/h</span>
+                  <strong className="text-base font-bold text-[#1d1d1f] dark:text-white block mt-0.5 num">
+                    {selectedSat === 'terra' ? '7.5 km/s' : '7.1 km/s'}
+                  </strong>
+                  <span className="text-[10px] text-[#6e6e73] dark:text-[#9ca3af]">
+                    {selectedSat === 'terra' ? '27,000 km/h' : '25,560 km/h'}
+                  </span>
                 </div>
               </div>
 
@@ -681,21 +736,37 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
                   {language === 'id' ? 'Payload Sensor Sains' : 'Science Payload Suite'}
                 </span>
                 <div className="flex flex-wrap items-center gap-1 text-[11px] font-mono">
-                  <span className="px-2 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800">
-                    MODIS (1 km)
-                  </span>
-                  <span className="px-2 py-0.5 rounded-lg bg-[#f5f5f7] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937] text-[#6e6e73] dark:text-[#9ca3af]">
-                    ASTER (15 m)
-                  </span>
-                  <span className="px-2 py-0.5 rounded-lg bg-[#f5f5f7] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937] text-[#6e6e73] dark:text-[#9ca3af]">
-                    CERES
-                  </span>
-                  <span className="px-2 py-0.5 rounded-lg bg-[#f5f5f7] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937] text-[#6e6e73] dark:text-[#9ca3af]">
-                    MISR
-                  </span>
-                  <span className="px-2 py-0.5 rounded-lg bg-[#f5f5f7] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937] text-[#6e6e73] dark:text-[#9ca3af]">
-                    MOPITT
-                  </span>
+                  {selectedSat === 'terra' ? (
+                    <>
+                      <span className="px-2 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800">
+                        MODIS (1 km)
+                      </span>
+                      <span className="px-2 py-0.5 rounded-lg bg-[#f5f5f7] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937] text-[#6e6e73] dark:text-[#9ca3af]">
+                        ASTER (15 m)
+                      </span>
+                      <span className="px-2 py-0.5 rounded-lg bg-[#f5f5f7] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937] text-[#6e6e73] dark:text-[#9ca3af]">
+                        CERES
+                      </span>
+                      <span className="px-2 py-0.5 rounded-lg bg-[#f5f5f7] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937] text-[#6e6e73] dark:text-[#9ca3af]">
+                        MISR
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-200 dark:border-emerald-800">
+                        VIIRS (375 m)
+                      </span>
+                      <span className="px-2 py-0.5 rounded-lg bg-[#f5f5f7] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937] text-[#6e6e73] dark:text-[#9ca3af]">
+                        CrIS
+                      </span>
+                      <span className="px-2 py-0.5 rounded-lg bg-[#f5f5f7] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937] text-[#6e6e73] dark:text-[#9ca3af]">
+                        ATMS
+                      </span>
+                      <span className="px-2 py-0.5 rounded-lg bg-[#f5f5f7] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937] text-[#6e6e73] dark:text-[#9ca3af]">
+                        OMPS
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
 
