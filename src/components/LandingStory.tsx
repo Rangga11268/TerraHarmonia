@@ -99,24 +99,33 @@ export const LandingStory: React.FC<LandingStoryProps> = ({
   return (
     <div className="w-full space-y-8 sm:space-y-12 animate-in fade-in duration-200 max-w-full overflow-hidden">
       
-      {/* 1. HERO SECTION (Clean, Solid Contrast, Anti-Slop) */}
-      <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-neutral-900 text-white border border-neutral-800 p-5 sm:p-10 lg:p-14 shadow-xl">
+      {/* 1. HERO SECTION (HD Satellite Background Backdrop) */}
+      <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-neutral-800 p-5 sm:p-10 lg:p-14 shadow-2xl space-y-6 sm:space-y-8 bg-neutral-950 text-white">
         
-        {/* Subtle Geometric Background Motif */}
-        <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px] opacity-25 pointer-events-none" />
+        {/* HD Satellite Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 mix-blend-luminosity scale-105 pointer-events-none transition duration-1000"
+          style={{ backgroundImage: "url('/terra_hero_satellite_earth.jpg')" }}
+        />
+
+        {/* Dark Scrim / Vignette for 100% Contrast & Text Legibility */}
+        <div className="absolute inset-0 bg-gradient-to-b from-neutral-950/90 via-neutral-950/70 to-neutral-950/95 pointer-events-none" />
+
+        {/* Subtle Geometric Overlay */}
+        <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:28px_28px] opacity-15 pointer-events-none" />
 
         <div className="relative z-10 max-w-4xl mx-auto text-center space-y-5 sm:space-y-6">
           
           {/* Top Pill Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-800/90 border border-neutral-700 text-xs font-semibold text-neutral-200">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900/90 backdrop-blur-md border border-neutral-700/80 text-xs font-semibold text-neutral-200 shadow-md">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="tracking-tight text-[11px] sm:text-xs">
               NASA Space Apps Challenge 2026 &bull; Global Earth Observation
             </span>
           </div>
 
-          {/* Main Headline (High Contrast, Bold) */}
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight sm:leading-tight text-white">
+          {/* Main Headline */}
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight sm:leading-tight text-white drop-shadow-md">
             {language === 'id' ? (
               <>
                 Harmonisasi <span className="text-emerald-400">26 Tahun Data Titik Api</span> Satelit NASA di Indonesia
@@ -128,18 +137,18 @@ export const LandingStory: React.FC<LandingStoryProps> = ({
             )}
           </h1>
 
-          {/* Subtitle / Scientific Scope */}
-          <p className="text-sm sm:text-base lg:text-lg text-neutral-300 max-w-3xl mx-auto leading-relaxed font-normal">
+          {/* Subtitle */}
+          <p className="text-sm sm:text-base lg:text-lg text-neutral-200 max-w-3xl mx-auto leading-relaxed font-normal drop-shadow-sm">
             {language === 'id'
               ? 'Dari sensor MODIS 1 km (2000) hingga VIIRS 375 m (2026): Memulihkan kebenaran ilmiah deret waktu iklim, mengeliminasi bias sensorik 300%, dan melindungi 13.4 juta hektar lahan gambut tropis Indonesia.'
               : 'From 1 km MODIS (2000) to 375 m VIIRS (2026): Restoring historical fire climatology truth, eliminating artificial 300% sensor shift bias, and protecting 13.4 million hectares of Indonesian tropical peatlands.'}
           </p>
 
-          {/* Action CTAs (Mobile: Full-Width Uniformly Stacked, Desktop: Inline) */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 pt-3 sm:pt-4">
+          {/* Action CTAs (Mobile: Full-Width Stacked, Desktop: Inline) */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 pt-2">
             <button
               onClick={() => onSelectTab('overview')}
-              className="w-full sm:w-auto h-12 min-h-[48px] px-6 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+              className="w-full sm:w-auto h-12 min-h-[48px] px-6 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold text-sm transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
             >
               <Activity className="w-4 h-4 text-neutral-950" />
               <span>{language === 'id' ? 'Buka Intelijen Peta & Kalender' : 'Launch 26-Year Intel & Map'}</span>
@@ -148,7 +157,7 @@ export const LandingStory: React.FC<LandingStoryProps> = ({
 
             <button
               onClick={() => onSelectTab('lab')}
-              className="w-full sm:w-auto h-12 min-h-[48px] px-6 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white border border-neutral-700 font-semibold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+              className="w-full sm:w-auto h-12 min-h-[48px] px-6 rounded-xl bg-neutral-900/90 backdrop-blur-md hover:bg-neutral-800 text-white border border-neutral-700 font-semibold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
             >
               <Cpu className="w-4 h-4 text-blue-400" />
               <span>{language === 'id' ? 'Lab Harmonisasi & Fisika' : 'Harmonization Lab & Physics'}</span>
@@ -156,7 +165,7 @@ export const LandingStory: React.FC<LandingStoryProps> = ({
 
             <button
               onClick={onOpenTour}
-              className="w-full sm:w-auto h-12 min-h-[48px] px-5 rounded-xl bg-neutral-800/60 hover:bg-neutral-800 text-neutral-300 hover:text-white border border-neutral-700/60 text-xs font-semibold transition flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+              className="w-full sm:w-auto h-12 min-h-[48px] px-5 rounded-xl bg-neutral-900/60 backdrop-blur-md hover:bg-neutral-800 text-neutral-300 hover:text-white border border-neutral-700/60 text-xs font-semibold transition flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
             >
               <PlayCircle className="w-4 h-4 text-amber-400" />
               <span>{language === 'id' ? 'Panduan Eksplorasi 30 Detik' : '30-Sec Guide'}</span>
@@ -164,26 +173,26 @@ export const LandingStory: React.FC<LandingStoryProps> = ({
           </div>
 
           {/* 4 Quantitative Proof Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5 pt-6 sm:pt-8 border-t border-neutral-800 text-left">
-            <div className="p-3 sm:p-4 rounded-xl bg-neutral-800/50 border border-neutral-700/70">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5 pt-6 sm:pt-8 border-t border-neutral-800/80 text-left">
+            <div className="p-3.5 sm:p-4 rounded-xl bg-neutral-900/80 backdrop-blur-md border border-neutral-700/70 shadow-sm">
               <span className="text-[10px] font-bold uppercase text-neutral-400 tracking-wider block">Rentang Data NASA</span>
               <strong className="text-xl sm:text-2xl font-black text-white num block mt-0.5">26 Tahun</strong>
               <span className="text-[11px] text-neutral-400">2000 &ndash; 2026 Archive</span>
             </div>
 
-            <div className="p-3 sm:p-4 rounded-xl bg-neutral-800/50 border border-neutral-700/70">
+            <div className="p-3.5 sm:p-4 rounded-xl bg-neutral-900/80 backdrop-blur-md border border-neutral-700/70 shadow-sm">
               <span className="text-[10px] font-bold uppercase text-neutral-400 tracking-wider block">Fusi Spasial Grid</span>
               <strong className="text-xl sm:text-2xl font-black text-emerald-400 num block mt-0.5">5.5 km</strong>
               <span className="text-[11px] text-neutral-400">Equal-Area Binning</span>
             </div>
 
-            <div className="p-3 sm:p-4 rounded-xl bg-neutral-800/50 border border-neutral-700/70">
+            <div className="p-3.5 sm:p-4 rounded-xl bg-neutral-900/80 backdrop-blur-md border border-neutral-700/70 shadow-sm">
               <span className="text-[10px] font-bold uppercase text-neutral-400 tracking-wider block">Ambang Gambut BRGM</span>
               <strong className="text-xl sm:text-2xl font-black text-red-400 num block mt-0.5">&lt; -40 cm</strong>
               <span className="text-[11px] text-neutral-400">TMAG Fire Threshold</span>
             </div>
 
-            <div className="p-3 sm:p-4 rounded-xl bg-neutral-800/50 border border-neutral-700/70">
+            <div className="p-3.5 sm:p-4 rounded-xl bg-neutral-900/80 backdrop-blur-md border border-neutral-700/70 shadow-sm">
               <span className="text-[10px] font-bold uppercase text-neutral-400 tracking-wider block">Latensi Eksekusi</span>
               <strong className="text-xl sm:text-2xl font-black text-blue-400 num block mt-0.5">0 ms</strong>
               <span className="text-[11px] text-neutral-400">Client-Side Engine</span>
@@ -191,6 +200,7 @@ export const LandingStory: React.FC<LandingStoryProps> = ({
           </div>
 
         </div>
+
       </section>
 
       {/* 2. CONTINUOUS TICKER MARQUEE (Zero Horizontal Overflow) */}
