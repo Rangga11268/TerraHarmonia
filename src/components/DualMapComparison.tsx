@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { AOIRegion, RawHotspot } from '../engine/harmonizer';
 import { Language, translations } from '../data/translations';
+import { resolveHotspotLocation, getIndonesianLocalTime } from '../utils/locationResolver';
 import { Split, RefreshCw } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -141,15 +142,28 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
         fillOpacity: 0.75,
       });
 
-      circle.bindTooltip(
-        `<div class="font-sans text-xs">
-          <strong>${h.instrument}</strong> &bull; FRP: ${Math.round(h.frp)} MW<br/>
-          ${language === 'id' ? 'Tgl' : 'Date'}: ${h.date || h.time}
-        </div>`
+      const loc = resolveHotspotLocation(h.lat, h.lon, selectedAOI.id, language);
+      const localTime = getIndonesianLocalTime(h.date, h.time, h.lon);
+
+      circle.bindPopup(
+        `<div style="font-family:system-ui,sans-serif;font-size:12px;min-width:220px;padding:2px;line-height:1.4">
+          <div style="font-weight:700;color:#0f172a;font-size:12.5px;margin-bottom:2px;">${h.instrument} (${h.satellite})</div>
+          <div style="color:#0071e3;font-weight:600;font-size:11px;margin-bottom:3px;">📍 ${loc.regency}</div>
+          <div style="font-size:10.5px;color:#059669;margin-bottom:4px;">🌿 ${loc.landscape}</div>
+          <div style="background:#f8fafc;padding:5px;border-radius:6px;font-size:11px;margin-bottom:4px;">
+            <div><b>Koordinat:</b> <span style="font-family:monospace">${h.lat.toFixed(4)}°, ${h.lon.toFixed(4)}°</span></div>
+            <div><b>Waktu:</b> ${localTime.timeFormatted} (${h.date})</div>
+            <div><b>Daya Termal (FRP):</b> ${Math.round(h.frp)} MW</div>
+          </div>
+          <a href="${loc.googleMapsUrl}" target="_blank" rel="noopener noreferrer" style="color:#0071e3;text-decoration:none;font-size:10.5px;font-weight:600;">
+            ↗ Buka di Google Maps
+          </a>
+        </div>`,
+        { maxWidth: 260 }
       );
       circle.addTo(layerGroupA.current!);
     });
-  }, [hotspotsA, language]);
+  }, [hotspotsA, selectedAOI, language]);
 
   useEffect(() => {
     if (!leafletMapB.current || !layerGroupB.current) return;
@@ -168,15 +182,28 @@ export const DualMapComparison: React.FC<DualMapComparisonProps> = ({
         fillOpacity: 0.75,
       });
 
-      circle.bindTooltip(
-        `<div class="font-sans text-xs">
-          <strong>${h.instrument}</strong> &bull; FRP: ${Math.round(h.frp)} MW<br/>
-          ${language === 'id' ? 'Tgl' : 'Date'}: ${h.date || h.time}
-        </div>`
+      const loc = resolveHotspotLocation(h.lat, h.lon, selectedAOI.id, language);
+      const localTime = getIndonesianLocalTime(h.date, h.time, h.lon);
+
+      circle.bindPopup(
+        `<div style="font-family:system-ui,sans-serif;font-size:12px;min-width:220px;padding:2px;line-height:1.4">
+          <div style="font-weight:700;color:#0f172a;font-size:12.5px;margin-bottom:2px;">${h.instrument} (${h.satellite})</div>
+          <div style="color:#0071e3;font-weight:600;font-size:11px;margin-bottom:3px;">📍 ${loc.regency}</div>
+          <div style="font-size:10.5px;color:#059669;margin-bottom:4px;">🌿 ${loc.landscape}</div>
+          <div style="background:#f8fafc;padding:5px;border-radius:6px;font-size:11px;margin-bottom:4px;">
+            <div><b>Koordinat:</b> <span style="font-family:monospace">${h.lat.toFixed(4)}°, ${h.lon.toFixed(4)}°</span></div>
+            <div><b>Waktu:</b> ${localTime.timeFormatted} (${h.date})</div>
+            <div><b>Daya Termal (FRP):</b> ${Math.round(h.frp)} MW</div>
+          </div>
+          <a href="${loc.googleMapsUrl}" target="_blank" rel="noopener noreferrer" style="color:#0071e3;text-decoration:none;font-size:10.5px;font-weight:600;">
+            ↗ Buka di Google Maps
+          </a>
+        </div>`,
+        { maxWidth: 260 }
       );
       circle.addTo(layerGroupB.current!);
     });
-  }, [hotspotsB, language]);
+  }, [hotspotsB, selectedAOI, language]);
 
   const years = Array.from({ length: 27 }, (_, i) => 2000 + i);
 

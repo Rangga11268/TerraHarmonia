@@ -5,6 +5,7 @@ import { AOIRegion, RawHotspot, HarmonizedWeekData } from '../engine/harmonizer'
 import { Layers, Maximize2 } from 'lucide-react';
 import { Language, translations } from '../data/translations';
 import { FullMapModal } from './FullMapModal';
+import { resolveHotspotLocation, toDMS, getIndonesianLocalTime } from '../utils/locationResolver';
 
 interface MapViewerProps {
   language: Language;
@@ -163,34 +164,82 @@ export const MapViewer: React.FC<MapViewerProps> = ({
         : spot.frp < 150 ? (language === 'id' ? 'Tinggi' : 'High')
         : (language === 'id' ? 'Sangat Tinggi' : 'Extreme');
 
-      // Resolve province/region name from spot ID
-      let locationName = selectedAOI.name;
-      if (spot.id.startsWith('NAT-')) {
-        const parts = spot.id.split('-');
-        if (parts.length >= 2 && REGION_NAMES[parts[1]]) {
-          locationName = REGION_NAMES[parts[1]];
-        }
-      }
+      const intensityColor =
+        spot.frp < 15 ? '#10b981'
+        : spot.frp < 50 ? '#f59e0b'
+        : spot.frp < 150 ? '#f97316'
+        : '#dc2626';
 
-      const popupHtml = language === 'id'
-        ? `<div style="font-family:system-ui,-apple-system,sans-serif;font-size:12px;min-width:200px;padding:2px;line-height:1.4">
-            <div style="font-weight:700;color:#1d1d1f;font-size:13px;margin-bottom:4px">Titik Panas Satelit</div>
-            <div style="color:#0071e3;font-weight:600;margin-bottom:3px">${locationName}</div>
-            <div><b>Sensor:</b> ${spot.instrument} (${spot.satellite})</div>
-            <div><b>Tanggal:</b> ${spot.date} (${spot.time.slice(0,2)}:${spot.time.slice(2)} UTC)</div>
-            <div><b>Daya Termal (FRP):</b> ${spot.frp} MW (${intensity})</div>
-            <div><b>Tingkat Keyakinan:</b> ${spot.confidence}%</div>
-            <div style="color:#86868b;margin-top:4px;font-size:10px">${spot.lat.toFixed(4)}&deg;, ${spot.lon.toFixed(4)}&deg;</div>
-          </div>`
-        : `<div style="font-family:system-ui,-apple-system,sans-serif;font-size:12px;min-width:200px;padding:2px;line-height:1.4">
-            <div style="font-weight:700;color:#1d1d1f;font-size:13px;margin-bottom:4px">Satellite Hotspot Detection</div>
-            <div style="color:#0071e3;font-weight:600;margin-bottom:3px">${locationName}</div>
-            <div><b>Sensor:</b> ${spot.instrument} (${spot.satellite})</div>
-            <div><b>Date:</b> ${spot.date} (${spot.time.slice(0,2)}:${spot.time.slice(2)} UTC)</div>
-            <div><b>Thermal Radiative Power:</b> ${spot.frp} MW (${intensity})</div>
-            <div><b>Confidence Level:</b> ${spot.confidence}%</div>
-            <div style="color:#86868b;margin-top:4px;font-size:10px">${spot.lat.toFixed(4)}&deg;, ${spot.lon.toFixed(4)}&deg;</div>
-          </div>`;
+      // Deep location resolution
+      const loc = resolveHotspotLocation(spot.lat, spot.lon, selectedAOI.id, language);
+      const localTime = getIndonesianLocalTime(spot.date, spot.time, spot.lon);
+      const tempCelsius = (spot.brightness - 273.15).toFixed(1);
+
+      const popupHtml = `
+        <div style="font-family:system-ui,-apple-system,sans-serif;font-size:12px;min-width:260px;max-width:320px;line-height:1.45;color:#1e293b;">
+          
+          <!-- Header: Status & Instrument -->
+          <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;padding-bottom:6px;margin-bottom:8px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};"></span>
+              <strong style="font-size:13px;color:#0f172a;">${spot.instrument} (${spot.satellite})</strong>
+            </div>
+            <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;background:${intensityColor}15;color:${intensityColor};border:1px solid ${intensityColor}30;">
+              ${intensity.toUpperCase()} • ${spot.frp} MW
+            </span>
+          </div>
+
+          <!-- Administrative Region & Peat Landscape -->
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px;margin-bottom:8px;">
+            <div style="font-size:11px;font-weight:700;color:#0071e3;text-transform:uppercase;letter-spacing:0.5px;">
+              📍 ${loc.regency}
+            </div>
+            ${loc.district ? `<div style="font-size:11px;color:#475569;margin-top:2px;"><b>Kecamatan/Area:</b> ${loc.district}</div>` : ''}
+            <div style="font-size:11px;color:#059669;margin-top:3px;font-weight:600;">
+              🌿 ${loc.landscape}
+            </div>
+            ${loc.isPeatland ? `<div style="font-size:10px;color:#b45309;margin-top:2px;"><b>Estimasi Kedalaman Gambut:</b> ${loc.peatDepthEstimate}</div>` : ''}
+          </div>
+
+          <!-- Precise Coordinates & Local Time -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;margin-bottom:8px;">
+            <div style="background:#f1f5f9;padding:6px;border-radius:6px;">
+              <span style="font-size:9px;color:#64748b;text-transform:uppercase;font-weight:700;display:block;">${language === 'id' ? 'Koordinat Presisi' : 'Coordinates'}</span>
+              <strong style="font-family:monospace;font-size:11px;color:#0f172a;display:block;margin-top:2px;">
+                ${spot.lat.toFixed(5)}°, ${spot.lon.toFixed(5)}°
+              </strong>
+              <span style="font-size:9px;color:#64748b;display:block;margin-top:1px;">
+                ${loc.coordinatesDMS}
+              </span>
+            </div>
+
+            <div style="background:#f1f5f9;padding:6px;border-radius:6px;">
+              <span style="font-size:9px;color:#64748b;text-transform:uppercase;font-weight:700;display:block;">${language === 'id' ? 'Waktu Deteksi' : 'Detection Time'}</span>
+              <strong style="font-family:monospace;font-size:11px;color:#0f172a;display:block;margin-top:2px;">
+                ${localTime.timeFormatted}
+              </strong>
+              <span style="font-size:9px;color:#64748b;display:block;margin-top:1px;">
+                ${spot.date} (${spot.time.slice(0,2)}:${spot.time.slice(2)} UTC)
+              </span>
+            </div>
+          </div>
+
+          <!-- Telemetry & Sensor Stats -->
+          <div style="font-size:11px;border-top:1px solid #f1f5f9;padding-top:6px;color:#475569;display:flex;justify-content:space-between;">
+            <span><b>${language === 'id' ? 'Suhu Termal' : 'Thermal Temp'}:</b> ${tempCelsius}°C (${spot.brightness} K)</span>
+            <span><b>${language === 'id' ? 'Keyakinan' : 'Confidence'}:</b> ${spot.confidence}%</span>
+          </div>
+
+          <!-- Direct Navigation Link -->
+          <div style="margin-top:8px;padding-top:6px;border-top:1px dashed #cbd5e1;display:flex;align-items:center;justify-content:space-between;font-size:10.5px;">
+            <a href="${loc.googleMapsUrl}" target="_blank" rel="noopener noreferrer" style="color:#0071e3;text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:3px;">
+              ↗ ${language === 'id' ? 'Buka di Google Maps' : 'Open in Google Maps'}
+            </a>
+            <span style="color:#94a3b8;font-size:9.5px;">NASA FIRMS Data</span>
+          </div>
+
+        </div>
+      `;
 
       const circle = L.circleMarker([spot.lat, spot.lon], {
         radius,
@@ -201,7 +250,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({
         fillOpacity: 0.85,
       });
 
-      circle.bindPopup(popupHtml, { maxWidth: 260 });
+      circle.bindPopup(popupHtml, { maxWidth: 320 });
       circle.addTo(layerGroup);
     });
   }, [selectedAOI, hotspots, selectedWeekData, rawMode, isLiveSync, language]);
