@@ -15,11 +15,31 @@ import {
   Satellite,
   Radio,
   Sparkles,
+  MapPin,
+  Activity,
+  Layers,
+  Droplets,
+  Thermometer,
 } from 'lucide-react';
 
 interface FooterProps {
   language: Language;
   onSelectTab: (tab: NavTab) => void;
+}
+
+interface GroundTarget {
+  id: string;
+  name: string;
+  nameId: string;
+  coords: string;
+  cx: number;
+  cy: number;
+  color: string;
+  depth: string;
+  gwl: string;
+  status: string;
+  statusId: string;
+  sensor: string;
 }
 
 export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
@@ -35,6 +55,67 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
     return () => clearInterval(timer);
   }, []);
 
+  const groundTargets: GroundTarget[] = [
+    {
+      id: 'riau',
+      name: 'Riau • Siak Peat Basin',
+      nameId: 'Riau • Kubah Gambut Siak',
+      coords: '0.5°N 101.8°E',
+      cx: 480,
+      cy: 258,
+      color: '#ef4444',
+      depth: '4.2 m',
+      gwl: '-38 cm',
+      status: 'CRITICAL (FWI 28.4)',
+      statusId: 'KRITIS (FWI 28.4)',
+      sensor: 'MODIS Band 21/22',
+    },
+    {
+      id: 'kalteng',
+      name: 'Central Kalimantan • Ex-PLG Block A',
+      nameId: 'Kalimantan Tengah • Eks-PLG Blok A',
+      coords: '-2.2°S 113.8°E',
+      cx: 740,
+      cy: 250,
+      color: '#f97316',
+      depth: '5.8 m',
+      gwl: '-45 cm',
+      status: 'VERY HIGH (FWI 32.1)',
+      statusId: 'SANGAT TINGGI (FWI 32.1)',
+      sensor: 'MODIS TIR 3.9µm',
+    },
+    {
+      id: 'sumsel',
+      name: 'South Sumatra • OKI Concession Arc',
+      nameId: 'Sumatera Selatan • Konsesi OKI',
+      coords: '-3.1°S 105.4°E',
+      cx: 980,
+      cy: 260,
+      color: '#eab308',
+      depth: '3.5 m',
+      gwl: '-29 cm',
+      status: 'MODERATE RISK (FWI 18.6)',
+      statusId: 'RISIKO SEDANG (FWI 18.6)',
+      sensor: 'VIIRS I4 375m',
+    },
+    {
+      id: 'papua',
+      name: 'Papua • Merauke Savanna Basin',
+      nameId: 'Papua • Kubah Savana Merauke',
+      coords: '-7.8°S 139.6°E',
+      cx: 1220,
+      cy: 275,
+      color: '#10b981',
+      depth: '2.1 m',
+      gwl: '-14 cm',
+      status: 'NOMINAL MONITORING',
+      statusId: 'PEMANTAUAN NOMINAL',
+      sensor: 'MODIS + VIIRS Cross-Sync',
+    },
+  ];
+
+  const [activeTarget, setActiveTarget] = useState<GroundTarget>(groundTargets[1]);
+
   return (
     <footer className="relative w-full bg-[#fbfbfd] dark:bg-[#060911] border-t border-[#e5e5e7] dark:border-[#1f2937] text-[#1d1d1f] dark:text-[#f3f4f6] transition-colors overflow-hidden">
       
@@ -46,7 +127,7 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
           {/* Col 1: Official Brand Logo & Vision */}
           <div className="space-y-3.5">
             <div>
-              <Logo size="md" />
+              <Logo size="md" showNasaBadge={true} />
             </div>
 
             <p className="text-[#6e6e73] dark:text-[#9ca3af] leading-relaxed">
@@ -169,14 +250,14 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
 
         </div>
 
-        {/* 2. DEDICATED UNOBSTRUCTED ORBITAL STAGE (The "Story" Canvas — Like Meridian Train Reference) */}
+        {/* 2. DEDICATED CINEMATIC ORBITAL FLIGHT DECK (Unobstructed Story Stage) */}
         <div className="relative w-full rounded-3xl border border-[#e5e5e7] dark:border-[#1f2937] bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0] dark:from-[#080d1a] dark:via-[#0c1222] dark:to-[#050811] shadow-xs overflow-hidden">
           
           {/* Header Bar inside Orbital Stage */}
           <div className="relative z-10 px-5 sm:px-8 pt-5 pb-2 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/80 dark:bg-[#151d2f]/80 backdrop-blur-md border border-[#e5e5e7] dark:border-[#1f2937] text-xs font-semibold text-[#1d1d1f] dark:text-white shadow-2xs">
-                <Orbit className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 animate-spin" style={{ animationDuration: '18s' }} />
+                <Orbit className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 animate-spin" style={{ animationDuration: '20s' }} />
                 <span>NASA Earth Observing System (EOS) &bull; Planetary Flight Deck</span>
               </span>
               <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs font-mono font-bold">
@@ -195,7 +276,7 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
           </div>
 
           {/* Panoramic Orbital Sky Window where NASA Terra orbits completely unobstructed */}
-          <div className="relative w-full h-[220px] sm:h-[260px] overflow-hidden select-none pointer-events-none">
+          <div className="relative w-full h-[240px] sm:h-[280px] overflow-hidden select-none">
             <svg
               viewBox="0 0 1440 320"
               preserveAspectRatio="xMidYMid meet"
@@ -206,9 +287,9 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
                 {/* Solar Array Sapphire Blue Gradient */}
                 <linearGradient id="orbitSolarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#1e3a8a" />
-                  <stop offset="40%" stopColor="#2563eb" />
-                  <stop offset="75%" stopColor="#1d4ed8" />
-                  <stop offset="100%" stopColor="#172554" />
+                  <stop offset="30%" stopColor="#2563eb" />
+                  <stop offset="70%" stopColor="#1d4ed8" />
+                  <stop offset="100%" stopColor="#0f172a" />
                 </linearGradient>
 
                 {/* NASA Multi-Layer Insulation (MLI) Gold Foil Gradient */}
@@ -221,48 +302,48 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
 
                 {/* Dynamic Multispectral MODIS Sensor Thermal Cone Beam */}
                 <linearGradient id="modisSwathBeam" x1="50%" y1="0%" x2="50%" y2="100%">
-                  <stop offset="0%" stopColor="#10b981" stopOpacity="0.55" />
-                  <stop offset="35%" stopColor="#06b6d4" stopOpacity="0.3" />
-                  <stop offset="80%" stopColor="#10b981" stopOpacity="0.1" />
+                  <stop offset="0%" stopColor="#10b981" stopOpacity="0.65" />
+                  <stop offset="35%" stopColor="#06b6d4" stopOpacity="0.35" />
+                  <stop offset="75%" stopColor="#10b981" stopOpacity="0.12" />
                   <stop offset="100%" stopColor="#059669" stopOpacity="0" />
                 </linearGradient>
 
                 {/* Orbit Trajectory Arc Gradient */}
                 <linearGradient id="orbitPathGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#0071e3" stopOpacity="0.1" />
-                  <stop offset="20%" stopColor="#0071e3" stopOpacity="0.5" />
-                  <stop offset="50%" stopColor="#10b981" stopOpacity="0.7" />
-                  <stop offset="80%" stopColor="#0071e3" stopOpacity="0.5" />
-                  <stop offset="100%" stopColor="#0071e3" stopOpacity="0.1" />
+                  <stop offset="0%" stopColor="#0071e3" stopOpacity="0.05" />
+                  <stop offset="20%" stopColor="#0071e3" stopOpacity="0.6" />
+                  <stop offset="50%" stopColor="#10b981" stopOpacity="0.8" />
+                  <stop offset="80%" stopColor="#0071e3" stopOpacity="0.6" />
+                  <stop offset="100%" stopColor="#0071e3" stopOpacity="0.05" />
                 </linearGradient>
 
                 {/* Atmosphere Limb Horizon Glow */}
-                <radialGradient id="earthAtmosphereLimb" cx="50%" cy="110%" r="70%">
-                  <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.25" />
-                  <stop offset="50%" stopColor="#10b981" stopOpacity="0.12" />
-                  <stop offset="90%" stopColor="#0ea5e9" stopOpacity="0.03" />
+                <radialGradient id="earthAtmosphereLimb" cx="50%" cy="115%" r="75%">
+                  <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.32" />
+                  <stop offset="45%" stopColor="#10b981" stopOpacity="0.16" />
+                  <stop offset="85%" stopColor="#0ea5e9" stopOpacity="0.04" />
                   <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
                 </radialGradient>
 
-                {/* Unobstructed Flight Trajectory Track */}
+                {/* Curved Orbital Ground Track */}
                 <path
                   id="stageFlightTrack"
-                  d="M -120 70 C 320 -25, 980 140, 1560 50"
+                  d="M -120 75 C 340 -20, 960 145, 1560 55"
                 />
               </defs>
 
               {/* Earth Curvature Horizon Limb at bottom of sky */}
-              <ellipse cx="720" cy="380" rx="920" ry="140" fill="url(#earthAtmosphereLimb)" />
+              <ellipse cx="720" cy="385" rx="940" ry="145" fill="url(#earthAtmosphereLimb)" />
               <path
-                d="M -100 310 Q 720 235 1540 310"
+                d="M -100 310 Q 720 230 1540 310"
                 fill="none"
                 stroke="#38bdf8"
-                strokeWidth="1.5"
-                strokeOpacity="0.4"
+                strokeWidth="1.8"
+                strokeOpacity="0.45"
               />
 
-              {/* Equatorial & Lat/Long Reference Coordinates */}
-              <g opacity="0.3" stroke="#94a3b8" strokeWidth="0.5" strokeDasharray="3 6">
+              {/* Celestial Coordinate Grid */}
+              <g opacity="0.25" stroke="#94a3b8" strokeWidth="0.5" strokeDasharray="3 6">
                 <line x1="0" y1="90" x2="1440" y2="90" />
                 <line x1="0" y1="180" x2="1440" y2="180" />
                 <line x1="360" y1="0" x2="360" y2="320" />
@@ -270,31 +351,8 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
                 <line x1="1080" y1="0" x2="1080" y2="320" />
               </g>
 
-              {/* Indonesian Peatland Target Points on Earth Limb */}
-              <g transform="translate(0, 240)">
-                {/* Riau Hotspot Cluster */}
-                <circle cx="480" cy="18" r="3" fill="#ef4444" opacity="0.8">
-                  <animate attributeName="r" values="2;4.5;2" dur="2s" repeatCount="indefinite" />
-                  <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite" />
-                </circle>
-                <text x="480" y="34" textAnchor="middle" fill="#64748b" fontSize="7.5" fontFamily="monospace">RIAU 0.5°N</text>
-
-                {/* Central Kalimantan (PLG) Hotspot Cluster */}
-                <circle cx="720" cy="10" r="3.5" fill="#f97316" opacity="0.9">
-                  <animate attributeName="r" values="2.5;5.5;2.5" dur="1.8s" repeatCount="indefinite" />
-                  <animate attributeName="opacity" values="0.9;0.35;0.9" dur="1.8s" repeatCount="indefinite" />
-                </circle>
-                <text x="720" y="27" textAnchor="middle" fill="#64748b" fontSize="7.5" fontFamily="monospace">KALTENG PLG -2.2°S</text>
-
-                {/* South Sumatra (OKI) */}
-                <circle cx="960" cy="20" r="2.8" fill="#eab308" opacity="0.8">
-                  <animate attributeName="r" values="2;4;2" dur="2.4s" repeatCount="indefinite" />
-                </circle>
-                <text x="960" y="36" textAnchor="middle" fill="#64748b" fontSize="7.5" fontFamily="monospace">SUMSEL OKI -3.1°S</text>
-              </g>
-
               {/* Celestial Starfield */}
-              <g fill="#94a3b8" opacity="0.5">
+              <g fill="#94a3b8" opacity="0.55">
                 <circle cx="120" cy="40" r="1.2" />
                 <circle cx="280" cy="110" r="0.9" />
                 <circle cx="450" cy="30" r="1.1" />
@@ -314,6 +372,64 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
                 strokeDasharray="8 6"
               />
 
+              {/* INTERACTIVE PEATLAND GROUND TARGET STATIONS ON EARTH LIMB */}
+              {groundTargets.map((target) => {
+                const isSelected = activeTarget.id === target.id;
+                return (
+                  <g
+                    key={target.id}
+                    className="cursor-pointer transition-all"
+                    onClick={() => setActiveTarget(target)}
+                  >
+                    {/* Pulsing Radar Ring */}
+                    <circle
+                      cx={target.cx}
+                      cy={target.cy}
+                      r={isSelected ? 10 : 6}
+                      fill={target.color}
+                      fillOpacity={isSelected ? 0.25 : 0.12}
+                    >
+                      <animate
+                        attributeName="r"
+                        values={isSelected ? '6;14;6' : '4;9;4'}
+                        dur="2s"
+                        repeatCount="indefinite"
+                      />
+                      <animate
+                        attributeName="opacity"
+                        values="0.8;0.2;0.8"
+                        dur="2s"
+                        repeatCount="indefinite"
+                      />
+                    </circle>
+
+                    {/* Central Target Dot */}
+                    <circle
+                      cx={target.cx}
+                      cy={target.cy}
+                      r={isSelected ? 4 : 3}
+                      fill={target.color}
+                      stroke="#ffffff"
+                      strokeWidth={isSelected ? 1.5 : 1}
+                    />
+
+                    {/* Label */}
+                    <text
+                      x={target.cx}
+                      y={target.cy + 17}
+                      textAnchor="middle"
+                      fill={isSelected ? '#0f172a' : '#64748b'}
+                      className="dark:fill-slate-300"
+                      fontSize={isSelected ? '9' : '8'}
+                      fontWeight={isSelected ? 'bold' : 'normal'}
+                      fontFamily="monospace"
+                    >
+                      {target.coords}
+                    </text>
+                  </g>
+                );
+              })}
+
               {/* THE REALISTIC NASA TERRA (EOS AM-1) SPACECRAFT IN ORBIT */}
               <g>
                 <animateMotion
@@ -327,17 +443,17 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
 
                 {/* Active MODIS Multispectral Sensor Swath Beam down to Earth */}
                 <polygon
-                  points="0,8 -90,195 90,195"
+                  points="0,8 -90,200 90,200"
                   fill="url(#modisSwathBeam)"
                 />
                 {/* Ground Scan Footprint Ellipse */}
                 <ellipse
                   cx="0"
-                  cy="195"
+                  cy="200"
                   rx="90"
-                  ry="12"
+                  ry="13"
                   fill="#10b981"
-                  fillOpacity="0.2"
+                  fillOpacity="0.22"
                   stroke="#059669"
                   strokeWidth="1.2"
                   strokeDasharray="4 4"
@@ -390,7 +506,8 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
                     stroke="#94a3b8"
                     strokeWidth="0.8"
                   />
-                  <circle cx="0" cy="-27" r="1.2" fill="#22c55e">
+                  {/* Pulsing Communication Ring */}
+                  <circle cx="0" cy="-27" r="1.5" fill="#22c55e">
                     <animate attributeName="opacity" values="0.4;1;0.4" dur="1s" repeatCount="indefinite" />
                   </circle>
 
@@ -455,9 +572,9 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
                 {/* Floating HUD Spacecraft Tag */}
                 <g transform="translate(0, -42)">
                   <rect
-                    x="-50"
+                    x="-52"
                     y="-11"
-                    width="100"
+                    width="104"
                     height="20"
                     rx="10"
                     fill="#020617"
@@ -483,8 +600,43 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
             </svg>
           </div>
 
+          {/* Active Target Peatland Station Insight Bar */}
+          <div className="relative z-10 px-5 sm:px-8 py-3 bg-white/70 dark:bg-[#0f172a]/70 border-t border-[#e5e5e7] dark:border-[#1f2937] backdrop-blur-md flex flex-wrap items-center justify-between gap-4 text-xs">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <div>
+                <span className="font-bold text-[#1d1d1f] dark:text-white">
+                  {language === 'id' ? activeTarget.nameId : activeTarget.name}
+                </span>
+                <span className="text-[#6e6e73] dark:text-[#9ca3af] ml-2 font-mono text-[11px]">
+                  ({activeTarget.coords})
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 sm:gap-6 font-mono text-[11px]">
+              <div className="flex items-center gap-1.5">
+                <Layers className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                <span className="text-[#6e6e73] dark:text-[#9ca3af]">{language === 'id' ? 'Kedalaman Gambut:' : 'Peat Depth:'}</span>
+                <strong className="text-[#1d1d1f] dark:text-white">{activeTarget.depth}</strong>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Droplets className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                <span className="text-[#6e6e73] dark:text-[#9ca3af]">{language === 'id' ? 'Tinggi Air Tanah:' : 'Water Table:'}</span>
+                <strong className="text-[#1d1d1f] dark:text-white">{activeTarget.gwl}</strong>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Activity className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+                <span className="text-[#6e6e73] dark:text-[#9ca3af]">{language === 'id' ? 'Status Pantauan:' : 'Status:'}</span>
+                <span className="px-2 py-0.5 rounded bg-rose-500/10 text-rose-700 dark:text-rose-400 font-bold border border-rose-500/20">
+                  {language === 'id' ? activeTarget.statusId : activeTarget.status}
+                </span>
+              </div>
+            </div>
+          </div>
+
           {/* Integrated Mission Telemetry Deck (Docked at bottom of stage with high contrast) */}
-          <div className="relative z-10 p-5 sm:p-7 border-t border-[#e5e5e7] dark:border-[#1f2937] bg-white/90 dark:bg-[#0c1324]/90 backdrop-blur-md">
+          <div className="relative z-10 p-5 sm:p-7 border-t border-[#e5e5e7] dark:border-[#1f2937] bg-white/95 dark:bg-[#0c1324]/95 backdrop-blur-md">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
               
               {/* Mission Summary */}
@@ -554,9 +706,10 @@ export const Footer: React.FC<FooterProps> = ({ language, onSelectTab }) => {
 
         {/* 3. Bottom Minimal Legal Bar */}
         <div className="pt-6 border-t border-[#e5e5e7] dark:border-[#1f2937] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#86868b] dark:text-[#9ca3af]">
-          <p className="text-center sm:text-left">
-            &copy; 2026 {t.appName} &bull; {t.footerChallenge} &bull; {t.footerCourtesy}
-          </p>
+          <div className="flex items-center gap-3">
+            <Logo size="sm" showSubtitle={false} showNasaBadge={true} />
+            <span>&copy; 2026 Terra Harmonia &bull; NASA Space Apps Challenge &bull; NASA FIRMS &amp; Earthdata</span>
+          </div>
 
           <div className="flex items-center gap-4 text-[11px]">
             <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-medium">

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, Suspense, lazy } from 'react';
 import { Navbar, NavTab, ThemeMode } from './components/Navbar';
 import { DashboardControlBar, OverviewViewMode } from './components/DashboardControlBar';
 import { BurningCalendar } from './components/BurningCalendar';
@@ -7,19 +7,31 @@ import { ComparisonMetrics } from './components/ComparisonMetrics';
 import { VisualAnalytics } from './components/VisualAnalytics';
 import { CriticalAlerts } from './components/CriticalAlerts';
 import { RiskForecast } from './components/RiskForecast';
-import { HarmonizationLab } from './components/HarmonizationLab';
-import { MitigationHub } from './components/MitigationHub';
-import { DataHub } from './components/DataHub';
-import { TeamPage } from './components/TeamPage';
 import { Footer } from './components/Footer';
 import { NasaApiKeyModal } from './components/NasaApiKeyModal';
-import { DualMapComparison } from './components/DualMapComparison';
-import { PolygonInspector } from './components/PolygonInspector';
 import { PRESET_AOIS, AOIRegion, RawHotspot, HarmonizedWeekData, harmonizeHotspots } from './engine/harmonizer';
 import { generateHistoricalFireData } from './data/generator';
 import { fetchLiveNASAHotspots, LiveSyncResult } from './services/nasaFirmsApi';
 import { Language, translations } from './data/translations';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Loader2 } from 'lucide-react';
+
+// Lazy-loaded heavy modules for blazing initial load time
+const HarmonizationLab = lazy(() => import('./components/HarmonizationLab').then(m => ({ default: m.HarmonizationLab })));
+const MitigationHub = lazy(() => import('./components/MitigationHub').then(m => ({ default: m.MitigationHub })));
+const DataHub = lazy(() => import('./components/DataHub').then(m => ({ default: m.DataHub })));
+const TeamPage = lazy(() => import('./components/TeamPage').then(m => ({ default: m.TeamPage })));
+const DualMapComparison = lazy(() => import('./components/DualMapComparison').then(m => ({ default: m.DualMapComparison })));
+const PolygonInspector = lazy(() => import('./components/PolygonInspector').then(m => ({ default: m.PolygonInspector })));
+
+// Sleek minimal fallback skeleton
+const TabLoadingFallback: React.FC<{ label?: string }> = ({ label = 'Loading Module...' }) => (
+  <div className="w-full min-h-[420px] flex flex-col items-center justify-center gap-3 py-16 text-[#6e6e73] dark:text-[#9ca3af]">
+    <div className="w-10 h-10 rounded-2xl bg-white dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937] shadow-xs flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+      <Loader2 className="w-5 h-5 animate-spin" />
+    </div>
+    <span className="text-xs font-medium tracking-tight animate-pulse">{label}</span>
+  </div>
+);
 
 export function App() {
   const [language, setLanguage] = useState<Language>('en');
@@ -352,24 +364,28 @@ export function App() {
 
             {/* VIEW MODE 2: Dedicated Dual Map Comparison */}
             {overviewView === 'dual_map' && (
-              <div className="animate-in fade-in duration-150">
-                <DualMapComparison
-                  language={language}
-                  selectedAOI={selectedAOI}
-                  allHotspots={displayedHotspots}
-                />
-              </div>
+              <Suspense fallback={<TabLoadingFallback label={language === 'id' ? 'Memuat Peta Komparasi Dual...' : 'Loading Dual Sensor Map...'} />}>
+                <div className="animate-in fade-in duration-150">
+                  <DualMapComparison
+                    language={language}
+                    selectedAOI={selectedAOI}
+                    allHotspots={displayedHotspots}
+                  />
+                </div>
+              </Suspense>
             )}
 
             {/* VIEW MODE 3: Dedicated Polygon & Concession Inspector */}
             {overviewView === 'polygon' && (
-              <div className="animate-in fade-in duration-150">
-                <PolygonInspector
-                  language={language}
-                  selectedAOI={selectedAOI}
-                  allHotspots={displayedHotspots}
-                />
-              </div>
+              <Suspense fallback={<TabLoadingFallback label={language === 'id' ? 'Memuat Inspektur Konsesi & Poligon...' : 'Loading Concession Inspector...'} />}>
+                <div className="animate-in fade-in duration-150">
+                  <PolygonInspector
+                    language={language}
+                    selectedAOI={selectedAOI}
+                    allHotspots={displayedHotspots}
+                  />
+                </div>
+              </Suspense>
             )}
 
           </div>
@@ -377,42 +393,50 @@ export function App() {
 
         {/* Tab 2: Harmonization Lab */}
         {activeTab === 'lab' && (
-          <div className="animate-in fade-in duration-200">
-            <HarmonizationLab language={language} />
-          </div>
+          <Suspense fallback={<TabLoadingFallback label={language === 'id' ? 'Memuat Laboratorium Harmonisasi...' : 'Loading Harmonization Lab...'} />}>
+            <div className="animate-in fade-in duration-200">
+              <HarmonizationLab language={language} />
+            </div>
+          </Suspense>
         )}
 
         {/* Tab 3: Mitigation Hub & Executive SitRep */}
         {activeTab === 'mitigation' && (
-          <div className="animate-in fade-in duration-200">
-            <MitigationHub
-              language={language}
-              selectedAOI={selectedAOI}
-              onSelectAOI={setSelectedAOI}
-              calendarMatrix={calendarMatrix}
-              totalHotspots={totalEvents}
-            />
-          </div>
+          <Suspense fallback={<TabLoadingFallback label={language === 'id' ? 'Memuat Pusat Mitigasi & SitRep...' : 'Loading Mitigation Hub & SitRep...'} />}>
+            <div className="animate-in fade-in duration-200">
+              <MitigationHub
+                language={language}
+                selectedAOI={selectedAOI}
+                onSelectAOI={setSelectedAOI}
+                calendarMatrix={calendarMatrix}
+                totalHotspots={totalEvents}
+              />
+            </div>
+          </Suspense>
         )}
 
         {/* Tab 4: Open Data Registry */}
         {activeTab === 'data-hub' && (
-          <div className="animate-in fade-in duration-200">
-            <DataHub
-              language={language}
-              selectedAOI={selectedAOI}
-              calendarMatrix={calendarMatrix}
-              onOpenApiKeyModal={() => setIsNasaModalOpen(true)}
-              userMapKey={userMapKey}
-            />
-          </div>
+          <Suspense fallback={<TabLoadingFallback label={language === 'id' ? 'Memuat Pusat Data Terbuka...' : 'Loading Open Data Hub...'} />}>
+            <div className="animate-in fade-in duration-200">
+              <DataHub
+                language={language}
+                selectedAOI={selectedAOI}
+                calendarMatrix={calendarMatrix}
+                onOpenApiKeyModal={() => setIsNasaModalOpen(true)}
+                userMapKey={userMapKey}
+              />
+            </div>
+          </Suspense>
         )}
 
         {/* Tab 5: Team Profile & Scientific Dossier */}
         {activeTab === 'team' && (
-          <div className="animate-in fade-in duration-200">
-            <TeamPage language={language} />
-          </div>
+          <Suspense fallback={<TabLoadingFallback label={language === 'id' ? 'Memuat Profil Tim & Berkas Ilmiah...' : 'Loading Team Dossier...'} />}>
+            <div className="animate-in fade-in duration-200">
+              <TeamPage language={language} />
+            </div>
+          </Suspense>
         )}
       </main>
 
