@@ -47,17 +47,77 @@ export interface AOIRegion {
 export const PRESET_AOIS: AOIRegion[] = [
   {
     id: 'indonesia',
-    name: 'Seluruh Indonesia (National Peatlands & Forests)',
+    name: 'Seluruh Indonesia (National Overview)',
     country: 'Indonesia',
     bbox: [-11.0, 95.0, 6.0, 141.0],
-    center: [-2.2, 115.5],
+    center: [-2.2, 118.0],
     zoom: 5,
-    description: 'Pemantauan komposit nasional mencakup seluruh ekosistem gambut dan hutan rawan kebakaran di Sumatera, Kalimantan, Papua, dan Sulawesi.',
+    description: 'Pemantauan komposit nasional mencakup seluruh ekosistem gambut, hutan hujan tropis, dan sabana di 38 provinsi Indonesia.',
     biome: 'National Peatland & Forest Ecosystems (14.9 Mha)'
   },
   {
+    id: 'sumatera',
+    name: 'Pulau Sumatera (Riau, Sumsel, Jambi, Aceh)',
+    country: 'Indonesia',
+    bbox: [-6.0, 95.0, 6.0, 106.0],
+    center: [-0.5, 102.5],
+    zoom: 6,
+    description: 'Zona kerentanan gambut Semenanjung Kampar, Kubah Gambut OKI, TN Berbak, dan Rawa Tripa dengan risiko kabut asap lintas batas.',
+    biome: 'Tropical Peat Swamp Forest & Lowland Rainforest'
+  },
+  {
+    id: 'kalimantan',
+    name: 'Pulau Kalimantan (Kalteng, Kalbar, Kalsel, Kaltim)',
+    country: 'Indonesia',
+    bbox: [-4.5, 108.5, 4.5, 119.0],
+    center: [-1.5, 114.0],
+    zoom: 6,
+    description: 'Kawasan gambut eks-PLG Mega Rice, Sebangau, Ketapang, dan hutan rawa gambut Barito-Kahayan dengan emisi karbon masif.',
+    biome: 'Degraded Peat Dome & Heart of Borneo Forest'
+  },
+  {
+    id: 'jawa_bali',
+    name: 'Jawa & Bali (TN Bromo, Ijen, Baluran, Merbabu)',
+    country: 'Indonesia',
+    bbox: [-8.9, 105.0, -5.9, 115.8],
+    center: [-7.5, 110.5],
+    zoom: 7,
+    description: 'Kawasan hutan pegunungan, savana TN Baluran, dan lereng vulkanik rawan kebakaran rumput dan tajuk saat puncak kemarau.',
+    biome: 'Montane Forest & Savanna'
+  },
+  {
+    id: 'nusa_tenggara',
+    name: 'Nusa Tenggara (Sumba, Timor, Flores, Sumbawa)',
+    country: 'Indonesia',
+    bbox: [-11.2, 115.8, -8.0, 125.5],
+    center: [-9.2, 120.5],
+    zoom: 7,
+    description: 'Bentang alam sabana dan padang rumput kering dengan frekuensi kebakaran permukaan tahunan tinggi saat angin Monsun Timur Australia.',
+    biome: 'Tropical Savanna & Dry Deciduous'
+  },
+  {
+    id: 'sulawesi',
+    name: 'Pulau Sulawesi (Morowali, Konawe, Luwu, Gorontalo)',
+    country: 'Indonesia',
+    bbox: [-6.0, 118.5, 2.0, 125.5],
+    center: [-2.5, 121.0],
+    zoom: 6,
+    description: 'Zona transisi Wallacea, rawa gambut Konawe, dan koridor hutan sekunder pegunungan Sulawesi.',
+    biome: 'Wallacea Mixed Rainforest & Lowland Peat'
+  },
+  {
+    id: 'papua',
+    name: 'Papua & Maluku (Merauke, Mappi, Bintuni, Asmat, Seram)',
+    country: 'Indonesia',
+    bbox: [-9.2, 129.0, -0.5, 141.0],
+    center: [-5.0, 137.0],
+    zoom: 6,
+    description: 'Bentang alam sabana basah Merauke-Mappi, rawa gambut pesisir Bintuni-Asmat, dan hutan primer Papua.',
+    biome: 'Savanna Wetland & Virgin Peat Rainforest'
+  },
+  {
     id: 'riau',
-    name: 'Riau & Sumatra Peatlands',
+    name: 'Riau (Semenanjung Kampar & Giam Siak)',
     country: 'Indonesia',
     bbox: [-0.8, 100.5, 2.1, 103.2],
     center: [0.6, 101.8],
@@ -67,7 +127,7 @@ export const PRESET_AOIS: AOIRegion[] = [
   },
   {
     id: 'kalteng',
-    name: 'Kalimantan Tengah (Ex-PLG Mega Rice)',
+    name: 'Kalimantan Tengah (Eks-PLG & TN Sebangau)',
     country: 'Indonesia',
     bbox: [-3.5, 111.0, -0.5, 115.0],
     center: [-2.0, 113.0],
@@ -77,7 +137,7 @@ export const PRESET_AOIS: AOIRegion[] = [
   },
   {
     id: 'sumsel',
-    name: 'Sumatera Selatan (OKI & Musi Banyuasin)',
+    name: 'Sumatera Selatan (Kubah Gambut OKI & Banyuasin)',
     country: 'Indonesia',
     bbox: [-4.5, 104.0, -2.0, 107.5],
     center: [-3.2, 105.8],
@@ -86,8 +146,18 @@ export const PRESET_AOIS: AOIRegion[] = [
     biome: 'Tropical Peat Swamp Forest'
   },
   {
+    id: 'kalbar',
+    name: 'Kalimantan Barat (Ketapang & Kubu Raya)',
+    country: 'Indonesia',
+    bbox: [-3.0, 108.5, 2.0, 114.0],
+    center: [-0.8, 110.5],
+    zoom: 7,
+    description: 'Kubah gambut pesisir Ketapang dan Kubu Raya rawan kebakaran saat anomali cuaca kering.',
+    biome: 'Peat Swamp & Coastal Lowland'
+  },
+  {
     id: 'kalsel',
-    name: 'Kalimantan Selatan (Banjar & Barito)',
+    name: 'Kalimantan Selatan (Banjarbaru & Barito)',
     country: 'Indonesia',
     bbox: [-4.2, 114.5, -1.8, 116.8],
     center: [-3.0, 115.5],
@@ -97,7 +167,7 @@ export const PRESET_AOIS: AOIRegion[] = [
   },
   {
     id: 'kaltim',
-    name: 'Kalimantan Timur (Hutan Kering & Transisi)',
+    name: 'Kalimantan Timur (Kutai & Buffer IKN)',
     country: 'Indonesia',
     bbox: [-2.5, 115.0, 1.5, 118.5],
     center: [-0.5, 116.8],

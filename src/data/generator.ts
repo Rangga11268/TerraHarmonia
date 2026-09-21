@@ -155,8 +155,21 @@ export const INDONESIAN_FIRE_CLUSTERS: Record<string, { province: string; island
       [-5.20, 119.60, 1.4],  // Gowa / Takalar Hutan Kering
     ]
   },
+  jawa_bali: {
+    province: 'Jawa & Bali',
+    island: 'Jawa & Bali',
+    clusters: [
+      [-7.80, 114.35, 2.2],  // TN Baluran / Savanna Bekol Banyuwangi
+      [-7.94, 112.95, 2.0],  // TN Bromo Tengger Semeru / Kaldera
+      [-8.05, 114.24, 1.8],  // Lereng Kawah Ijen / Bondowoso
+      [-7.45, 110.43, 1.6],  // Gunung Merbabu / Boyolali
+      [-7.63, 111.19, 1.5],  // Gunung Lawu / Karanganyar
+      [-8.20, 115.15, 1.4],  // Buleleng / TN Bali Barat
+      [-6.80, 107.40, 1.3],  // Gunung Tangkuban Parahu / Lembang
+    ]
+  },
   nusa_tenggara: {
-    province: 'Nusa Tenggara & Jawa Bali',
+    province: 'Nusa Tenggara Barat & Timur',
     island: 'Kepulauan Nusa Tenggara',
     clusters: [
       [-9.60, 120.25, 2.4],  // Sumba Timur / Waingapu Savanna
@@ -164,9 +177,16 @@ export const INDONESIAN_FIRE_CLUSTERS: Record<string, { province: string; island
       [-8.50, 118.70, 2.0],  // Sumbawa / Bima Hutan Kering
       [-8.60, 116.30, 1.8],  // Lombok Timur / Sembalun
       [-8.55, 120.40, 1.6],  // Flores Barat / Komodo Buffer
-      [-7.80, 114.30, 2.0],  // Jawa Timur / Banyuwangi / Baluran
-      [-7.90, 113.00, 1.8],  // Jawa Timur / Probolinggo / Bromo
-      [-7.30, 110.00, 1.5],  // Jawa Tengah / Temanggung / Sumbing
+      [-9.80, 124.25, 1.7],  // Timor Tengah Selatan / Soe
+    ]
+  },
+  maluku: {
+    province: 'Maluku & Maluku Utara',
+    island: 'Kepulauan Maluku',
+    clusters: [
+      [-3.10, 129.50, 1.6],  // Pulau Seram / TN Manusela
+      [0.80, 127.90, 1.5],   // Halmahera Tengah / Weda
+      [-5.80, 134.40, 1.3],  // Kepulauan Aru
     ]
   },
 };
@@ -323,11 +343,36 @@ function generateRegionData(
   return hotspots;
 }
 
+function getClustersForAOI(aoiId: string): [number, number, number][] {
+  if (aoiId === 'sumatera') {
+    return [
+      ...(INDONESIAN_FIRE_CLUSTERS['riau']?.clusters || []),
+      ...(INDONESIAN_FIRE_CLUSTERS['sumsel']?.clusters || []),
+      ...(INDONESIAN_FIRE_CLUSTERS['jambi']?.clusters || []),
+      ...(INDONESIAN_FIRE_CLUSTERS['sumut_aceh']?.clusters || []),
+    ];
+  }
+  if (aoiId === 'kalimantan') {
+    return [
+      ...(INDONESIAN_FIRE_CLUSTERS['kalteng']?.clusters || []),
+      ...(INDONESIAN_FIRE_CLUSTERS['kalbar']?.clusters || []),
+      ...(INDONESIAN_FIRE_CLUSTERS['kalsel']?.clusters || []),
+      ...(INDONESIAN_FIRE_CLUSTERS['kaltim']?.clusters || []),
+    ];
+  }
+  if (aoiId === 'papua') {
+    return [
+      ...(INDONESIAN_FIRE_CLUSTERS['papua']?.clusters || []),
+      ...(INDONESIAN_FIRE_CLUSTERS['maluku']?.clusters || []),
+    ];
+  }
+  return INDONESIAN_FIRE_CLUSTERS[aoiId]?.clusters || [];
+}
+
 function generateAOIData(aoi: AOIRegion): RawHotspot[] {
   const hotspots: RawHotspot[] = [];
   let idCounter = 1;
-  const clusterData = INDONESIAN_FIRE_CLUSTERS[aoi.id];
-  const clusters = clusterData ? clusterData.clusters : [];
+  const clusters = getClustersForAOI(aoi.id);
 
   for (let year = 2000; year <= 2026; year++) {
     let cm = 1.0;
@@ -356,11 +401,12 @@ function generateAOIData(aoi: AOIRegion): RawHotspot[] {
       if (month === 10) sf = 0.65;
       if (month === 11) sf = 0.25;
 
-      if ((aoi.id === 'riau' || aoi.id === 'sumsel') && (month === 2 || month === 3)) {
+      if ((aoi.id === 'riau' || aoi.id === 'sumsel' || aoi.id === 'sumatera') && (month === 2 || month === 3)) {
         sf = Math.max(sf, 0.55);
       }
 
-      const baseEvents = Math.round(22 * sf * cm);
+      const eventMultiplier = aoi.id === 'sumatera' || aoi.id === 'kalimantan' ? 30 : 22;
+      const baseEvents = Math.round(eventMultiplier * sf * cm);
       if (baseEvents <= 0) continue;
 
       for (let e = 0; e < baseEvents; e++) {
