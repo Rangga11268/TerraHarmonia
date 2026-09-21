@@ -557,61 +557,61 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
   if (!isOpen) return null;
 
   const modalContent = (
-    <div className="fixed inset-0 z-[99999] bg-[#070d18] text-slate-100 flex flex-col font-sans select-none overflow-hidden animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-[99999] bg-[#f8fafc] dark:bg-[#070d18] text-slate-900 dark:text-slate-100 flex flex-col font-sans select-none overflow-hidden animate-in fade-in duration-150">
       
-      {/* Top Header Toolbar (Single Clean Row) */}
-      <header className="relative z-[3000] h-14 bg-[#0a1120]/95 backdrop-blur-xl border-b border-slate-800/90 px-3 sm:px-5 flex items-center justify-between gap-3 shrink-0 shadow-md">
+      {/* Top Header Toolbar (Single Clean Row, Dynamic Light/Dark Theme) */}
+      <header className="relative z-[3000] h-14 bg-white/95 dark:bg-[#0a1120]/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 px-3 sm:px-5 flex items-center justify-between gap-3 shrink-0 shadow-xs">
         
         {/* Left: Back Button + Title + Status */}
         <div className="flex items-center gap-2.5 min-w-0">
           <button
             onClick={onClose}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/90 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg text-xs font-semibold border border-slate-700/70 transition cursor-pointer shrink-0 shadow-xs"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 rounded-lg text-xs font-semibold border border-slate-200 dark:border-slate-700/80 transition cursor-pointer shrink-0 shadow-2xs"
             title="Kembali ke Dashboard (Esc)"
           >
-            <ArrowLeft className="w-4 h-4 text-sky-400" />
+            <ArrowLeft className="w-4 h-4 text-sky-600 dark:text-sky-400" />
             <span>{language === 'id' ? 'Kembali' : 'Back'}</span>
           </button>
 
-          <div className="h-5 w-px bg-slate-800 hidden sm:block shrink-0" />
+          <div className="h-5 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block shrink-0" />
 
           <div className="min-w-0 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0 hidden sm:inline-block" />
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0 hidden sm:inline-block" />
             <div className="truncate">
-              <h1 className="text-xs sm:text-sm font-bold text-white tracking-tight leading-tight truncate">
+              <h1 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white tracking-tight leading-tight truncate">
                 Terra Harmonia GIS Explorer
               </h1>
-              <p className="text-[10px] text-slate-400 truncate hidden md:block">
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate hidden md:block">
                 Harmonisasi NASA MODIS (1km) &bull; VIIRS (375m) &bull; Kalibrasi Lahan Gambut
               </p>
             </div>
           </div>
         </div>
 
-        {/* Center: Clean Island & Region Dropdown Popover */}
+        {/* Center: Clean Island & Region Dropdown Popover with Solid High-Contrast Background */}
         <div className="relative">
           <button
             onClick={() => setIsRegionDropdownOpen(!isRegionDropdownOpen)}
-            className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/90 hover:bg-slate-700/90 text-white rounded-xl border border-slate-700/80 text-xs font-semibold shadow-xs transition cursor-pointer"
+            className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/95 dark:hover:bg-slate-700 text-slate-900 dark:text-white rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-semibold shadow-xs transition cursor-pointer"
           >
-            <MapPin className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+            <MapPin className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
             <span className="max-w-[150px] sm:max-w-[220px] truncate">{selectedAOI.name.split(' (')[0]}</span>
-            <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isRegionDropdownOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-3.5 h-3.5 text-slate-500 dark:text-slate-400 transition-transform duration-200 ${isRegionDropdownOpen ? 'rotate-180' : ''}`} />
           </button>
 
-          {/* Popover Dropdown Menu */}
+          {/* Popover Dropdown Menu - 100% Solid Background (No bleed-through) */}
           {isRegionDropdownOpen && (
             <>
               <div
-                className="fixed inset-0 z-40"
+                className="fixed inset-0 z-40 bg-black/30 backdrop-blur-[2px]"
                 onClick={() => setIsRegionDropdownOpen(false)}
               />
-              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 sm:w-80 bg-[#0d1627]/98 backdrop-blur-2xl border border-slate-700/80 rounded-2xl shadow-2xl z-50 p-2 text-xs divide-y divide-slate-800/80 max-h-[75vh] overflow-y-auto">
+              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 sm:w-80 bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl z-50 p-2 text-xs divide-y divide-slate-100 dark:divide-slate-800 max-h-[75vh] overflow-y-auto">
                 
                 {/* 1. National Overview */}
                 <div className="pb-1.5">
-                  <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                    <Globe2 className="w-3 h-3 text-sky-400" />
+                  <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                    <Globe2 className="w-3 h-3 text-sky-600 dark:text-sky-400" />
                     <span>{language === 'id' ? 'Cakupan Nasional' : 'National Scope'}</span>
                   </div>
                   {regionGroups.national.map((aoi) => {
@@ -624,12 +624,14 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
                           setIsRegionDropdownOpen(false);
                         }}
                         className={`w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-left transition cursor-pointer ${
-                          isSel ? 'bg-sky-600 text-white font-bold' : 'text-slate-200 hover:bg-slate-800/90'
+                          isSel
+                            ? 'bg-sky-600 text-white font-bold'
+                            : 'text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
                         }`}
                       >
                         <div>
                           <div className="font-semibold">{aoi.name.split(' (')[0]}</div>
-                          <div className={`text-[10px] ${isSel ? 'text-sky-100' : 'text-slate-400'}`}>38 Provinsi &bull; Seluruh Wilayah</div>
+                          <div className={`text-[10px] ${isSel ? 'text-sky-100' : 'text-slate-500 dark:text-slate-400'}`}>38 Provinsi &bull; Seluruh Wilayah</div>
                         </div>
                         {isSel && <Check className="w-4 h-4 text-white shrink-0" />}
                       </button>
@@ -639,8 +641,8 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
 
                 {/* 2. Major Islands */}
                 <div className="py-1.5">
-                  <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                    <MapPin className="w-3 h-3 text-emerald-400" />
+                  <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                    <MapPin className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                     <span>{language === 'id' ? 'Pulau & Wilayah Utama' : 'Major Islands & Zones'}</span>
                   </div>
                   <div className="grid grid-cols-1 gap-0.5">
@@ -654,10 +656,12 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
                             setIsRegionDropdownOpen(false);
                           }}
                           className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left transition cursor-pointer ${
-                            isSel ? 'bg-sky-600 text-white font-bold' : 'text-slate-200 hover:bg-slate-800/90'
+                            isSel
+                              ? 'bg-sky-600 text-white font-bold'
+                              : 'text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
                           }`}
                         >
-                          <span className="truncate">{aoi.name.split(' (')[0]}</span>
+                          <span className="truncate font-medium">{aoi.name.split(' (')[0]}</span>
                           {isSel && <Check className="w-3.5 h-3.5 text-white shrink-0" />}
                         </button>
                       );
@@ -667,8 +671,8 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
 
                 {/* 3. Priority Peatland Landscapes */}
                 <div className="pt-1.5">
-                  <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-                    <Flame className="w-3 h-3 text-amber-400" />
+                  <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                    <Flame className="w-3 h-3 text-amber-500 dark:text-amber-400" />
                     <span>{language === 'id' ? 'Kubah Gambut Prioritas' : 'Priority Peat Domes'}</span>
                   </div>
                   <div className="grid grid-cols-1 gap-0.5">
@@ -682,10 +686,12 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
                             setIsRegionDropdownOpen(false);
                           }}
                           className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left transition cursor-pointer ${
-                            isSel ? 'bg-sky-600 text-white font-bold' : 'text-slate-200 hover:bg-slate-800/90'
+                            isSel
+                              ? 'bg-sky-600 text-white font-bold'
+                              : 'text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
                           }`}
                         >
-                          <span className="truncate">{aoi.name.split(' (')[0]}</span>
+                          <span className="truncate font-medium">{aoi.name.split(' (')[0]}</span>
                           {isSel && <Check className="w-3.5 h-3.5 text-white shrink-0" />}
                         </button>
                       );
@@ -702,11 +708,11 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
         <div className="flex items-center gap-2">
           
           {/* Basemap Switcher Pill */}
-          <div className="flex items-center bg-slate-800/90 rounded-xl p-0.5 border border-slate-700/80 text-xs">
+          <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl p-0.5 border border-slate-200 dark:border-slate-700 text-xs font-medium">
             <button
               onClick={() => setBasemap('satellite')}
               className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
-                basemap === 'satellite' ? 'bg-sky-600 text-white font-bold shadow-xs' : 'text-slate-400 hover:text-white'
+                basemap === 'satellite' ? 'bg-sky-600 text-white font-bold shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Sat HD
@@ -714,7 +720,7 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
             <button
               onClick={() => setBasemap('dark')}
               className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
-                basemap === 'dark' ? 'bg-sky-600 text-white font-bold shadow-xs' : 'text-slate-400 hover:text-white'
+                basemap === 'dark' ? 'bg-sky-600 text-white font-bold shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Dark
@@ -722,11 +728,11 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
             <button
               onClick={() => setBasemap('nasa_gibs')}
               className={`px-2.5 py-1 rounded-lg transition cursor-pointer flex items-center gap-1 ${
-                basemap === 'nasa_gibs' ? 'bg-sky-600 text-white font-bold shadow-xs' : 'text-slate-400 hover:text-white'
+                basemap === 'nasa_gibs' ? 'bg-sky-600 text-white font-bold shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
               title="NASA Global Imagery Browse Services (MODIS True Color)"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               <span>GIBS</span>
             </button>
           </div>
@@ -736,29 +742,29 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
             onClick={() => setShowPeatOverlay(!showPeatOverlay)}
             className={`hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-semibold transition cursor-pointer ${
               showPeatOverlay
-                ? 'bg-emerald-950/70 border-emerald-500/50 text-emerald-300'
-                : 'bg-slate-800/90 border-slate-700/80 text-slate-400 hover:text-white'
+                ? 'bg-emerald-50 border-emerald-300 text-emerald-800 dark:bg-emerald-950/70 dark:border-emerald-500/50 dark:text-emerald-300'
+                : 'bg-slate-100 border-slate-200 text-slate-600 hover:text-slate-900 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 dark:hover:text-white'
             }`}
             title="Tampilkan Lapisan Kawasan Gambut & Taman Nasional"
           >
-            <TreePine className="w-3.5 h-3.5 text-emerald-400" />
+            <TreePine className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             <span>{language === 'id' ? 'Kawasan Gambut' : 'Peatlands'}</span>
           </button>
 
           {/* GeoJSON Download */}
           <button
             onClick={handleExportGeoJSON}
-            className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 bg-slate-800/90 hover:bg-slate-700 border border-slate-700/80 text-slate-200 hover:text-white rounded-xl text-xs font-semibold transition cursor-pointer"
+            className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-semibold transition cursor-pointer shadow-2xs"
             title="Unduh Dataset Spasial GeoJSON"
           >
-            <Download className="w-3.5 h-3.5 text-sky-400" />
+            <Download className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
             <span>GeoJSON</span>
           </button>
 
           {/* Single Close Button */}
           <button
             onClick={onClose}
-            className="p-1.5 bg-slate-800/90 hover:bg-red-500/20 text-slate-300 hover:text-red-400 border border-slate-700/80 rounded-xl transition cursor-pointer"
+            className="p-1.5 bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 dark:bg-slate-800 dark:hover:bg-red-500/20 dark:text-slate-300 dark:hover:text-red-400 border border-slate-200 dark:border-slate-700 rounded-xl transition cursor-pointer"
             title="Tutup Peta (Esc)"
           >
             <X className="w-4 h-4" />
@@ -775,12 +781,12 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
 
         {/* Floating Mini Dashboard (Spatial Intelligence HUD) */}
         <div className="absolute top-4 left-4 z-20 w-72 sm:w-80 max-w-[calc(100vw-2rem)]">
-          <div className="bg-[#0a1120]/95 text-white backdrop-blur-xl border border-slate-800/90 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300">
+          <div className="bg-white/95 dark:bg-[#0a1120]/95 text-slate-900 dark:text-white backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300">
             
-            <div className="px-3.5 py-2.5 border-b border-slate-800/80 flex items-center justify-between">
+            <div className="px-3.5 py-2.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Activity className="w-4 h-4 text-sky-400" />
-                <span className="font-bold text-xs tracking-tight text-white">
+                <Activity className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                <span className="font-bold text-xs tracking-tight text-slate-900 dark:text-white">
                   {isRadiusToolActive && bufferCenter
                     ? `Buffer Radius (${bufferRadiusKm} km)`
                     : language === 'id'
@@ -790,7 +796,7 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
               </div>
               <button
                 onClick={() => setIsHudCollapsed(!isHudCollapsed)}
-                className="text-slate-400 hover:text-white transition-colors p-0.5 cursor-pointer"
+                className="text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors p-0.5 cursor-pointer"
               >
                 {isHudCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
               </button>
@@ -801,66 +807,66 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
                 
                 {/* Metric Grid */}
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="p-2.5 bg-slate-900/90 rounded-xl border border-slate-800/80">
-                    <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
+                  <div className="p-2.5 bg-slate-50 dark:bg-slate-900/90 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">
                       {language === 'id' ? 'Titik Api Aktif' : 'Active Hotspots'}
                     </div>
-                    <div className="text-lg font-bold text-white num mt-0.5">
+                    <div className="text-lg font-bold text-slate-900 dark:text-white num mt-0.5">
                       {hudMetrics.totalCount.toLocaleString()}
                     </div>
-                    <div className="text-[10px] text-slate-400 mt-0.5">
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
                       MODIS: {hudMetrics.modisCount} &bull; VIIRS: {hudMetrics.viirsCount}
                     </div>
                   </div>
 
-                  <div className="p-2.5 bg-slate-900/90 rounded-xl border border-slate-800/80">
-                    <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
+                  <div className="p-2.5 bg-slate-50 dark:bg-slate-900/90 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">
                       {language === 'id' ? 'Klaster 5.5km' : '5.5km Clusters'}
                     </div>
-                    <div className="text-lg font-bold text-sky-400 num mt-0.5">
+                    <div className="text-lg font-bold text-sky-600 dark:text-sky-400 num mt-0.5">
                       {hudMetrics.harmonizedClusters.toLocaleString()}
                     </div>
-                    <div className="text-[10px] text-slate-400 mt-0.5">
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
                       {language === 'id' ? 'Harmonisasi NASA' : 'NASA Calibrated'}
                     </div>
                   </div>
                 </div>
 
                 {/* Fire Energy & Peat Carbon Emissions */}
-                <div className="space-y-1.5 border-t border-slate-800/80 pt-2 text-[11px]">
-                  <div className="flex items-center justify-between text-slate-300">
+                <div className="space-y-1.5 border-t border-slate-100 dark:border-slate-800 pt-2 text-[11px]">
+                  <div className="flex items-center justify-between text-slate-700 dark:text-slate-300">
                     <span className="flex items-center gap-1.5">
-                      <Flame className="w-3.5 h-3.5 text-red-400" />
+                      <Flame className="w-3.5 h-3.5 text-red-500 dark:text-red-400" />
                       <span>Total FRP:</span>
                     </span>
-                    <span className="font-semibold text-white num font-mono">
+                    <span className="font-semibold text-slate-900 dark:text-white num font-mono">
                       {hudMetrics.totalFRP.toLocaleString()} MW
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between text-slate-300">
+                  <div className="flex items-center justify-between text-slate-700 dark:text-slate-300">
                     <span className="flex items-center gap-1.5">
-                      <Wind className="w-3.5 h-3.5 text-amber-400" />
+                      <Wind className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
                       <span>{language === 'id' ? 'Emisi Gambut:' : 'Peat Emissions:'}</span>
                     </span>
-                    <span className="font-semibold text-amber-300 num font-mono">
+                    <span className="font-semibold text-amber-600 dark:text-amber-300 num font-mono">
                       {hudMetrics.estimatedCO2eTons.toLocaleString()} ton CO₂e
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between text-slate-300">
+                  <div className="flex items-center justify-between text-slate-700 dark:text-slate-300">
                     <span className="flex items-center gap-1.5">
-                      <ShieldAlert className="w-3.5 h-3.5 text-emerald-400" />
+                      <ShieldAlert className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                       <span>{language === 'id' ? 'Rata-rata Keyakinan:' : 'Avg Confidence:'}</span>
                     </span>
-                    <span className="font-semibold text-white num font-mono">
+                    <span className="font-semibold text-slate-900 dark:text-white num font-mono">
                       {hudMetrics.avgConfidence}%
                     </span>
                   </div>
                 </div>
 
                 {isRadiusToolActive && !bufferCenter && (
-                  <div className="p-2 bg-sky-950/60 border border-sky-500/40 rounded-xl text-[11px] text-sky-300">
+                  <div className="p-2 bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-500/40 rounded-xl text-[11px] text-sky-800 dark:text-sky-300 font-medium">
                     {language === 'id'
                       ? 'Klik pada titik mana saja di peta untuk menarik radius inspeksi.'
                       : 'Click anywhere on map to inspect within buffer radius.'}
@@ -873,7 +879,7 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
 
         {/* Floating Bottom Timeline & Multi-Tool Deck */}
         <div className="absolute bottom-5 left-4 right-4 z-20 max-w-3xl mx-auto">
-          <div className="bg-[#0a1120]/95 text-white backdrop-blur-xl border border-slate-800/90 rounded-2xl p-3 sm:p-3.5 shadow-2xl space-y-2.5">
+          <div className="bg-white/95 dark:bg-[#0a1120]/95 text-slate-900 dark:text-white backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-2xl p-3 sm:p-3.5 shadow-2xl space-y-2.5">
             
             {/* Row 1: Timeline Scrubber & Epoch Presets */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
@@ -881,14 +887,14 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setIsPlaying(!isPlaying)}
-                  className="w-8 h-8 rounded-full bg-white hover:bg-slate-200 text-slate-900 flex items-center justify-center transition shrink-0 shadow-sm cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 flex items-center justify-center transition shrink-0 shadow-sm cursor-pointer hover:opacity-90"
                   title={isPlaying ? 'Jeda Animasi' : 'Putar Animasi (2000-2026)'}
                 >
                   {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
                 </button>
 
                 <div className="flex items-center gap-1.5">
-                  <span className="text-base font-bold text-white num font-mono min-w-[42px]">
+                  <span className="text-base font-bold text-slate-900 dark:text-white num font-mono min-w-[42px]">
                     {selectedYear}
                   </span>
                   <div className="flex items-center gap-1">
@@ -898,7 +904,7 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
                         setSelectedYear(Math.max(2000, selectedYear - 1));
                         setIsPlaying(false);
                       }}
-                      className="w-5 h-5 rounded bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold flex items-center justify-center cursor-pointer transition"
+                      className="w-5 h-5 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white text-xs font-bold flex items-center justify-center cursor-pointer transition border border-slate-200 dark:border-slate-700"
                     >
                       -
                     </button>
@@ -908,7 +914,7 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
                         setSelectedYear(Math.min(2026, selectedYear + 1));
                         setIsPlaying(false);
                       }}
-                      className="w-5 h-5 rounded bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold flex items-center justify-center cursor-pointer transition"
+                      className="w-5 h-5 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white text-xs font-bold flex items-center justify-center cursor-pointer transition border border-slate-200 dark:border-slate-700"
                     >
                       +
                     </button>
@@ -919,10 +925,10 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
               {/* Climate Epoch Milestones */}
               <div className="flex flex-wrap items-center gap-1 scrollbar-none">
                 {[
-                  { yr: 2000, label: '2000 (Baseline)' },
-                  { yr: 2015, label: '2015 (Super El Niño)' },
+                  { yr: 2000, label: '2000' },
+                  { yr: 2015, label: '2015 (El Niño)' },
                   { yr: 2019, label: '2019 (IOD+)' },
-                  { yr: 2023, label: '2023 (El Niño)' },
+                  { yr: 2023, label: '2023' },
                   { yr: 2024, label: '2024' },
                   { yr: 2026, label: '2026 (Live)' },
                 ].map(({ yr, label }) => (
@@ -935,7 +941,7 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
                     className={`px-2 py-1 rounded-lg text-[11px] font-semibold transition cursor-pointer ${
                       selectedYear === yr
                         ? 'bg-sky-600 text-white shadow-xs'
-                        : 'bg-slate-800/80 text-slate-300 hover:text-white border border-slate-700/60'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700'
                     }`}
                   >
                     {label}
@@ -945,12 +951,12 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
             </div>
 
             {/* Row 2: Sensor Filters, FRP Threshold, & Radius Tool */}
-            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800/80 text-xs">
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
               
               <div className="flex items-center gap-2 flex-wrap">
                 
                 {/* Sensor Filter */}
-                <div className="flex items-center bg-slate-800/90 rounded-lg p-0.5 border border-slate-700/80">
+                <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200 dark:border-slate-700">
                   {(['ALL', 'VIIRS', 'MODIS'] as const).map((s) => (
                     <button
                       key={s}
@@ -958,16 +964,16 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
                       className={`px-2 py-0.5 rounded-md text-[11px] font-semibold transition cursor-pointer ${
                         sensorFilter === s
                           ? 'bg-sky-600 text-white shadow-xs'
-                          : 'text-slate-400 hover:text-white'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                       }`}
                     >
-                      {s === 'ALL' ? (language === 'id' ? 'Semua Sensor' : 'All Sensors') : s === 'VIIRS' ? 'VIIRS (375m)' : 'MODIS (1km)'}
+                      {s === 'ALL' ? (language === 'id' ? 'Semua' : 'All') : s === 'VIIRS' ? 'VIIRS (375m)' : 'MODIS (1km)'}
                     </button>
                   ))}
                 </div>
 
                 {/* FRP Intensity Filter */}
-                <div className="flex items-center bg-slate-800/90 rounded-lg p-0.5 border border-slate-700/80">
+                <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200 dark:border-slate-700">
                   {[
                     { val: 0, label: language === 'id' ? 'Semua FRP' : 'All FRP' },
                     { val: 50, label: '>50 MW' },
@@ -979,7 +985,7 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
                       className={`px-2 py-0.5 rounded-md text-[11px] font-semibold transition cursor-pointer ${
                         frpThreshold === val
                           ? 'bg-amber-600 text-white shadow-xs'
-                          : 'text-slate-400 hover:text-white'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                       }`}
                     >
                       {label}
@@ -994,7 +1000,7 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
                     className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-semibold text-[11px] transition cursor-pointer ${
                       isRadiusToolActive
                         ? 'bg-sky-600 text-white shadow-xs'
-                        : 'bg-slate-800/90 text-slate-300 hover:text-white border border-slate-700/80'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700'
                     }`}
                   >
                     <Crosshair className="w-3.5 h-3.5" />
@@ -1002,7 +1008,7 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
                   </button>
 
                   {isRadiusToolActive && (
-                    <div className="flex items-center bg-slate-800/90 rounded-lg p-0.5 border border-slate-700/80">
+                    <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200 dark:border-slate-700">
                       {[10, 25, 50, 100].map((km) => (
                         <button
                           key={km}
@@ -1010,7 +1016,7 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
                           className={`px-1.5 py-0.5 rounded text-[10px] font-semibold transition cursor-pointer ${
                             bufferRadiusKm === km
                               ? 'bg-sky-600 text-white font-bold'
-                              : 'text-slate-400 hover:text-white'
+                              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                           }`}
                         >
                           {km}k
@@ -1023,7 +1029,7 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
               </div>
 
               {/* Status summary */}
-              <div className="text-[11px] text-slate-400 font-mono hidden sm:block">
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono hidden sm:block">
                 {filteredHotspots.length.toLocaleString()} {language === 'id' ? 'titik aktif' : 'points'}
               </div>
 
