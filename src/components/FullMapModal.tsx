@@ -41,8 +41,10 @@ interface FullMapModalProps {
 const CONSERVATION_OVERLAYS = [
   {
     id: 'sebangau_np',
-    name: 'TN Sebangau (Kubah Gambut Kalteng)',
-    type: 'Peatland National Park',
+    nameId: 'TN Sebangau (Kubah Gambut Kalteng)',
+    nameEn: 'Sebangau NP (Central Kalimantan Peat Dome)',
+    typeId: 'Taman Nasional Rawa Gambut',
+    typeEn: 'Peatland National Park',
     coords: [
       [-2.10, 113.40],
       [-2.10, 114.10],
@@ -53,8 +55,10 @@ const CONSERVATION_OVERLAYS = [
   },
   {
     id: 'tanjung_puting',
-    name: 'TN Tanjung Puting (Kalteng)',
-    type: 'National Park & Peat Swamp',
+    nameId: 'TN Tanjung Puting (Kalteng)',
+    nameEn: 'Tanjung Puting NP (Central Kalimantan)',
+    typeId: 'Taman Nasional & Hutan Rawa',
+    typeEn: 'National Park & Peat Swamp',
     coords: [
       [-2.65, 111.70],
       [-2.65, 112.25],
@@ -65,8 +69,10 @@ const CONSERVATION_OVERLAYS = [
   },
   {
     id: 'tesso_nilo',
-    name: 'TN Tesso Nilo & Kampar (Riau)',
-    type: 'Lowland Peat Forest',
+    nameId: 'TN Tesso Nilo & Kampar (Riau)',
+    nameEn: 'Tesso Nilo NP & Kampar (Riau)',
+    typeId: 'Hutan Dataran Rendah & Gambut',
+    typeEn: 'Lowland Peat Forest',
     coords: [
       [-0.05, 101.40],
       [-0.05, 101.85],
@@ -77,8 +83,10 @@ const CONSERVATION_OVERLAYS = [
   },
   {
     id: 'padang_sugihan',
-    name: 'SM Padang Sugihan (Kubah Gambut OKI Sumsel)',
-    type: 'Wildlife Reserve Peat Dome',
+    nameId: 'SM Padang Sugihan (Kubah Gambut OKI Sumsel)',
+    nameEn: 'Padang Sugihan Wildlife Reserve (OKI South Sumatra)',
+    typeId: 'Suaka Margasatwa Kubah Gambut',
+    typeEn: 'Wildlife Reserve Peat Dome',
     coords: [
       [-2.95, 105.00],
       [-2.95, 105.35],
@@ -89,8 +97,10 @@ const CONSERVATION_OVERLAYS = [
   },
   {
     id: 'berbak_np',
-    name: 'TN Berbak-Sembilang (Jambi & Sumsel)',
-    type: 'Ramsar Peat Wetland',
+    nameId: 'TN Berbak-Sembilang (Jambi & Sumsel)',
+    nameEn: 'Berbak-Sembilang NP (Jambi & South Sumatra)',
+    typeId: 'Lahan Basah Gambut Ramsar',
+    typeEn: 'Ramsar Peat Wetland',
     coords: [
       [-1.10, 104.10],
       [-1.10, 104.55],
@@ -101,8 +111,10 @@ const CONSERVATION_OVERLAYS = [
   },
   {
     id: 'baluran_np',
-    name: 'TN Baluran (Savana Bekol Jawa Timur)',
-    type: 'Savanna National Park',
+    nameId: 'TN Baluran (Savana Bekol Jawa Timur)',
+    nameEn: 'Baluran NP (Bekol Savanna East Java)',
+    typeId: 'Taman Nasional Sabana',
+    typeEn: 'Savanna National Park',
     coords: [
       [-7.75, 114.30],
       [-7.75, 114.45],
@@ -113,8 +125,10 @@ const CONSERVATION_OVERLAYS = [
   },
   {
     id: 'wasur_np',
-    name: 'TN Wasur (Savana Basah Merauke Papua)',
-    type: 'Wetland & Savanna National Park',
+    nameId: 'TN Wasur (Savana Basah Merauke Papua)',
+    nameEn: 'Wasur NP (Wetland Savanna Merauke Papua)',
+    typeId: 'Taman Nasional Sabana & Rawa',
+    typeEn: 'Wetland & Savanna National Park',
     coords: [
       [-8.20, 140.35],
       [-8.20, 141.00],
@@ -317,8 +331,8 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
 
       polygon.bindTooltip(
         `<div style="font-family:system-ui,sans-serif;font-size:11px;padding:2px;">
-          <b>${poly.name}</b><br/>
-          <span style="color:${poly.color}">${poly.type}</span>
+          <b>${language === 'id' ? poly.nameId : poly.nameEn}</b><br/>
+          <span style="color:${poly.color}">${language === 'id' ? poly.typeId : poly.typeEn}</span>
         </div>`,
         { sticky: true }
       );
@@ -583,7 +597,9 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
                 Terra Harmonia GIS Explorer
               </h1>
               <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate hidden md:block">
-                Harmonisasi NASA MODIS (1km) &bull; VIIRS (375m) &bull; Kalibrasi Lahan Gambut
+                {language === 'id'
+                  ? 'Harmonisasi NASA MODIS (1km) • VIIRS (375m) • Kalibrasi Lahan Gambut'
+                  : 'NASA MODIS (1km) • VIIRS (375m) Harmonization • Peatland Calibration'}
               </p>
             </div>
           </div>
@@ -632,7 +648,9 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
                       >
                         <div>
                           <div className="font-semibold">{aoi.name.split(' (')[0]}</div>
-                          <div className={`text-[10px] ${isSel ? 'text-sky-100' : 'text-slate-500 dark:text-slate-400'}`}>38 Provinsi &bull; Seluruh Wilayah</div>
+                          <div className={`text-[10px] ${isSel ? 'text-sky-100' : 'text-slate-500 dark:text-slate-400'}`}>
+                            {language === 'id' ? '38 Provinsi • Seluruh Wilayah' : '38 Provinces • Nationwide'}
+                          </div>
                         </div>
                         {isSel && <Check className="w-4 h-4 text-white shrink-0" />}
                       </button>
