@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { AOIRegion, RawHotspot, HarmonizedWeekData } from '../engine/harmonizer';
-import { Layers, Maximize2, Flame, Satellite, Activity, Crosshair, Filter, Calendar, Eye, EyeOff } from 'lucide-react';
+import { Layers, Maximize2, Satellite, Filter, Eye } from 'lucide-react';
 import { Language, translations } from '../data/translations';
 import { FullMapModal } from './FullMapModal';
 import { resolveHotspotLocation, toDMS, getIndonesianLocalTime } from '../utils/locationResolver';
@@ -16,17 +16,6 @@ interface MapViewerProps {
   rawMode: boolean;
   isLiveSync?: boolean;
   isLoading?: boolean;
-}
-
-function getMarkerRadius(frp: number, rawMode: boolean, isVIIRS: boolean): number {
-  if (rawMode) {
-    return isVIIRS ? 3.5 : 6;
-  }
-  if (frp < 15) return 3.5;
-  if (frp < 40) return 5;
-  if (frp < 100) return 7.5;
-  if (frp < 250) return 11;
-  return 15;
 }
 
 export const MapViewer: React.FC<MapViewerProps> = ({
@@ -46,7 +35,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({
   const layerGroupRef = useRef<L.LayerGroup | null>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
 
-  // FIRMS UI States
+  // Clean FIRMS-Grade Controls (Integrated in Toolbar)
   const [basemap, setBasemap] = useState<'dark' | 'satellite' | 'nasa_gibs'>('satellite');
   const [timeSpan, setTimeSpan] = useState<'today' | '24hrs' | '7days' | 'all'>('24hrs');
   const [showModis, setShowModis] = useState<boolean>(true);
@@ -54,9 +43,8 @@ export const MapViewer: React.FC<MapViewerProps> = ({
   const [frpThreshold, setFrpThreshold] = useState<number>(0);
   const [isFullMapOpen, setIsFullMapOpen] = useState<boolean>(false);
   const [cursorCoords, setCursorCoords] = useState<{ lat: number; lng: number } | null>(null);
-  const [isPanelOpen, setIsPanelOpen] = useState<boolean>(true);
 
-  // Init map with high-performance Canvas Renderer (able to render 15,000+ points at 60fps)
+  // Init map with high-performance Canvas Renderer
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
 
@@ -137,11 +125,9 @@ export const MapViewer: React.FC<MapViewerProps> = ({
       display = display.filter((h) => h.confidence >= 70);
     }
 
-    // Filter by year/week if a specific week is selected in calendar and not live sync
     if (selectedWeekData && !isLiveSync && timeSpan === 'all') {
       display = display.filter((h) => new Date(h.date).getUTCFullYear() === selectedWeekData.year);
     } else if (timeSpan === 'today' || timeSpan === '24hrs') {
-      // Show most recent dense snapshot
       const targetYear = selectedWeekData ? selectedWeekData.year : 2023;
       display = display.filter((h) => {
         const d = new Date(h.date);
@@ -172,7 +158,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({
     return display;
   }, [hotspots, selectedAOI, isLiveSync, selectedWeekData, timeSpan, showModis, showViirs, frpThreshold]);
 
-  // Render massive hotspot markers onto Canvas
+  // Render clean FIRMS-authentic small pixel points onto Canvas
   useEffect(() => {
     const map = mapInstanceRef.current;
     const layerGroup = layerGroupRef.current;
@@ -190,18 +176,17 @@ export const MapViewer: React.FC<MapViewerProps> = ({
         weight: 1.5,
         dashArray: '5 5',
         fillColor: '#0284c7',
-        fillOpacity: 0.03,
+        fillOpacity: 0.02,
         renderer: canvas,
       }).addTo(layerGroup);
     }
 
     displayHotspots.forEach((spot) => {
       const isVIIRS = spot.instrument === 'VIIRS';
-      const radius = getMarkerRadius(spot.frp, rawMode, isVIIRS);
-
-      // NASA FIRMS exact color: Vibrant thermal red (#ff1e1e) and fire amber
-      const color = isVIIRS ? '#ff2a14' : '#d90429';
-      const strokeColor = isVIIRS ? '#ffdd00' : '#ffffff';
+      
+      // NASA FIRMS true pixel scale: crisp solid points without bulky rings
+      const radius = isVIIRS ? 2.5 : 4.0;
+      const color = isVIIRS ? '#ff1e1e' : '#dc2626';
 
       const intensity =
         spot.frp < 15 ? (language === 'id' ? 'Rendah' : 'Low')
@@ -290,10 +275,10 @@ export const MapViewer: React.FC<MapViewerProps> = ({
       const circle = L.circleMarker([spot.lat, spot.lon], {
         radius,
         fillColor: color,
-        color: strokeColor,
-        weight: isVIIRS ? 0.8 : 1.2,
-        opacity: 0.95,
-        fillOpacity: 0.9,
+        color: '#ffffff',
+        weight: 0.4,
+        opacity: 0.9,
+        fillOpacity: 0.92,
         renderer: canvas,
       });
 
@@ -311,24 +296,84 @@ export const MapViewer: React.FC<MapViewerProps> = ({
   return (
     <div className="relative z-0 bg-white dark:bg-[#0c121e] border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm flex flex-col [isolation:isolate] transition-colors">
       
-      {/* Map Header Controls */}
-      <div className="px-4 sm:px-5 py-3 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2.5 bg-white dark:bg-[#0c121e]">
+      {/* Clean Top Toolbar with Integrated NASA FIRMS Controls (No Obtrusive Floating Boxes) */}
+      <div className="px-4 sm:px-5 py-3 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-[#0c121e]">
         
-        {/* Left: AOI Name & Massive Point Counter */}
+        {/* Left: AOI Name & Live Point Counter */}
         <div className="flex items-center gap-2 flex-wrap">
           <span className="font-bold text-slate-900 dark:text-white text-sm">{selectedAOI.name}</span>
           <span className="text-xs text-slate-500 dark:text-slate-400">({selectedAOI.biome})</span>
-          <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-red-100 dark:bg-red-950/80 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900/60 flex items-center gap-1">
+          <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-red-100 dark:bg-red-950/80 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900/60 flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
             <span>{displayHotspots.length.toLocaleString()} {language === 'id' ? 'titik api aktif' : 'active fire points'}</span>
           </span>
         </div>
 
-        {/* Right: Quick Tools */}
-        <div className="flex items-center flex-wrap gap-2">
+        {/* Center/Right: Integrated Filters */}
+        <div className="flex items-center flex-wrap gap-2 text-xs">
           
+          {/* Time Span Tabs (24h / 7d / All) */}
+          <div className="flex items-center bg-slate-100 dark:bg-slate-900 rounded-xl p-0.5 font-medium border border-slate-200 dark:border-slate-800">
+            {[
+              { id: '24hrs', label: '24h' },
+              { id: '7days', label: '7d' },
+              { id: 'all', label: 'All' },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setTimeSpan(tab.id as any)}
+                className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
+                  timeSpan === tab.id
+                    ? 'bg-sky-600 text-white font-bold shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Sensor Filter Toggles (VIIRS / MODIS) */}
+          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-900 rounded-xl p-1 border border-slate-200 dark:border-slate-800">
+            <button
+              onClick={() => setShowViirs(!showViirs)}
+              className={`px-2 py-0.5 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer text-[11px] ${
+                showViirs
+                  ? 'bg-red-500 text-white shadow-xs'
+                  : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+              }`}
+            >
+              <span className="w-2 h-2 rounded-full bg-white inline-block" />
+              <span>VIIRS (375m)</span>
+            </button>
+
+            <button
+              onClick={() => setShowModis(!showModis)}
+              className={`px-2 py-0.5 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer text-[11px] ${
+                showModis
+                  ? 'bg-red-700 text-white shadow-xs'
+                  : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+              }`}
+            >
+              <span className="w-2 h-2 rounded-full bg-white inline-block" />
+              <span>MODIS (1km)</span>
+            </button>
+          </div>
+
+          {/* FRP Intensity Filter */}
+          <select
+            value={frpThreshold}
+            onChange={(e) => setFrpThreshold(Number(e.target.value))}
+            className="px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-xs font-medium cursor-pointer"
+          >
+            <option value={0}>All FRP</option>
+            <option value={25}>&ge; 25 MW</option>
+            <option value={50}>&ge; 50 MW</option>
+            <option value={100}>&ge; 100 MW (Severe)</option>
+          </select>
+
           {/* Basemap switch */}
-          <div className="flex items-center bg-slate-100 dark:bg-slate-900 rounded-xl p-0.5 text-xs font-medium border border-slate-200 dark:border-slate-800">
+          <div className="flex items-center bg-slate-100 dark:bg-slate-900 rounded-xl p-0.5 font-medium border border-slate-200 dark:border-slate-800">
             <button
               onClick={() => setBasemap('dark')}
               className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
@@ -366,8 +411,8 @@ export const MapViewer: React.FC<MapViewerProps> = ({
           {/* Full Screen Map Explorer Button */}
           <button
             onClick={() => setIsFullMapOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 rounded-xl text-xs font-medium transition-all shadow-xs shrink-0 cursor-pointer"
-            title={language === 'id' ? 'Buka Peta Penuh dengan Mini Dashboard' : 'Open Full Screen Map Explorer with HUD'}
+            className="flex items-center gap-1.5 px-3 py-1 bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 rounded-xl font-medium transition-all shadow-xs shrink-0 cursor-pointer"
+            title={language === 'id' ? 'Buka Peta Penuh' : 'Open Full Screen Map'}
           >
             <Maximize2 className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">{language === 'id' ? 'Peta Penuh' : 'Full Map'}</span>
@@ -375,140 +420,37 @@ export const MapViewer: React.FC<MapViewerProps> = ({
         </div>
       </div>
 
-      {/* Map Viewport with Floating NASA FIRMS Control Panel (Right Side) */}
+      {/* Clean Unobstructed Map Viewport */}
       <div className="relative z-0 [isolation:isolate]">
         <div ref={mapContainerRef} className="w-full h-[540px] lg:h-[620px] z-0" />
 
-        {/* NASA FIRMS Interactive Sidebar Overlay (Matches the user's screenshot) */}
-        <div className="absolute top-3 right-3 z-[1000] pointer-events-auto bg-slate-900/95 text-white backdrop-blur-md border border-slate-700/80 rounded-2xl shadow-2xl p-3 sm:p-4 w-64 sm:w-72 space-y-3.5 text-xs transition-all">
-          
-          {/* Panel Header */}
-          <div className="flex items-center justify-between pb-2 border-b border-slate-700/80">
-            <div className="flex items-center gap-1.5 text-emerald-400 font-bold uppercase tracking-wider text-[11px]">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping inline-block" />
-              <span>NASA FIRMS MODE</span>
-            </div>
-            <span className="text-[10px] font-mono text-slate-400 font-bold">2026 NRT</span>
-          </div>
-
-          {/* Time Selector Pills (TODAY / 24HRS / 7DAYS / ALL) */}
-          <div className="space-y-1.5">
-            <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
-              Time Range
-            </label>
-            <div className="grid grid-cols-4 gap-1 p-0.5 bg-slate-800/80 rounded-xl">
-              {(['today', '24hrs', '7days', 'all'] as const).map((mode) => (
-                <button
-                  key={mode}
-                  onClick={() => setTimeSpan(mode)}
-                  className={`py-1 rounded-lg text-[10px] font-bold uppercase transition cursor-pointer ${
-                    timeSpan === mode
-                      ? 'bg-sky-500 text-white shadow-xs'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  {mode}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Fires / Hotspots Sensor Checkboxes */}
-          <div className="space-y-2">
-            <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
-              Active Satellites
-            </label>
-            
-            {/* VIIRS Checkbox */}
-            <label className="flex items-center justify-between p-2 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/50 cursor-pointer transition">
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={showViirs}
-                  onChange={(e) => setShowViirs(e.target.checked)}
-                  className="rounded text-sky-500 focus:ring-0 cursor-pointer w-3.5 h-3.5"
-                />
-                <span className="font-semibold text-white">VIIRS [375m]</span>
-              </div>
-              <span className="w-3 h-3 rounded-sm bg-[#ff2a14] border border-[#ffdd00]" />
-            </label>
-
-            {/* MODIS Checkbox */}
-            <label className="flex items-center justify-between p-2 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/50 cursor-pointer transition">
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={showModis}
-                  onChange={(e) => setShowModis(e.target.checked)}
-                  className="rounded text-sky-500 focus:ring-0 cursor-pointer w-3.5 h-3.5"
-                />
-                <span className="font-semibold text-white">MODIS [1km]</span>
-              </div>
-              <span className="w-3 h-3 rounded-sm bg-[#d90429] border border-white" />
-            </label>
-          </div>
-
-          {/* FRP Filter Selector */}
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-[10px] text-slate-400">
-              <span className="uppercase font-bold tracking-wider">Thermal Intensity</span>
-              <span className="font-mono text-amber-400 font-bold">{frpThreshold === 0 ? 'All MW' : `≥ ${frpThreshold} MW`}</span>
-            </div>
-            <select
-              value={frpThreshold}
-              onChange={(e) => setFrpThreshold(Number(e.target.value))}
-              className="w-full px-2.5 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs cursor-pointer font-medium"
-            >
-              <option value={0}>All Thermal Detections</option>
-              <option value={25}>≥ 25 MW (Moderate Smoldering)</option>
-              <option value={50}>≥ 50 MW (Active Flame Front)</option>
-              <option value={100}>≥ 100 MW (Extreme Combustion)</option>
-            </select>
-          </div>
-
-          {/* Quick Stats Counter */}
-          <div className="pt-2 border-t border-slate-700/80 grid grid-cols-3 gap-1 text-[10px] font-mono text-center">
-            <div className="p-1.5 rounded-lg bg-slate-800/50">
-              <span className="text-slate-400 block">MODIS</span>
-              <span className="font-bold text-red-400">{modisCount}</span>
-            </div>
-            <div className="p-1.5 rounded-lg bg-slate-800/50">
-              <span className="text-slate-400 block">VIIRS</span>
-              <span className="font-bold text-amber-400">{viirsCount}</span>
-            </div>
-            <div className="p-1.5 rounded-lg bg-slate-800/50">
-              <span className="text-slate-400 block">Peak FRP</span>
-              <span className="font-bold text-emerald-400">{maxFrp}M</span>
-            </div>
-          </div>
-
-        </div>
-
-        {/* Floating Telemetry Coordinates Bar (Bottom Left inside Map) */}
-        <div className="absolute bottom-3 left-3 z-[1000] pointer-events-auto bg-slate-900/90 dark:bg-[#0c121e]/90 backdrop-blur-md border border-slate-700/80 rounded-xl px-3 py-2 text-[11px] text-white flex items-center gap-3 shadow-xl">
+        {/* Minimal Floating Telemetry Status (Bottom Left inside Map) */}
+        <div className="absolute bottom-3 left-3 z-[1000] pointer-events-auto bg-slate-900/85 text-white backdrop-blur-md border border-slate-700/60 rounded-xl px-3 py-1.5 text-[11px] flex items-center gap-3 shadow-lg">
           <div className="flex items-center gap-1.5 text-sky-400 font-bold uppercase tracking-wider text-[10px]">
-            <Satellite className="w-3.5 h-3.5" />
-            <span>NASA FIRMS Telemetry</span>
+            <Satellite className="w-3 h-3" />
+            <span>NASA FIRMS NRT</span>
           </div>
+          <span className="text-slate-300 font-mono text-[10px] border-l border-slate-700 pl-2">
+            MODIS: <b className="text-red-400">{modisCount}</b> &bull; VIIRS: <b className="text-amber-400">{viirsCount}</b> &bull; Peak: <b className="text-emerald-400">{maxFrp} MW</b>
+          </span>
           {cursorCoords && (
-            <span className="font-mono text-[10px] text-slate-300 border-l border-slate-700 pl-2.5">
-              Lat: {cursorCoords.lat.toFixed(4)}° &bull; Lon: {cursorCoords.lng.toFixed(4)}°
+            <span className="hidden sm:inline text-slate-400 font-mono text-[10px] border-l border-slate-700 pl-2">
+              {cursorCoords.lat.toFixed(3)}°, {cursorCoords.lng.toFixed(3)}°
             </span>
           )}
         </div>
-
       </div>
 
       {/* Map footer */}
       <div className="px-5 py-2.5 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
         <span>
           {language === 'id'
-            ? 'Peta merender sebaran titik api masif dari sensor MODIS (1km) dan VIIRS (375m) menggunakan engine Canvas berkecepatan tinggi 60 FPS.'
-            : 'Rendering massive active fire hotspot clusters across MODIS (1km) and VIIRS (375m) using a high-performance 60 FPS Canvas engine.'}
+            ? 'Titik api solid merah merepresentasikan deteksi aktif sensor NASA MODIS (1km) dan VIIRS (375m) tanpa distorsi visual.'
+            : 'Solid red hotspot points represent active detections from NASA MODIS (1km) and VIIRS (375m) sensors without visual clutter.'}
         </span>
         {isLiveSync && (
           <span className="text-emerald-600 dark:text-emerald-400 font-bold">
-            NASA FIRMS NRT 24-Hour Active Feed
+            NASA FIRMS NRT Active
           </span>
         )}
       </div>
