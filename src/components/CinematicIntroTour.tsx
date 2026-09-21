@@ -4,20 +4,19 @@ import {
   X,
   ChevronRight,
   ChevronLeft,
-  Sparkles,
+  Play,
+  Pause,
+  ArrowRight,
+  RotateCcw,
   Satellite,
   Flame,
   ShieldCheck,
   Zap,
   Globe2,
-  CheckCircle2,
-  Play,
-  Pause,
-  ArrowRight,
-  RotateCcw,
-  TreePine,
-  Activity,
-  Layers,
+  Radio,
+  Sliders,
+  Compass,
+  Crosshair,
   Volume2,
   VolumeX,
 } from 'lucide-react';
@@ -42,109 +41,131 @@ export const CinematicIntroTour: React.FC<CinematicIntroTourProps> = ({
   const [isAutoPlaying, setIsAutoPlaying] = useState<boolean>(true);
   const [progress, setProgress] = useState<number>(0);
   const [orbitAngle, setOrbitAngle] = useState<number>(0);
+  const [isWarping, setIsWarping] = useState<boolean>(false);
+  const [warpProgress, setWarpProgress] = useState<number>(0);
 
-  const SLIDE_DURATION_MS = 7000; // 7 seconds per slide
+  const SLIDE_DURATION_MS = 7500; // 7.5 seconds per briefing slide
 
-  // 30-Second Mission Briefing Slides
+  // 30-Second NASA Mission Briefing Slides
   const slides = [
     {
       id: 'history_crisis',
       step: '01 / 04',
-      badgeId: 'Sejarah & Krisis Nyata (2000–2026)',
-      badgeEn: 'Historical Context & Real Crisis (2000–2026)',
-      badgeColor: 'bg-red-500/20 text-red-400 border-red-500/40',
-      titleId: '26 Tahun Krisis Asap & Pembakaran Lahan Gambut Indonesia',
+      badgeId: 'Konteks Sejarah & Krisis Nyata (2000-2026)',
+      badgeEn: 'Historical Context & Real Crisis (2000-2026)',
+      badgeColor: 'bg-red-950/80 text-red-300 border-red-500/50',
+      titleId: '26 Tahun Krisis Asap & Pembakaran Lahan Gambut Tropis Indonesia',
       titleEn: '26 Years of Peatland Wildfire & Transboundary Haze in Indonesia',
       descId:
-        'Lahan gambut tropis Indonesia menyimpan lebih dari 57 Gigaton karbon. Saat terjadi anomali iklim ekstrem seperti Super El Niño 2015 dan IOD+ 2019, jutaan hektar gambut terbakar di bawah tanah (smoldering), melepaskan emisi gas rumah kaca masif dan kabut asap lintas batas yang melumpuhkan Asia Tenggara.',
+        'Lahan gambut tropis Indonesia menyimpan lebih dari 57 Gigaton karbon. Pada anomali iklim El Niño 2015 dan IOD+ 2019, jutaan hektar gambut terbakar di bawah tanah (smoldering), melepaskan 1.75 Gt emisi gas rumah kaca dan kabut asap pekat lintas batas ke negara tetangga.',
       descEn:
-        'Indonesian tropical peatlands store over 57 Gigatons of carbon. During extreme climate anomalies like Super El Niño 2015 and positive IOD 2019, millions of hectares of deep peat smolder underground, releasing massive greenhouse emissions and suffocating transboundary haze across Southeast Asia.',
+        'Indonesian tropical peatlands store over 57 Gigatons of carbon. During extreme El Niño 2015 and positive IOD 2019 climate anomalies, millions of hectares of deep peat smoldered underground, releasing 1.75 Gt CO2e and hazardous transboundary haze across Southeast Asia.',
       highlightId: '14.9 Juta Hektar Ekosistem Gambut Rentan Terbakar',
       highlightEn: '14.9 Million Hectares of Fragile Tropical Peat Dome',
       stats: [
-        { labelId: 'Emisi 2015', labelEn: '2015 Emissions', value: '1.75 Gt CO₂e' },
-        { labelId: 'Rentang Rekaman', labelEn: 'Archive Span', value: '26 Tahun' },
-        { labelId: 'Kedalaman Gambut', labelEn: 'Peat Dome Depth', value: 'Hingga 12 m' },
+        { labelId: 'Emisi Karbon 2015', labelEn: '2015 CO2e Emissions', valueId: '1.75 Gt CO2e', valueEn: '1.75 Gt CO2e' },
+        { labelId: 'Rentang Arsip Data', labelEn: 'Archive Span', valueId: '26 Tahun', valueEn: '26 Years' },
+        { labelId: 'Kedalaman Gambut', labelEn: 'Peat Dome Depth', valueId: 'Hingga 12 m', valueEn: 'Up to 12 m' },
       ],
-      mode: 'crisis',
+      missionTelemetry: {
+        mode: 'CRISIS TELEMETRY',
+        statusId: 'Anomali El Niño & Pembakaran Bawah Tanah',
+        statusEn: 'El Niño Anomaly & Subsurface Smoldering',
+        color: 'text-red-400',
+      },
     },
     {
       id: 'satellite_shift',
       step: '02 / 04',
-      badgeId: 'Paradoks Pergeseran Sensor NASA',
+      badgeId: 'Paradoks Pergeseran Sensor Satelit NASA',
       badgeEn: 'The NASA Satellite Shift Paradox',
-      badgeColor: 'bg-amber-500/20 text-amber-400 border-amber-500/40',
-      titleId: 'Mengapa Data Titik Api Mentah Pasca-2012 Seolah Melonjak 300%?',
+      badgeColor: 'bg-amber-950/80 text-amber-300 border-amber-500/50',
+      titleId: 'Mengapa Data Titik Api Mentah Pasca-2012 Melonjak Hingga 300%?',
       titleEn: 'Why Uncorrected Post-2012 Satellite Fire Counts Artificially Tripled',
       descId:
-        'Pada 2000, NASA meluncurkan satelit Terra (MODIS, piksel 1km). Pada 2012, satelit Suomi-NPP (VIIRS, piksel 375m) ditambahkan. Karena VIIRS 7x lebih tajam, satu kebakaran yang sama terdeteksi sebagai 5–9 titik terpisah! Tanpa kalibrasi, pengambil kebijakan tertipu mengira kebakaran meningkat drastis.',
+        'Pada tahun 2000, NASA mengoperasikan satelit Terra (MODIS, resolusi piksel 1 km). Pada tahun 2012, satelit Suomi-NPP (VIIRS, resolusi 375 m) mulai beroperasi. Karena resolusi optik VIIRS 7x lebih rapat, satu garis api yang sama terdeteksi sebagai 5 sampai 9 titik terpisah. Tanpa kalibrasi, pengambil kebijakan tertipu mengira kebakaran melonjak drastis.',
       descEn:
-        'In 2000, NASA deployed Terra (MODIS, 1km pixel). In 2012, Suomi-NPP (VIIRS, 375m pixel) joined. Because VIIRS has 7x smaller pixels, a single continuous fire front gets counted as 5 to 9 discrete points! Without harmonization, raw data misleads decision-makers into assuming fire frequency exploded.',
-      highlightId: 'Piksel 1km (MODIS) vs 375m (VIIRS) Tanpa Kalibrasi',
-      highlightEn: 'MODIS 1km vs VIIRS 375m Optical Footprint Divergence',
+        'In 2000, NASA deployed the Terra satellite (MODIS, 1 km pixel footprint). In 2012, Suomi-NPP (VIIRS, 375 m pixel) joined. Because VIIRS has a 7x finer optical footprint, a single continuous fire front gets detected as 5 to 9 discrete hotspots. Uncorrected raw data misleads decision-makers into assuming fire frequency exploded.',
+      highlightId: 'MODIS 1 km vs VIIRS 375 m: Perbedaan Jejak Optik Sensor',
+      highlightEn: 'MODIS 1 km vs VIIRS 375 m: Sensor Optical Footprint Divergence',
       stats: [
-        { labelId: 'Resolusi MODIS', labelEn: 'MODIS Footprint', value: '1,000 m' },
-        { labelId: 'Resolusi VIIRS', labelEn: 'VIIRS Footprint', value: '375 m' },
-        { labelId: 'Pecahan Deteksi', labelEn: 'Overcount Ratio', value: '5 – 9x Spike' },
+        { labelId: 'Resolusi MODIS', labelEn: 'MODIS Footprint', valueId: '1,000 m (1 km)', valueEn: '1,000 m (1 km)' },
+        { labelId: 'Resolusi VIIRS', labelEn: 'VIIRS Footprint', valueId: '375 m', valueEn: '375 m' },
+        { labelId: 'Lonjakan Hitungan', labelEn: 'Artificial Multiplier', valueId: '5-9x Titik Mentah', valueEn: '5-9x Raw Points' },
       ],
-      mode: 'sensors',
+      missionTelemetry: {
+        mode: 'OPTICAL FOOTPRINT',
+        statusId: 'Perbedaan Resolusi MODIS vs VIIRS',
+        statusEn: 'MODIS vs VIIRS Footprint Disparity',
+        color: 'text-amber-400',
+      },
     },
     {
       id: 'terra_harmonia',
       step: '03 / 04',
-      badgeId: 'Solusi: Lahirnya Terra Harmonia',
-      badgeEn: 'The Solution: Birth of Terra Harmonia',
-      badgeColor: 'bg-sky-500/20 text-sky-400 border-sky-500/40',
-      titleId: 'Menyatukan 26 Tahun Sains Antariksa NASA Menjadi Satu Rekaman Iklim yang Valid',
-      titleEn: 'Harmonizing 26 Years of NASA Satellite Data into One True Climate Record',
+      badgeId: 'Solusi: Algoritma Rekonsiliasi Terra Harmonia',
+      badgeEn: 'The Solution: Terra Harmonia Reconciliation Engine',
+      badgeColor: 'bg-blue-950/80 text-blue-300 border-blue-500/50',
+      titleId: 'Menyatukan 26 Tahun Rekaman Satelit NASA Menjadi Data Iklim Homogen',
+      titleEn: 'Harmonizing 26 Years of NASA Satellite Data into One Verified Climate Record',
       descId:
-        'Terra Harmonia mengintegrasikan algoritma Equal-Area Binning 5.5 km dan normalisasi energi termal Fire Radiative Power (FRP Megawatt) berbasis hukum radiasi Stefan-Boltzmann. Menyatukan MODIS dan VIIRS ke dalam satu standar iklim yang homogen dan akurat untuk seluruh 38 provinsi Indonesia.',
+        'Terra Harmonia menyelesaikan distorsi ini melalui agregasi spasial sel 5.5 km equal-area dan kalibrasi daya radiasi api (Fire Radiative Power - FRP Megawatt) berbasis hukum radiasi termal Stefan-Boltzmann. Seluruh titik api dari MODIS dan VIIRS diselaraskan ke dalam satu deret waktu iklim yang valid untuk seluruh 38 provinsi.',
       descEn:
-        'Terra Harmonia solves this through 5.5 km Equal-Area Spatial Binning and Stefan-Boltzmann Fire Radiative Power (FRP Megawatts) cross-calibration. Harmonizing MODIS and VIIRS into a unified, cross-decadal climatology across all 38 provinces of Indonesia.',
-      highlightId: 'Harmonisasi Spasial 5.5km & Pembobotan FRP Termal',
-      highlightEn: '5.5 km Equal-Area Grid & Cross-Sensor FRP Weighting',
+        'Terra Harmonia reconciles this distortion through 5.5 km equal-area spatial binning and Fire Radiative Power (FRP Megawatts) thermal calibration using Stefan-Boltzmann radiation laws. Merging MODIS and VIIRS into a homogeneous, long-term climate series across all 38 Indonesian provinces.',
+      highlightId: 'Grid Spasial 5.5 km Equal-Area & Kalibrasi FRP Stefan-Boltzmann',
+      highlightEn: '5.5 km Equal-Area Spatial Grid & Stefan-Boltzmann FRP Calibration',
       stats: [
-        { labelId: 'Grid Spasial', labelEn: 'Equal-Area Grid', value: '5.5 km' },
-        { labelId: 'Koreksi Overcount', labelEn: 'Overcount Cleared', value: '100% Valid' },
-        { labelId: 'Standar Kalibrasi', labelEn: 'Calibration Base', value: 'NASA FIRMS' },
+        { labelId: 'Ukuran Grid Sel', labelEn: 'Spatial Grid Cell', valueId: '5.5 km Equal-Area', valueEn: '5.5 km Equal-Area' },
+        { labelId: 'Eliminasi Overcount', labelEn: 'Overcount Eliminated', valueId: '100% Terkalibrasi', valueEn: '100% Calibrated' },
+        { labelId: 'Kepatuhan Standar', labelEn: 'Standard Compliance', valueId: 'NASA FIRMS / GIBS', valueEn: 'NASA FIRMS / GIBS' },
       ],
-      mode: 'harmonize',
+      missionTelemetry: {
+        mode: 'ALGORITHM ACTIVE',
+        statusId: 'Kalibrasi Spasial 5.5 km & FRP Megawatt',
+        statusEn: '5.5 km Spatial & FRP Megawatt Calibration',
+        color: 'text-blue-400',
+      },
     },
     {
       id: 'field_action',
       step: '04 / 04',
-      badgeId: 'Dampak Nyata & Mitigasi Lapangan',
-      badgeEn: 'Field Mitigation & Climate Action',
-      badgeColor: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40',
-      titleId: 'Dari Sains Antariksa Menjadi Aksi Cepat Tim Patroli Manggala Agni',
-      titleEn: 'From Orbital Science to Rapid Ground Action for Fire Brigades',
+      badgeId: 'Aksi Lapangan & Mitigasi Kebakaran Nyata',
+      badgeEn: 'Field Action & Frontline Wildfire Mitigation',
+      badgeColor: 'bg-emerald-950/80 text-emerald-300 border-emerald-500/50',
+      titleId: 'Dari Telemetri Antariksa Menjadi Instruksi Cepat Brigada Manggala Agni',
+      titleEn: 'From Satellite Telemetry to Rapid Ground Dispatch for Fire Brigades',
       descId:
-        'Terra Harmonia menghubungkan deteksi satelit dengan parameter hidrologi gambut nyata: status Muka Air Tanah (TMAG < -40 cm BRGM), estimasi emisi karbon lahan gambut, generator disposisi WhatsApp untuk Manggala Agni, dan ekspor spasial GeoJSON untuk GIS lapangan.',
+        'Terra Harmonia mengintegrasikan data satelit dengan parameter hidrologi gambut: ambang batas Tinggi Muka Air Gambut (TMAG < -40 cm BRGM), penghitungan emisi karbon gambut, format laporan cepat WhatsApp untuk tim patroli lapangan Manggala Agni, dan ekspor GeoJSON standar GIS.',
       descEn:
-        'Terra Harmonia bridges orbital telemetry with ground hydrology: statutory Peat Water Table depths (TMAG < -40 cm), real-time carbon emission estimation, automated WhatsApp dispatch for frontline fire brigades, and instant GeoJSON GIS exports.',
-      highlightId: 'Pencegahan Kebakaran Bawah Tanah & Proteksi Karbon',
-      highlightEn: 'Underground Smoldering Prevention & Peat Conservation',
+        'Terra Harmonia bridges orbital telemetry with ground hydrology: statutory Peat Water Table thresholds (TMAG < -40 cm), peatland carbon emission quantification, automated WhatsApp dispatch generator for Manggala Agni patrol crews, and open GeoJSON GIS exports.',
+      highlightId: 'Pencegahan Kebakaran Gambut Bawah Tanah & Proteksi Iklim',
+      highlightEn: 'Subsurface Peat Fire Prevention & Carbon Reservoir Protection',
       stats: [
-        { labelId: 'Ambang Kritis BRGM', labelEn: 'BRGM Critical TMAG', value: '-40 cm' },
-        { labelId: 'Integrasi Disposisi', labelEn: 'Dispatch Pipeline', value: 'WhatsApp & SMS' },
-        { labelId: 'Format Standar', labelEn: 'Standard Format', value: 'GeoJSON / RFC 7946' },
+        { labelId: 'Ambang Kritis BRGM', labelEn: 'BRGM Critical Depth', valueId: '-40 cm TMAG', valueEn: '-40 cm TMAG' },
+        { labelId: 'Format Disposisi', labelEn: 'Dispatch Pipeline', valueId: 'WhatsApp / SMS Sitrep', valueEn: 'WhatsApp / SMS Sitrep' },
+        { labelId: 'Standar Data Geospasial', labelEn: 'Geospatial Standard', valueId: 'GeoJSON / RFC 7946', valueEn: 'GeoJSON / RFC 7946' },
       ],
-      mode: 'mitigate',
+      missionTelemetry: {
+        mode: 'FIELD DISPATCH',
+        statusId: 'Integrasi TMAG Gambut & Disposisi Cepat',
+        statusEn: 'Peat TMAG Integration & Rapid Sitrep',
+        color: 'text-emerald-400',
+      },
     },
   ];
 
-  // Satellite orbit animation tick
+  // Satellite orbit continuous rotation
   useEffect(() => {
     if (!isOpen) return;
     const interval = setInterval(() => {
-      setOrbitAngle((prev) => (prev + 0.8) % 360);
-    }, 30);
+      setOrbitAngle((prev) => (prev + 0.6) % 360);
+    }, 25);
     return () => clearInterval(interval);
   }, [isOpen]);
 
   // Slide progress & auto-advance timer
   useEffect(() => {
-    if (!isOpen || !isAutoPlaying) return;
+    if (!isOpen || !isAutoPlaying || isWarping) return;
 
     const tickMs = 50;
     const progressStep = (tickMs / SLIDE_DURATION_MS) * 100;
@@ -152,7 +173,15 @@ export const CinematicIntroTour: React.FC<CinematicIntroTourProps> = ({
     const timer = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
-          setCurrentSlide((s) => (s < slides.length - 1 ? s + 1 : 0));
+          setCurrentSlide((s) => {
+            if (s < slides.length - 1) {
+              return s + 1;
+            } else {
+              // Final slide completed: launch mission warp
+              triggerMissionLaunch();
+              return s;
+            }
+          });
           return 0;
         }
         return prev + progressStep;
@@ -160,34 +189,49 @@ export const CinematicIntroTour: React.FC<CinematicIntroTourProps> = ({
     }, tickMs);
 
     return () => clearInterval(timer);
-  }, [isOpen, isAutoPlaying, currentSlide, slides.length]);
+  }, [isOpen, isAutoPlaying, currentSlide, isWarping, slides.length]);
 
-  // Reset progress when manual slide changes
   const handleSelectSlide = (idx: number) => {
+    if (isWarping) return;
     setCurrentSlide(idx);
     setProgress(0);
   };
 
   const handleNext = () => {
+    if (isWarping) return;
     if (currentSlide < slides.length - 1) {
       handleSelectSlide(currentSlide + 1);
     } else {
-      handleEnter();
+      triggerMissionLaunch();
     }
   };
 
   const handlePrev = () => {
+    if (isWarping) return;
     if (currentSlide > 0) {
       handleSelectSlide(currentSlide - 1);
     }
   };
 
-  const handleEnter = () => {
-    try {
-      localStorage.setItem('terra_harmonia_intro_seen', 'true');
-    } catch (e) {}
-    if (onEnterApp) onEnterApp();
-    onClose();
+  // High-Speed Mission Warp & Transition Sequence into Application
+  const triggerMissionLaunch = () => {
+    if (isWarping) return;
+    setIsWarping(true);
+    setIsAutoPlaying(false);
+
+    let p = 0;
+    const warpInterval = setInterval(() => {
+      p += 4;
+      setWarpProgress(p);
+      if (p >= 100) {
+        clearInterval(warpInterval);
+        try {
+          localStorage.setItem('terra_harmonia_intro_seen', 'true');
+        } catch (e) {}
+        if (onEnterApp) onEnterApp();
+        onClose();
+      }
+    }, 30);
   };
 
   // Keyboard navigation
@@ -195,7 +239,7 @@ export const CinematicIntroTour: React.FC<CinematicIntroTourProps> = ({
     if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        handleEnter();
+        triggerMissionLaunch();
       } else if (e.key === 'ArrowRight' || e.key === ' ') {
         e.preventDefault();
         handleNext();
@@ -206,248 +250,304 @@ export const CinematicIntroTour: React.FC<CinematicIntroTourProps> = ({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, currentSlide]);
+  }, [isOpen, currentSlide, isWarping]);
 
   if (!isOpen) return null;
 
   const current = slides[currentSlide];
 
-  // Satellite orbit visual coordinates
+  // Orbital Mechanics Calculations for Dual Satellites
+  // Terra MODIS: Inclination 98.2°, Semi-major axis 7085 km (Altitude 705 km)
   const radTerra = (orbitAngle * Math.PI) / 180;
   const terraX = 50 + 38 * Math.cos(radTerra);
-  const terraY = 50 + 16 * Math.sin(radTerra);
+  const terraY = 50 + 15 * Math.sin(radTerra);
 
-  const radViirs = ((orbitAngle + 180) * Math.PI) / 180;
+  // Suomi-NPP VIIRS: Inclination 98.7°, Altitude 824 km
+  const radViirs = ((orbitAngle + 190) * Math.PI) / 180;
   const viirsX = 50 + 44 * Math.cos(radViirs);
-  const viirsY = 50 + 20 * Math.sin(radViirs);
+  const viirsY = 50 + 22 * Math.sin(radViirs);
 
   const modalContent = (
-    <div className="fixed inset-0 z-[100000] bg-[#050914] text-slate-100 flex flex-col font-sans select-none overflow-hidden animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[100000] bg-[#020617] text-slate-100 flex flex-col font-sans select-none overflow-hidden animate-in fade-in duration-300">
       
-      {/* Background Starfield & Atmospheric Glow */}
+      {/* Background Starfield & Subtle NASA Coordinate Grid */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-sky-500/10 rounded-full blur-[140px]" />
-        <div className="absolute bottom-10 left-1/4 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px]" />
-        <div className="absolute top-20 right-1/4 w-[400px] h-[400px] bg-amber-500/10 rounded-full blur-[100px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:24px_24px] opacity-40" />
+        {/* Subtle NASA Deep Blue Nebula Backdrops */}
+        <div className="absolute top-0 left-1/3 w-[650px] h-[650px] bg-[#0b3d91]/15 rounded-full blur-[160px]" />
+        <div className="absolute bottom-0 right-1/4 w-[550px] h-[550px] bg-[#1e3a8a]/12 rounded-full blur-[140px]" />
+        
+        {/* Aerospace Telemetry Coordinate Grid */}
+        <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:32px_32px] opacity-35" />
+        
+        {/* Corner Telemetry Markers */}
+        <div className="absolute top-4 left-4 text-[9px] font-mono text-slate-500 tracking-wider hidden sm:block">
+          SYS.ID: NASA-TH-2026 // GEO: 0.789°S, 113.921°E
+        </div>
+        <div className="absolute top-4 right-4 text-[9px] font-mono text-slate-500 tracking-wider hidden sm:block">
+          SENSOR PIPELINE: MODIS/TERRA + VIIRS/SNPP
+        </div>
       </div>
 
-      {/* Top Bar: Mission Brand, Language Switcher, Skip / Close */}
-      <header className="relative z-30 h-16 px-5 sm:px-8 flex items-center justify-between border-b border-slate-800/80 bg-[#070c1a]/80 backdrop-blur-md">
+      {/* Top Bar: Official NASA Space Apps Header, Language Toggle, Launch Action */}
+      <header className="relative z-30 h-16 px-4 sm:px-8 flex items-center justify-between border-b border-slate-800/80 bg-[#060b18]/90 backdrop-blur-md">
         
-        {/* Brand */}
+        {/* Brand: Dual NASA Meatball & Terra Harmonia Emblem */}
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-500 to-emerald-400 p-0.5 shadow-lg shadow-sky-500/20">
-            <div className="w-full h-full bg-[#070c1a] rounded-[10px] flex items-center justify-center text-sky-400">
-              <Globe2 className="w-4 h-4" />
+          <div className="flex items-center gap-1.5 shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-[#0b1b36] border border-blue-500/40 p-1 flex items-center justify-center shadow-lg shadow-blue-950">
+              <img
+                src="/terra_harmonia_transparent.svg"
+                alt="Terra Harmonia"
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <span className="text-slate-500 font-mono text-xs">×</span>
+            <div className="w-7 h-7 rounded-full overflow-hidden shadow-md shadow-blue-950 shrink-0">
+              <img
+                src="/nasa_meatball.svg"
+                alt="NASA"
+                className="w-full h-full object-contain"
+              />
             </div>
           </div>
+
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-sm text-white tracking-tight">Terra Harmonia</span>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
-                NASA Space Apps
+              <span className="font-extrabold text-sm text-white tracking-tight">Terra Harmonia</span>
+              <span className="text-[9px] font-bold font-mono px-1.5 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-700/60">
+                NASA SPACE APPS 2026
               </span>
             </div>
-            <p className="text-[10px] text-slate-400">
-              {language === 'id' ? 'Tur Singkat Misi & Harmonisasi Spasial 30 Detik' : '30-Second Mission Briefing & Climatology Tour'}
+            <p className="text-[10.5px] text-slate-400 font-medium">
+              {language === 'id'
+                ? 'Pengantar Misi: Harmonisasi Satelit Titik Api Lahan Gambut Indonesia'
+                : 'Mission Briefing: Indonesian Peatland Satellite Fire Harmonization'}
             </p>
           </div>
         </div>
 
-        {/* Right Actions: Auto-play Toggle, Language, Skip Button */}
+        {/* Top Right Controls: Auto-Play, Language Selector, Direct Launch */}
         <div className="flex items-center gap-2.5">
           
-          {/* Auto-play toggle */}
+          {/* Auto-Play Toggle */}
           <button
             onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-            className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 transition cursor-pointer text-xs flex items-center gap-1.5"
-            title={isAutoPlaying ? (language === 'id' ? 'Jeda Putar Otomatis' : 'Pause Auto-Play') : (language === 'id' ? 'Mulai Putar Otomatis' : 'Start Auto-Play')}
+            disabled={isWarping}
+            className="px-2.5 py-1.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 transition cursor-pointer text-xs flex items-center gap-1.5"
+            title={
+              isAutoPlaying
+                ? language === 'id' ? 'Jeda Putar Otomatis' : 'Pause Auto-Play'
+                : language === 'id' ? 'Lanjutkan Putar Otomatis' : 'Resume Auto-Play'
+            }
           >
-            {isAutoPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-            <span className="hidden sm:inline">{isAutoPlaying ? 'Auto' : 'Paused'}</span>
+            {isAutoPlaying ? <Pause className="w-3.5 h-3.5 text-blue-400" /> : <Play className="w-3.5 h-3.5 text-slate-400" />}
+            <span className="hidden sm:inline font-medium text-[11px]">{isAutoPlaying ? 'Auto' : 'Paused'}</span>
           </button>
 
-          {/* Language Switcher */}
-          <div className="flex items-center bg-slate-800/90 rounded-xl p-0.5 border border-slate-700/80 text-xs font-semibold">
+          {/* Bilingual Selector (ID / EN) */}
+          <div className="flex items-center bg-slate-900/90 rounded-xl p-0.5 border border-slate-700/80 text-xs font-semibold">
             <button
               onClick={() => onToggleLanguage('en')}
-              className={`px-2 py-1 rounded-lg transition cursor-pointer ${
-                language === 'en' ? 'bg-sky-600 text-white font-bold' : 'text-slate-400 hover:text-white'
+              className={`px-2.5 py-1 rounded-lg transition cursor-pointer text-[11px] ${
+                language === 'en' ? 'bg-[#0b3d91] text-white font-bold shadow-xs' : 'text-slate-400 hover:text-white'
               }`}
             >
               EN
             </button>
             <button
               onClick={() => onToggleLanguage('id')}
-              className={`px-2 py-1 rounded-lg transition cursor-pointer ${
-                language === 'id' ? 'bg-sky-600 text-white font-bold' : 'text-slate-400 hover:text-white'
+              className={`px-2.5 py-1 rounded-lg transition cursor-pointer text-[11px] ${
+                language === 'id' ? 'bg-[#0b3d91] text-white font-bold shadow-xs' : 'text-slate-400 hover:text-white'
               }`}
             >
               ID
             </button>
           </div>
 
-          {/* Skip Button to Enter Dashboard */}
+          {/* Mission Enter / Skip Button */}
           <button
-            onClick={handleEnter}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-500 hover:to-emerald-500 text-white font-bold text-xs rounded-xl transition-all shadow-lg shadow-sky-600/20 cursor-pointer shrink-0"
+            onClick={triggerMissionLaunch}
+            disabled={isWarping}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0b3d91] hover:bg-blue-600 text-white font-bold text-xs rounded-xl transition-all border border-blue-500/40 shadow-lg shadow-blue-950/60 cursor-pointer shrink-0"
           >
-            <span>{language === 'id' ? 'Masuk ke Web' : 'Enter App'}</span>
+            <span>{language === 'id' ? 'Masuk ke Platform' : 'Enter Mission'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
       </header>
 
-      {/* Main Content Area: 2 Columns (Narrative Card + 3D Satellite Radar Stage) */}
-      <div className="relative flex-1 w-full max-w-7xl mx-auto px-4 sm:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center z-20 overflow-y-auto">
+      {/* Main Mission Briefing Display: 2 Clean Columns */}
+      <div className="relative flex-1 w-full max-w-7xl mx-auto px-4 sm:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center z-20 overflow-y-auto">
         
-        {/* Left Column: Narrative Card & Metrics */}
+        {/* Left Column: Scientific Narrative & Telemetry Metrics */}
         <div className="lg:col-span-6 flex flex-col justify-center space-y-5">
           
-          {/* Step Badge */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-mono font-bold text-sky-400">
-              {current.step}
+          {/* Step Sequence & Topic Badge */}
+          <div className="flex items-center gap-2.5">
+            <span className="text-xs font-mono font-bold text-blue-400 bg-blue-950/80 px-2 py-0.5 rounded border border-blue-800/60">
+              STEP {current.step}
             </span>
             <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${current.badgeColor}`}>
               {language === 'id' ? current.badgeId : current.badgeEn}
             </span>
           </div>
 
-          {/* Title */}
+          {/* Heading */}
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight">
             {language === 'id' ? current.titleId : current.titleEn}
           </h2>
 
-          {/* Description */}
-          <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
+          {/* Narrative Body */}
+          <p className="text-sm sm:text-[15px] text-slate-300 leading-relaxed font-normal">
             {language === 'id' ? current.descId : current.descEn}
           </p>
 
-          {/* Key Stat Cards */}
-          <div className="grid grid-cols-3 gap-2.5 pt-2">
+          {/* Key Metric Telemetry Cards */}
+          <div className="grid grid-cols-3 gap-3 pt-1">
             {current.stats.map((stat, idx) => (
               <div
                 key={idx}
-                className="p-3 rounded-2xl bg-slate-900/80 backdrop-blur-md border border-slate-800/90 shadow-sm"
+                className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 shadow-sm flex flex-col justify-between"
               >
                 <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold truncate">
                   {language === 'id' ? stat.labelId : stat.labelEn}
                 </div>
-                <div className="text-sm sm:text-base font-black text-white num mt-0.5 truncate">
-                  {stat.value}
+                <div className="text-sm sm:text-base font-black text-white font-mono mt-1 truncate">
+                  {language === 'id' ? stat.valueId : stat.valueEn}
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Highlight Banner */}
-          <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center gap-2.5 text-xs text-slate-300">
-            <Sparkles className="w-4 h-4 text-sky-400 shrink-0" />
-            <span className="font-semibold text-white">
-              {language === 'id' ? current.highlightId : current.highlightEn}
+          {/* Mission Focus Telemetry Strip */}
+          <div className="p-3 rounded-xl bg-slate-900/70 border border-slate-800 flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2">
+              <Crosshair className="w-4 h-4 text-blue-400 shrink-0" />
+              <span className="font-semibold text-white">
+                {language === 'id' ? current.highlightId : current.highlightEn}
+              </span>
+            </div>
+            <span className={`text-[10px] font-mono font-bold ${current.missionTelemetry.color} hidden sm:inline`}>
+              [{current.missionTelemetry.mode}]
             </span>
           </div>
 
         </div>
 
-        {/* Right Column: Animated Interactive 3D Orbit Radar Stage */}
+        {/* Right Column: Authentic NASA Orbital Radar & Dual-Satellite Stage */}
         <div className="lg:col-span-6 flex flex-col items-center justify-center">
           
-          <div className="relative w-full max-w-lg aspect-square rounded-3xl bg-[#091122]/90 border border-slate-800/90 shadow-2xl p-6 flex flex-col items-center justify-center overflow-hidden [isolation:isolate]">
+          <div className="relative w-full max-w-lg aspect-square rounded-3xl bg-[#040916] border border-slate-800 shadow-2xl p-6 flex flex-col items-center justify-center overflow-hidden [isolation:isolate]">
             
-            {/* Radar Scan Grid Lines */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(56,189,248,0.08)_0%,transparent_70%)]" />
-            <div className="absolute inset-6 rounded-full border border-slate-800/80 border-dashed" />
-            <div className="absolute inset-16 rounded-full border border-sky-500/20" />
-            <div className="absolute inset-28 rounded-full border border-emerald-500/20" />
+            {/* Orbital Grid Radar Rings */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(11,61,145,0.12)_0%,transparent_70%)]" />
+            <div className="absolute inset-8 rounded-full border border-slate-800/80 border-dashed" />
+            <div className="absolute inset-20 rounded-full border border-blue-900/40" />
+            <div className="absolute inset-32 rounded-full border border-emerald-900/30" />
 
-            {/* Orbit Paths */}
+            {/* Coordinate Crosshairs */}
+            <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-slate-800/40 pointer-events-none" />
+            <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-slate-800/40 pointer-events-none" />
+
+            {/* Orbit Paths SVG */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100">
-              {/* Elliptical Orbit Terra MODIS */}
-              <ellipse cx="50" cy="50" rx="38" ry="16" fill="none" stroke="#38bdf8" strokeWidth="0.4" strokeDasharray="2 2" opacity="0.6" />
-              {/* Elliptical Orbit Suomi-NPP VIIRS */}
-              <ellipse cx="50" cy="50" rx="44" ry="20" fill="none" stroke="#34d399" strokeWidth="0.4" strokeDasharray="3 2" opacity="0.6" />
+              {/* Elliptical Orbit Terra MODIS (Blue Orbit) */}
+              <ellipse cx="50" cy="50" rx="38" ry="15" fill="none" stroke="#2563eb" strokeWidth="0.5" strokeDasharray="2 2" opacity="0.7" />
+              
+              {/* Elliptical Orbit Suomi-NPP VIIRS (Green Orbit) */}
+              <ellipse cx="50" cy="50" rx="44" ry="22" fill="none" stroke="#10b981" strokeWidth="0.5" strokeDasharray="3 2" opacity="0.7" />
 
-              {/* Sensor Beam Cone Projection to Earth */}
+              {/* Optical Sensor Scanning Cones Projecting to Indonesian Peatlands */}
               <polygon
                 points={`${terraX},${terraY} 46,50 54,50`}
                 fill="url(#terraBeamGrad)"
-                opacity="0.35"
+                opacity="0.4"
               />
               <polygon
                 points={`${viirsX},${viirsY} 48,52 52,48`}
                 fill="url(#viirsBeamGrad)"
-                opacity="0.35"
+                opacity="0.4"
               />
 
               <defs>
                 <linearGradient id="terraBeamGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.8" />
-                  <stop offset="100%" stopColor="#38bdf8" stopOpacity="0" />
+                  <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.8" />
+                  <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
                 </linearGradient>
                 <linearGradient id="viirsBeamGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#34d399" stopOpacity="0.8" />
-                  <stop offset="100%" stopColor="#34d399" stopOpacity="0" />
+                  <stop offset="0%" stopColor="#10b981" stopOpacity="0.8" />
+                  <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
                 </linearGradient>
               </defs>
             </svg>
 
-            {/* Earth Center Globe Visual */}
-            <div className="relative w-36 h-36 rounded-full bg-gradient-to-tr from-sky-950 via-emerald-950 to-slate-900 border-2 border-sky-500/40 shadow-2xl flex flex-col items-center justify-center p-3 text-center z-10 overflow-hidden">
+            {/* Central Globe Representation */}
+            <div className="relative w-40 h-40 rounded-full bg-gradient-to-tr from-[#021b36] via-[#052e16] to-[#0a1128] border-2 border-blue-500/50 shadow-2xl flex flex-col items-center justify-center p-3 text-center z-10 overflow-hidden">
               
-              {/* Glowing Atmosphere Rim */}
-              <div className="absolute inset-0 rounded-full bg-gradient-to-b from-sky-400/20 to-transparent pointer-events-none" />
+              {/* Atmospheric Rayleigh Scattering Rim Glow */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-b from-blue-400/20 to-transparent pointer-events-none" />
               
-              {/* Simulated Fire Hotspots Pulsing on Earth */}
-              <div className="absolute top-12 left-10 w-2.5 h-2.5 rounded-full bg-red-500 animate-ping opacity-80" />
-              <div className="absolute top-16 left-16 w-2 h-2 rounded-full bg-amber-400 animate-ping opacity-90 delay-300" />
-              <div className="absolute bottom-12 right-12 w-2 h-2 rounded-full bg-red-600 animate-ping opacity-80 delay-700" />
+              {/* Vector Silhouette for Equatorial Indonesia Landmass */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none">
+                <Globe2 className="w-28 h-28 text-emerald-400" />
+              </div>
 
-              <Globe2 className="w-10 h-10 text-sky-400/60 mb-1" />
-              <span className="font-bold text-[11px] text-white tracking-wider uppercase">Indonesia</span>
-              <span className="text-[9px] text-emerald-400 font-mono">0.789° S, 113.921° E</span>
+              {/* Real Peatland Fire Nodes (Kalimantan, Sumatra, Papua) with Thermal Waves */}
+              <div className="absolute top-12 left-10 w-2.5 h-2.5 rounded-full bg-orange-500 animate-ping opacity-90" />
+              <div className="absolute top-14 left-14 w-2 h-2 rounded-full bg-red-500 animate-ping opacity-95 delay-200" />
+              <div className="absolute top-20 left-20 w-3 h-3 rounded-full bg-amber-400 animate-ping opacity-85 delay-500" />
+              <div className="absolute bottom-12 right-10 w-2 h-2 rounded-full bg-red-600 animate-ping opacity-90 delay-700" />
+
+              <div className="relative z-10">
+                <span className="font-extrabold text-[12px] text-white tracking-widest uppercase block drop-shadow">
+                  INDONESIA
+                </span>
+                <span className="text-[9.5px] text-emerald-300 font-mono block mt-0.5">
+                  0.789° S, 113.921° E
+                </span>
+                <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-slate-950/80 text-slate-300 border border-slate-700 mt-1 inline-block">
+                  PEAT DOME REGION
+                </span>
+              </div>
             </div>
 
-            {/* Terra MODIS Satellite Icon Marker */}
+            {/* Satellite 1: EOS-AM1 (Terra MODIS) */}
             <div
               className="absolute z-20 flex items-center gap-1.5 transition-all duration-75 pointer-events-none -translate-x-1/2 -translate-y-1/2"
               style={{ left: `${terraX}%`, top: `${terraY}%` }}
             >
-              <div className="w-6 h-6 rounded-lg bg-sky-600 text-white flex items-center justify-center shadow-lg shadow-sky-500/40 ring-1 ring-sky-300">
-                <Satellite className="w-3.5 h-3.5" />
+              <div className="w-7 h-7 rounded-lg bg-[#0b3d91] text-white flex items-center justify-center shadow-lg shadow-blue-900/60 ring-1 ring-blue-400">
+                <Satellite className="w-4 h-4" />
               </div>
-              <span className="text-[9px] font-bold font-mono px-1 py-0.5 rounded bg-sky-950/90 text-sky-300 border border-sky-500/50 shadow-xs">
-                MODIS (1km)
-              </span>
+              <div className="text-[8.5px] font-mono px-1.5 py-0.5 rounded bg-blue-950/95 text-blue-200 border border-blue-500/60 shadow-xs whitespace-nowrap">
+                <span className="font-bold">TERRA (MODIS)</span>
+                <span className="text-slate-400 block text-[7.5px]">1 km | 705 km SSO</span>
+              </div>
             </div>
 
-            {/* Suomi-NPP VIIRS Satellite Icon Marker */}
+            {/* Satellite 2: Suomi-NPP (VIIRS) */}
             <div
               className="absolute z-20 flex items-center gap-1.5 transition-all duration-75 pointer-events-none -translate-x-1/2 -translate-y-1/2"
               style={{ left: `${viirsX}%`, top: `${viirsY}%` }}
             >
-              <div className="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-500/40 ring-1 ring-emerald-300">
-                <Satellite className="w-3.5 h-3.5" />
+              <div className="w-7 h-7 rounded-lg bg-[#047857] text-white flex items-center justify-center shadow-lg shadow-emerald-900/60 ring-1 ring-emerald-400">
+                <Satellite className="w-4 h-4" />
               </div>
-              <span className="text-[9px] font-bold font-mono px-1 py-0.5 rounded bg-emerald-950/90 text-emerald-300 border border-emerald-500/50 shadow-xs">
-                VIIRS (375m)
-              </span>
+              <div className="text-[8.5px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/95 text-emerald-200 border border-emerald-500/60 shadow-xs whitespace-nowrap">
+                <span className="font-bold">SUOMI-NPP (VIIRS)</span>
+                <span className="text-slate-400 block text-[7.5px]">375 m | 824 km SSO</span>
+              </div>
             </div>
 
-            {/* Stage HUD Telemetry Box */}
-            <div className="absolute bottom-3 left-4 right-4 bg-slate-950/80 backdrop-blur-md rounded-xl p-2.5 border border-slate-800 text-[10px] text-slate-300 flex items-center justify-between z-20">
+            {/* Bottom HUD Telemetry Status Box */}
+            <div className="absolute bottom-3 left-4 right-4 bg-[#060b18]/95 backdrop-blur-md rounded-xl p-2.5 border border-slate-800 text-[10px] text-slate-300 flex items-center justify-between z-20">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-mono">EOSDIS GIBS Orbit Sync</span>
+                <span className="font-mono text-slate-400">NASA EOSDIS GIBS Sync</span>
               </div>
-              <div className="font-mono text-sky-400 font-bold">
-                {current.mode === 'crisis' && '🔥 ANOMALY EL NIÑO PEAK'}
-                {current.mode === 'sensors' && '🛰️ MULTI-SENSOR DIVERGENCE'}
-                {current.mode === 'harmonize' && '⚡ 5.5KM STEFAN-BOLTZMANN CALIBRATED'}
-                {current.mode === 'mitigate' && '🛡️ BRGM TMAG & SITREP ACTIVE'}
+              <div className="font-mono font-bold text-blue-400">
+                {language === 'id' ? current.missionTelemetry.statusId : current.missionTelemetry.statusEn}
               </div>
             </div>
 
@@ -457,10 +557,10 @@ export const CinematicIntroTour: React.FC<CinematicIntroTourProps> = ({
 
       </div>
 
-      {/* Bottom Controls: Segmented Progress Bar & Slide Stepper */}
-      <footer className="relative z-30 px-5 sm:px-8 py-4 border-t border-slate-800/80 bg-[#070c1a]/90 backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-4">
+      {/* Bottom Controls: Segmented Progress & Slide Stepper */}
+      <footer className="relative z-30 px-4 sm:px-8 py-4 border-t border-slate-800/80 bg-[#060b18]/95 backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-4">
         
-        {/* Slide Progress Bars */}
+        {/* Slide Progress Stepper */}
         <div className="flex items-center gap-2 w-full sm:w-80">
           {slides.map((_, idx) => {
             const isDone = idx < currentSlide;
@@ -469,14 +569,15 @@ export const CinematicIntroTour: React.FC<CinematicIntroTourProps> = ({
               <button
                 key={idx}
                 onClick={() => handleSelectSlide(idx)}
+                disabled={isWarping}
                 className="flex-1 h-2 rounded-full bg-slate-800 overflow-hidden cursor-pointer transition-all hover:opacity-90"
               >
                 <div
                   className={`h-full transition-all duration-75 ${
                     isDone
-                      ? 'w-full bg-sky-500'
+                      ? 'w-full bg-[#0b3d91]'
                       : isCurrent
-                      ? 'bg-gradient-to-r from-sky-400 to-emerald-400'
+                      ? 'bg-blue-500'
                       : 'w-0'
                   }`}
                   style={{ width: isCurrent ? `${progress}%` : undefined }}
@@ -486,16 +587,16 @@ export const CinematicIntroTour: React.FC<CinematicIntroTourProps> = ({
           })}
         </div>
 
-        {/* Step Navigation Buttons */}
+        {/* Step Buttons */}
         <div className="flex items-center gap-3">
           
           <button
             onClick={handlePrev}
-            disabled={currentSlide === 0}
-            className={`flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${
-              currentSlide === 0
+            disabled={currentSlide === 0 || isWarping}
+            className={`flex items-center gap-1 px-3.5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${
+              currentSlide === 0 || isWarping
                 ? 'opacity-40 text-slate-500 cursor-not-allowed'
-                : 'bg-slate-800/90 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700/80'
+                : 'bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-700'
             }`}
           >
             <ChevronLeft className="w-4 h-4" />
@@ -504,13 +605,14 @@ export const CinematicIntroTour: React.FC<CinematicIntroTourProps> = ({
 
           <button
             onClick={handleNext}
-            className="flex items-center gap-1.5 px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-sky-600/30 cursor-pointer"
+            disabled={isWarping}
+            className="flex items-center gap-1.5 px-4 py-2 bg-[#0b3d91] hover:bg-blue-600 text-white rounded-xl text-xs font-bold transition border border-blue-500/40 shadow-lg shadow-blue-950 cursor-pointer"
           >
             <span>
               {currentSlide === slides.length - 1
                 ? language === 'id'
-                  ? 'Mulai Eksplorasi Sekarang'
-                  : 'Start Exploring Now'
+                  ? 'Luncurkan Platform'
+                  : 'Launch Mission'
                 : language === 'id'
                 ? 'Lanjut'
                 : 'Next'}
@@ -521,6 +623,48 @@ export const CinematicIntroTour: React.FC<CinematicIntroTourProps> = ({
         </div>
 
       </footer>
+
+      {/* Full-Screen High-Speed Mission Warp & Launch Sequence Overlay */}
+      {isWarping && (
+        <div className="absolute inset-0 z-50 bg-[#020617] flex flex-col items-center justify-center text-center p-6 animate-in fade-in duration-200">
+          
+          {/* Warp Speed Optical Lines */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full border border-blue-500/40 animate-ping opacity-60" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full border-2 border-emerald-400/60 animate-ping opacity-80 delay-150" />
+          </div>
+
+          <div className="relative z-10 flex flex-col items-center space-y-4 max-w-md">
+            
+            {/* NASA Crest Lock-on Icon */}
+            <div className="w-16 h-16 rounded-full bg-[#0b3d91] border-2 border-blue-400 flex items-center justify-center shadow-2xl shadow-blue-500/50 animate-pulse">
+              <Crosshair className="w-8 h-8 text-white" />
+            </div>
+
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-mono uppercase tracking-widest text-emerald-400 font-bold">
+                {language === 'id' ? 'KUNCI TELEMETRI AKTIF' : 'TELEMETRY LOCKED: INDONESIA EQUATORIAL GRID'}
+              </span>
+              <h3 className="text-xl sm:text-2xl font-black text-white font-mono">
+                {language === 'id' ? 'MEMASUKI SISTEM TERRA HARMONIA...' : 'ENTERING TERRA HARMONIA ENGINE...'}
+              </h3>
+              <p className="text-xs text-slate-400 font-mono">
+                COORD: 0.7893° S, 113.9213° E // 26-YEAR CLIMATOLOGY LOADED
+              </p>
+            </div>
+
+            {/* Launch Progress Meter */}
+            <div className="w-64 h-2 rounded-full bg-slate-800 overflow-hidden border border-slate-700">
+              <div
+                className="h-full bg-gradient-to-r from-blue-500 to-emerald-400 transition-all duration-75"
+                style={{ width: `${warpProgress}%` }}
+              />
+            </div>
+
+          </div>
+
+        </div>
+      )}
 
     </div>
   );
