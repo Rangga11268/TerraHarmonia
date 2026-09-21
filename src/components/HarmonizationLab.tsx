@@ -11,7 +11,12 @@ export const HarmonizationLab: React.FC<HarmonizationLabProps> = ({ language }) 
   const [simFireRadius, setSimFireRadius] = useState<number>(1.8); // km
   const [simFireIntensity, setSimFireIntensity] = useState<number>(65); // MW/km2
   const [simScanAngle, setSimScanAngle] = useState<number>(24); // degrees off nadir
-  const [activeTab, setActiveTab] = useState<'visualizer' | 'physics' | 'matrix'>('visualizer');
+  const [activeTab, setActiveTab] = useState<'visualizer' | 'physics' | 'matrix' | 'simulator'>('visualizer');
+
+  // Policy Simulator State (2027-2030)
+  const [simTargetTmag, setSimTargetTmag] = useState<number>(-25); // cm (target water table)
+  const [simCanalCompliance, setSimCanalCompliance] = useState<number>(85); // % compliance
+  const [simClimateScenario, setSimClimateScenario] = useState<'neutral' | 'elnino'>('neutral');
 
   // Physics calculation
   const modisPixelArea = Math.round(1.0 * (1 + 0.025 * simScanAngle) * 10) / 10;
@@ -26,6 +31,15 @@ export const HarmonizationLab: React.FC<HarmonizationLabProps> = ({ language }) 
 
   const harmonizedBinCount = Math.max(1, Math.ceil(fireGroundArea / 6.2));
   const calibratedEnergyOutput = estimatedTotalMW;
+
+  // Policy Simulator Projection Calculations
+  // Baseline: Unmanaged peat with TMAG -60 cm and 0% canal blocking has 100% baseline risk
+  const drynessFactor = Math.max(0, (-simTargetTmag - 20) / 40); // 0 at -20cm, 1 at -60cm
+  const complianceFactor = 1 - (simCanalCompliance / 100) * 0.7; // reduces risk up to 70%
+  const climateMultiplier = simClimateScenario === 'elnino' ? 1.85 : 1.0;
+  const projectedHotspotIndex = Math.min(100, Math.max(8, Math.round(drynessFactor * complianceFactor * climateMultiplier * 100)));
+  const fireReductionPct = Math.max(0, 100 - projectedHotspotIndex);
+  const co2PreventedMt = ((fireReductionPct / 100) * 58.4).toFixed(1);
 
   return (
     <div className="w-full space-y-6">
@@ -53,41 +67,53 @@ export const HarmonizationLab: React.FC<HarmonizationLabProps> = ({ language }) 
       </div>
 
       {/* Mode Sub-Tabs - Equal Width Grid on Mobile */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 bg-[#e5e5ea] dark:bg-[#1f2937] rounded-xl p-1 gap-1 w-full">
+      <div className="grid grid-cols-2 sm:grid-cols-4 bg-[#e5e5ea] dark:bg-[#1f2937] rounded-xl p-1 gap-1 w-full text-xs">
         <button
           onClick={() => setActiveTab('visualizer')}
-          className={`px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer min-h-[44px] ${
+          className={`px-3 py-2.5 rounded-lg font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px] ${
             activeTab === 'visualizer'
               ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
               : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
           }`}
         >
           <Layers className="w-4 h-4 text-blue-500 shrink-0" />
-          <span className="truncate">{language === 'id' ? 'Simulator Footprint Interaktif' : 'Interactive Footprint Lab'}</span>
+          <span className="truncate">{language === 'id' ? 'Simulator Footprint' : 'Footprint Lab'}</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('simulator')}
+          className={`px-3 py-2.5 rounded-lg font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px] ${
+            activeTab === 'simulator'
+              ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
+              : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
+          }`}
+        >
+          <ShieldCheck className="w-4 h-4 text-sky-500 shrink-0" />
+          <span className="truncate">{language === 'id' ? 'Simulator 2027–2030' : '2027–2030 Policy'}</span>
         </button>
 
         <button
           onClick={() => setActiveTab('physics')}
-          className={`px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer min-h-[44px] ${
+          className={`px-3 py-2.5 rounded-lg font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px] ${
             activeTab === 'physics'
               ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
               : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
           }`}
         >
           <Cpu className="w-4 h-4 text-emerald-500 shrink-0" />
-          <span className="truncate">{language === 'id' ? 'Alur Algoritma Harmonisasi' : 'Harmonization Pipeline'}</span>
+          <span className="truncate">{language === 'id' ? 'Alur Algoritma' : 'Pipeline'}</span>
         </button>
 
         <button
           onClick={() => setActiveTab('matrix')}
-          className={`px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer min-h-[44px] ${
+          className={`px-3 py-2.5 rounded-lg font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px] ${
             activeTab === 'matrix'
               ? 'bg-white dark:bg-[#111827] text-[#1d1d1f] dark:text-white shadow-xs font-bold'
               : 'text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white'
           }`}
         >
           <Activity className="w-4 h-4 text-amber-500 shrink-0" />
-          <span className="truncate">{language === 'id' ? 'Matriks Spesifikasi Sensor' : 'Sensor Spec Matrix'}</span>
+          <span className="truncate">{language === 'id' ? 'Matriks Sensor' : 'Spec Matrix'}</span>
         </button>
       </div>
 
@@ -566,6 +592,181 @@ export const HarmonizationLab: React.FC<HarmonizationLabProps> = ({ language }) 
         </div>
       )}
 
+      {/* TAB 4: 2027-2030 Peatland Policy Simulator */}
+      {activeTab === 'simulator' && (
+        <div className="space-y-6 animate-in fade-in duration-150">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            
+            {/* Left Column: Policy Parameter Knobs */}
+            <div className="lg:col-span-6 bg-white dark:bg-[#0c121e] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm space-y-5">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+                <h2 className="font-bold text-sm text-slate-900 dark:text-white">
+                  {language === 'id' ? 'Kontrol Parameter Intervensi BRGM' : 'BRGM Policy Intervention Controls'}
+                </h2>
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-sky-100 dark:bg-sky-950/80 text-sky-800 dark:text-sky-300">
+                  PP 71/2014 & 57/2016
+                </span>
+              </div>
+
+              {/* Target Water Table (TMAG) */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-medium text-slate-700 dark:text-slate-300">
+                    {language === 'id' ? 'Target Kedalaman Muka Air Tanah (TMAG)' : 'Target Groundwater Table Depth (TMAG)'}
+                  </span>
+                  <span className="font-bold font-mono text-sky-600 dark:text-sky-400">
+                    {simTargetTmag} cm
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { val: -20, label: language === 'id' ? 'Optimal (-20cm)' : 'Optimal (-20cm)', desc: 'Full Rewetted' },
+                    { val: -35, label: language === 'id' ? 'Standar (-35cm)' : 'Standard (-35cm)', desc: 'PP 57 Compliance' },
+                    { val: -60, label: language === 'id' ? 'Kering (-60cm)' : 'Drained (-60cm)', desc: 'High Hazard' },
+                  ].map((preset) => (
+                    <button
+                      key={preset.val}
+                      onClick={() => setSimTargetTmag(preset.val)}
+                      className={`p-2.5 rounded-xl border text-center transition cursor-pointer text-xs ${
+                        simTargetTmag === preset.val
+                          ? 'bg-sky-50 dark:bg-sky-950/60 border-sky-600 text-slate-900 dark:text-white font-bold'
+                          : 'bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="font-semibold">{preset.label}</div>
+                      <div className="text-[10px] text-slate-500 mt-0.5">{preset.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Canal Blocking Compliance */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-medium text-slate-700 dark:text-slate-300">
+                    {language === 'id' ? 'Tingkat Kepatuhan Sekat Kanal (Dam)' : 'Canal Blocking Compliance Rate'}
+                  </span>
+                  <span className="font-bold font-mono text-sky-600 dark:text-sky-400">
+                    {simCanalCompliance}%
+                  </span>
+                </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {[30, 60, 85, 100].map((rate) => (
+                    <button
+                      key={rate}
+                      onClick={() => setSimCanalCompliance(rate)}
+                      className={`py-2 px-1 rounded-xl border text-center transition cursor-pointer text-xs ${
+                        simCanalCompliance === rate
+                          ? 'bg-sky-50 dark:bg-sky-950/60 border-sky-600 text-slate-900 dark:text-white font-bold'
+                          : 'bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                      }`}
+                    >
+                      {rate}%
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Climate Scenario */}
+              <div className="space-y-2">
+                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300">
+                  {language === 'id' ? 'Skenario Iklim Global (2027–2030)' : 'Global Climate Driver Scenario'}
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setSimClimateScenario('neutral')}
+                    className={`p-3 rounded-xl border text-left transition cursor-pointer text-xs ${
+                      simClimateScenario === 'neutral'
+                        ? 'bg-sky-50 dark:bg-sky-950/60 border-sky-600 text-slate-900 dark:text-white font-bold'
+                        : 'bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="font-bold">Neutral ENSO / Baseline</div>
+                    <div className="text-[10px] text-slate-500 mt-0.5">Regular tropical monsoon cycles</div>
+                  </button>
+
+                  <button
+                    onClick={() => setSimClimateScenario('elnino')}
+                    className={`p-3 rounded-xl border text-left transition cursor-pointer text-xs ${
+                      simClimateScenario === 'elnino'
+                        ? 'bg-red-50 dark:bg-red-950/60 border-red-600 text-slate-900 dark:text-white font-bold'
+                        : 'bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="font-bold text-red-600 dark:text-red-400">Developing El Niño (+2.0°C)</div>
+                    <div className="text-[10px] text-slate-500 mt-0.5">Extended dry drought season</div>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Projected Impact Card */}
+            <div className="lg:col-span-6 bg-white dark:bg-[#0c121e] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-5">
+              <div>
+                <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+                  <h2 className="font-bold text-sm text-slate-900 dark:text-white">
+                    {language === 'id' ? 'Proyeksi Dampak Penurunan Titik Api' : 'Projected Fire Reduction Outcome'}
+                  </h2>
+                  <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
+                    fireReductionPct >= 70
+                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                      : fireReductionPct >= 40
+                      ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                      : 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300'
+                  }`}>
+                    {fireReductionPct >= 70 ? 'OPTIMAL POLICY' : fireReductionPct >= 40 ? 'MODERATE RISK' : 'HIGH CRITICAL HAZARD'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 mt-4">
+                  <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40">
+                    <span className="text-[10px] uppercase font-bold text-slate-500">Projected Fire Drop</span>
+                    <div className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-1 font-mono">
+                      -{fireReductionPct}%
+                    </div>
+                    <span className="text-[11px] text-slate-500">vs Unmanaged Peat</span>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40">
+                    <span className="text-[10px] uppercase font-bold text-slate-500">CO₂e Prevented</span>
+                    <div className="text-3xl font-black text-sky-600 dark:text-sky-400 mt-1 font-mono">
+                      {co2PreventedMt} Mt
+                    </div>
+                    <span className="text-[11px] text-slate-500">Per Year (Sumatra & Kal)</span>
+                  </div>
+                </div>
+
+                {/* Visual Projection Bar */}
+                <div className="mt-5 space-y-2">
+                  <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
+                    <span>Baseline Hazard (100)</span>
+                    <span className="font-bold font-mono text-emerald-600 dark:text-emerald-400">Policy Level: {projectedHotspotIndex} / 100</span>
+                  </div>
+                  <div className="w-full h-4 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden flex">
+                    <div
+                      className="h-full bg-emerald-500 transition-all duration-500"
+                      style={{ width: `${fireReductionPct}%` }}
+                    />
+                    <div
+                      className="h-full bg-red-500 transition-all duration-500"
+                      style={{ width: `${projectedHotspotIndex}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                {language === 'id'
+                  ? 'Kombinasi target TMAG > -25 cm dan kepatuhan sekat kanal > 80% membuktikan mitigasi efektif menahan kebakaran gambut bahkan saat anomali El Niño terjadi.'
+                  : 'Maintaining water table depth TMAG > -25 cm and canal blocking > 80% provides robust mitigation buffering peat ecosystems even during major El Niño events.'}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
+

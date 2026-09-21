@@ -11,6 +11,7 @@ import { JudgesEvaluationGuide } from './components/JudgesEvaluationGuide';
 import { Footer } from './components/Footer';
 import { NasaApiKeyModal } from './components/NasaApiKeyModal';
 import { ScienceTourModal } from './components/ScienceTourModal';
+import { ExecutiveBriefingModal } from './components/ExecutiveBriefingModal';
 import { PRESET_AOIS, AOIRegion, RawHotspot, HarmonizedWeekData, harmonizeHotspots } from './engine/harmonizer';
 import { generateHistoricalFireData } from './data/generator';
 import { fetchLiveNASAHotspots, LiveSyncResult } from './services/nasaFirmsApi';
@@ -123,6 +124,7 @@ export function App() {
   const [selectedWeekData, setSelectedWeekData] = useState<HarmonizedWeekData | null>(null);
   const [isNasaModalOpen, setIsNasaModalOpen] = useState<boolean>(false);
   const [isTourModalOpen, setIsTourModalOpen] = useState<boolean>(false);
+  const [isBriefingModalOpen, setIsBriefingModalOpen] = useState<boolean>(false);
   const [activeScenario, setActiveScenario] = useState<string | null>(null);
   const [isLinkCopied, setIsLinkCopied] = useState<boolean>(false);
 
@@ -250,6 +252,8 @@ export function App() {
         handleToggleLiveSync();
       } else if (e.key === 't' || e.key === 'T') {
         toggleTheme();
+      } else if (e.key === 'b' || e.key === 'B') {
+        setIsBriefingModalOpen((prev) => !prev);
       } else if (e.key === '?' || e.key === 'h' || e.key === 'H') {
         setIsTourModalOpen((prev) => !prev);
       }
@@ -346,6 +350,7 @@ export function App() {
               onSelectScenario={handleSelectScenario}
               onShareLink={handleShareLink}
               isLinkCopied={isLinkCopied}
+              onOpenBriefing={() => setIsBriefingModalOpen(true)}
             />
 
             {/* Live sync notification banner */}
@@ -618,6 +623,17 @@ export function App() {
         isOpen={isTourModalOpen}
         onClose={() => setIsTourModalOpen(false)}
         onSelectTab={setActiveTab}
+      />
+
+      {/* 1-Click Printable Executive Briefing Modal */}
+      <ExecutiveBriefingModal
+        isOpen={isBriefingModalOpen}
+        onClose={() => setIsBriefingModalOpen(false)}
+        language={language}
+        selectedAOI={selectedAOI}
+        calendarMatrix={calendarMatrix}
+        liveHotspots={displayedHotspots}
+        userMapKey={userMapKey}
       />
     </div>
   );

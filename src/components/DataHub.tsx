@@ -4,10 +4,16 @@ import {
   Key, 
   FileSpreadsheet, 
   Code2,
-  Map as MapIcon
+  Map as MapIcon,
+  BookOpen,
+  Copy,
+  Check,
+  ExternalLink,
+  Sparkles
 } from 'lucide-react';
 import { AOIRegion, HarmonizedWeekData } from '../engine/harmonizer';
 import { Language, translations } from '../data/translations';
+import { scientificReferences, ScientificReference } from '../data/scientificReferences';
 
 interface DataHubProps {
   language: Language;
@@ -26,6 +32,8 @@ export const DataHub: React.FC<DataHubProps> = ({
 }) => {
   const t = translations[language];
   const [downloadFormat, setDownloadFormat] = useState<'csv' | 'json' | 'geojson'>('csv');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   // NASA Constellation Data
   const satellites = [
@@ -35,6 +43,16 @@ export const DataHub: React.FC<DataHubProps> = ({
     { name: 'NOAA-20 (JPSS-1)', sensor: 'VIIRS', orbit: '1:30 PM / 1:30 AM', resolution: '375 m', waveband: 'I4 & I5 Bands' },
     { name: 'NOAA-21 (JPSS-2)', sensor: 'VIIRS', orbit: '1:30 PM / 1:30 AM', resolution: '375 m', waveband: 'I4 & I5 Bands' },
   ];
+
+  const handleCopyCitation = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2500);
+  };
+
+  const filteredReferences = selectedCategory === 'all'
+    ? scientificReferences
+    : scientificReferences.filter((r) => r.category === selectedCategory);
 
   const handleExport = () => {
     if (downloadFormat === 'csv') {
@@ -66,7 +84,6 @@ export const DataHub: React.FC<DataHubProps> = ({
       const deltaDeg = 0.025; // ~5.5 km grid cell width in equator degrees
 
       const features = Object.values(calendarMatrix).map((d, index) => {
-        // Offset coordinates slightly per week to create realistic spatial grid distribution
         const latOffset = ((index % 12) - 6) * deltaDeg;
         const lonOffset = ((Math.floor(index / 12) % 12) - 6) * deltaDeg;
         const cellCenterLat = centerLat + latOffset;
@@ -128,17 +145,17 @@ export const DataHub: React.FC<DataHubProps> = ({
   };
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-8">
       
       {/* Editorial Header */}
-      <div className="space-y-2 pt-2 pb-4 border-b border-[#e5e5e7] dark:border-[#1f2937]">
-        <div className="text-xs font-semibold uppercase tracking-wider text-[#86868b] dark:text-[#9ca3af]">
+      <div className="space-y-2 pt-2 pb-4 border-b border-slate-200 dark:border-slate-800">
+        <div className="text-xs font-semibold uppercase tracking-wider text-sky-600 dark:text-sky-400">
           {language === 'id' ? 'Arsip & Sumber Data Terbuka' : 'Open Data & Satellite Registry'}
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#1d1d1f] dark:text-white tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
           {t.dataHubTitle}
         </h1>
-        <p className="text-sm text-[#6e6e73] dark:text-[#9ca3af] max-w-3xl leading-relaxed">
+        <p className="text-sm text-slate-600 dark:text-slate-400 max-w-3xl leading-relaxed">
           {t.dataHubDesc}
         </p>
       </div>
@@ -147,8 +164,8 @@ export const DataHub: React.FC<DataHubProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         
         {/* Constellation Registry */}
-        <div className="lg:col-span-7 bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
-          <h2 className="font-semibold text-sm text-[#1d1d1f] dark:text-white">
+        <div className="lg:col-span-7 bg-white dark:bg-[#0c121e] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4">
+          <h2 className="font-semibold text-sm text-slate-900 dark:text-white">
             {t.constellationTitle}
           </h2>
 
@@ -156,23 +173,23 @@ export const DataHub: React.FC<DataHubProps> = ({
             {satellites.map((sat) => (
               <div
                 key={sat.name}
-                className="p-3.5 rounded-xl border border-[#e5e5e7] dark:border-[#1f2937] bg-white dark:bg-[#151d2f] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs"
+                className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs"
               >
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-[#1d1d1f] dark:text-white">{sat.name}</span>
-                    <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-[#f5f5f7] dark:bg-[#1f2937] text-[#1d1d1f] dark:text-white border border-[#e5e5e7] dark:border-[#374151]">
+                    <span className="font-bold text-slate-900 dark:text-white">{sat.name}</span>
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-sky-100 dark:bg-sky-950/80 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
                       {sat.sensor}
                     </span>
                   </div>
-                  <div className="text-[11px] text-[#86868b] dark:text-[#9ca3af] mt-1">
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
                     {t.equatorPass} {sat.orbit}
                   </div>
                 </div>
 
-                <div className="text-right sm:self-center text-[11px] text-[#1d1d1f] dark:text-white">
-                  <span className="font-semibold block num">{sat.resolution}</span>
-                  <span className="text-[#86868b] dark:text-[#9ca3af] text-[10px]">{sat.waveband}</span>
+                <div className="text-right sm:self-center text-[11px] text-slate-900 dark:text-white">
+                  <span className="font-semibold block font-mono">{sat.resolution}</span>
+                  <span className="text-slate-500 dark:text-slate-400 text-[10px]">{sat.waveband}</span>
                 </div>
               </div>
             ))}
@@ -180,15 +197,15 @@ export const DataHub: React.FC<DataHubProps> = ({
         </div>
 
         {/* Export Engine Card */}
-        <div className="lg:col-span-5 bg-white dark:bg-[#111827] border border-[#e5e5e7] dark:border-[#1f2937] rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col justify-between space-y-5">
+        <div className="lg:col-span-5 bg-white dark:bg-[#0c121e] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-5">
           <div>
-            <h2 className="font-semibold text-sm text-[#1d1d1f] dark:text-white pb-3 border-b border-[#e5e5e7] dark:border-[#1f2937]">
+            <h2 className="font-semibold text-sm text-slate-900 dark:text-white pb-3 border-b border-slate-200 dark:border-slate-800">
               {t.exportDatasetTitle}
             </h2>
 
             <div className="mt-4 space-y-4 text-xs">
               <div>
-                <label className="block text-[#6e6e73] dark:text-[#9ca3af] font-medium mb-1.5">
+                <label className="block text-slate-600 dark:text-slate-400 font-medium mb-1.5">
                   {t.fileFormat}:
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -196,8 +213,8 @@ export const DataHub: React.FC<DataHubProps> = ({
                     onClick={() => setDownloadFormat('csv')}
                     className={`p-2.5 rounded-xl border flex items-center justify-center gap-1.5 font-medium min-h-[44px] transition cursor-pointer text-xs ${
                       downloadFormat === 'csv'
-                        ? 'bg-[#1d1d1f] dark:bg-emerald-600 text-white border-[#1d1d1f] dark:border-emerald-600 shadow-xs font-bold'
-                        : 'bg-white dark:bg-[#151d2f] border-[#e5e5e7] dark:border-[#1f2937] text-[#1d1d1f] dark:text-white hover:bg-[#f5f5f7] dark:hover:bg-[#1f2937]'
+                        ? 'bg-sky-600 text-white border-sky-600 shadow-xs font-bold'
+                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'
                     }`}
                   >
                     <FileSpreadsheet className="w-4 h-4 shrink-0" />
@@ -207,8 +224,8 @@ export const DataHub: React.FC<DataHubProps> = ({
                     onClick={() => setDownloadFormat('json')}
                     className={`p-2.5 rounded-xl border flex items-center justify-center gap-1.5 font-medium min-h-[44px] transition cursor-pointer text-xs ${
                       downloadFormat === 'json'
-                        ? 'bg-[#1d1d1f] dark:bg-emerald-600 text-white border-[#1d1d1f] dark:border-emerald-600 shadow-xs font-bold'
-                        : 'bg-white dark:bg-[#151d2f] border-[#e5e5e7] dark:border-[#1f2937] text-[#1d1d1f] dark:text-white hover:bg-[#f5f5f7] dark:hover:bg-[#1f2937]'
+                        ? 'bg-sky-600 text-white border-sky-600 shadow-xs font-bold'
+                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'
                     }`}
                   >
                     <Code2 className="w-4 h-4 shrink-0" />
@@ -218,8 +235,8 @@ export const DataHub: React.FC<DataHubProps> = ({
                     onClick={() => setDownloadFormat('geojson')}
                     className={`p-2.5 rounded-xl border flex items-center justify-center gap-1.5 font-medium min-h-[44px] transition cursor-pointer text-xs ${
                       downloadFormat === 'geojson'
-                        ? 'bg-[#1d1d1f] dark:bg-emerald-600 text-white border-[#1d1d1f] dark:border-emerald-600 shadow-xs font-bold'
-                        : 'bg-white dark:bg-[#151d2f] border-[#e5e5e7] dark:border-[#1f2937] text-[#1d1d1f] dark:text-white hover:bg-[#f5f5f7] dark:hover:bg-[#1f2937]'
+                        ? 'bg-sky-600 text-white border-sky-600 shadow-xs font-bold'
+                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'
                     }`}
                   >
                     <MapIcon className="w-4 h-4 shrink-0" />
@@ -229,10 +246,10 @@ export const DataHub: React.FC<DataHubProps> = ({
               </div>
 
               <div>
-                <label className="block text-[#6e6e73] dark:text-[#9ca3af] font-medium mb-1">
+                <label className="block text-slate-600 dark:text-slate-400 font-medium mb-1">
                   {t.selectedDataset}:
                 </label>
-                <div className="p-2.5 rounded-lg bg-[#f5f5f7] dark:bg-[#151d2f] border border-[#e5e5e7] dark:border-[#1f2937] font-semibold text-[#1d1d1f] dark:text-white">
+                <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 font-semibold text-slate-900 dark:text-white">
                   {selectedAOI.name} (2000 – 2026 Archive)
                 </div>
               </div>
@@ -242,7 +259,7 @@ export const DataHub: React.FC<DataHubProps> = ({
           <div className="space-y-2">
             <button
               onClick={handleExport}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-xs transition shadow-xs min-h-[44px] cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-medium text-xs transition shadow-xs min-h-[44px] cursor-pointer"
             >
               <Download className="w-4 h-4" />
               <span>{t.downloadDatasetFile}</span>
@@ -250,14 +267,129 @@ export const DataHub: React.FC<DataHubProps> = ({
 
             <button
               onClick={onOpenApiKeyModal}
-              className="w-full flex items-center justify-center gap-1.5 py-2.5 text-xs text-[#6e6e73] dark:text-[#9ca3af] hover:text-[#1d1d1f] dark:hover:text-white transition font-medium min-h-[40px] cursor-pointer"
+              className="w-full flex items-center justify-center gap-1.5 py-2.5 text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition font-medium min-h-[40px] cursor-pointer"
             >
-              <Key className="w-3.5 h-3.5" />
+              <Key className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
               <span>{userMapKey ? t.nasaMapKeyInstalled : t.configurePersonalMapKey}</span>
             </button>
           </div>
         </div>
       </div>
+
+      {/* NASA Science & DOI Citations Registry */}
+      <div className="bg-white dark:bg-[#0c121e] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200 dark:border-slate-800">
+          <div>
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                {t.scienceRegistry}
+              </h2>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 max-w-3xl">
+              {t.scienceRegistrySub}
+            </p>
+          </div>
+
+          {/* Category Filter */}
+          <div className="flex flex-wrap gap-1.5">
+            {[
+              { id: 'all', label: language === 'id' ? 'Semua' : 'All' },
+              { id: 'satellite', label: 'MODIS/VIIRS' },
+              { id: 'physics', label: 'Stefan-Boltzmann' },
+              { id: 'policy', label: 'BRGM / PP 71' },
+              { id: 'api', label: 'NASA API' },
+            ].map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id)}
+                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition cursor-pointer ${
+                  selectedCategory === cat.id
+                    ? 'bg-sky-600 text-white shadow-xs'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* References List */}
+        <div className="grid grid-cols-1 gap-4">
+          {filteredReferences.map((ref) => {
+            const isBibtexCopied = copiedId === `bibtex-${ref.id}`;
+            const isApaCopied = copiedId === `apa-${ref.id}`;
+
+            return (
+              <div
+                key={ref.id}
+                className="p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-900/30 space-y-3"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
+                        {ref.category}
+                      </span>
+                      <span className="text-xs font-mono text-sky-600 dark:text-sky-400">
+                        {ref.year}
+                      </span>
+                      {ref.doi && (
+                        <a
+                          href={ref.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[11px] font-mono text-slate-500 hover:text-sky-600 dark:hover:text-sky-400 flex items-center gap-1 transition"
+                        >
+                          DOI: {ref.doi}
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      )}
+                    </div>
+                    <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-snug">
+                      {ref.title}
+                    </h3>
+                    <div className="text-xs text-slate-600 dark:text-slate-400">
+                      {ref.authors} &bull; <span className="italic">{ref.publication}</span>
+                    </div>
+                  </div>
+
+                  {/* Copy Citation Buttons */}
+                  <div className="flex items-center gap-1.5 shrink-0 self-start">
+                    <button
+                      onClick={() => handleCopyCitation(ref.apa, `apa-${ref.id}`)}
+                      className="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1 transition cursor-pointer"
+                      title="Copy APA Citation"
+                    >
+                      {isApaCopied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
+                      <span>{isApaCopied ? t.copiedCitation : t.copyApa}</span>
+                    </button>
+                    <button
+                      onClick={() => handleCopyCitation(ref.bibtex, `bibtex-${ref.id}`)}
+                      className="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1 transition cursor-pointer"
+                      title="Copy BibTeX Citation"
+                    >
+                      {isBibtexCopied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Code2 className="w-3.5 h-3.5 text-slate-500" />}
+                      <span>{isBibtexCopied ? t.copiedCitation : t.copyBibtex}</span>
+                    </button>
+                  </div>
+                </div>
+
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                  {ref.abstract}
+                </p>
+
+                <div className="p-2.5 rounded-lg bg-sky-50/60 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-900/50 text-xs text-sky-900 dark:text-sky-300 flex items-start gap-2">
+                  <span className="font-semibold shrink-0">Impact in Terra Harmonia:</span>
+                  <span>{ref.keyTakeaway}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
     </div>
   );
 };

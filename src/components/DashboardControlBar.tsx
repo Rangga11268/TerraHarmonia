@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Language, translations } from '../data/translations';
 import { AOIRegion, PRESET_AOIS } from '../engine/harmonizer';
-import { Radio, RefreshCw, Settings2, ChevronDown, Volume2, VolumeX, Split, MapPin, Calendar, Share2, CheckCircle2, History, Sparkles } from 'lucide-react';
+import { Radio, RefreshCw, Settings2, ChevronDown, Volume2, VolumeX, Split, MapPin, Calendar, Share2, CheckCircle2, History, Sparkles, Printer } from 'lucide-react';
 import { speakSituationBriefing } from '../utils/audioBriefing';
 
 export type OverviewViewMode = 'main' | 'dual_map' | 'polygon';
@@ -24,6 +24,7 @@ interface DashboardControlBarProps {
   onSelectScenario?: (id: string | null) => void;
   onShareLink?: () => void;
   isLinkCopied?: boolean;
+  onOpenBriefing?: () => void;
 }
 
 export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
@@ -44,6 +45,7 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
   onSelectScenario,
   onShareLink,
   isLinkCopied = false,
+  onOpenBriefing,
 }) => {
   const t = translations[language];
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
@@ -155,6 +157,18 @@ export const DashboardControlBar: React.FC<DashboardControlBarProps> = ({
             {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
             <span>{isSpeaking ? t.stopVoice : t.listenVoice}</span>
           </button>
+
+          {/* 1-Click Executive Briefing Button */}
+          {onOpenBriefing && (
+            <button
+              onClick={onOpenBriefing}
+              className="w-full sm:w-auto px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c121e] text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px]"
+              title={language === 'id' ? 'Buka Ringkasan Eksekutif Siap Cetak (A4 PDF)' : 'Open Printable Executive Briefing (A4 PDF)'}
+            >
+              <Printer className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+              <span>{t.executiveBriefing}</span>
+            </button>
+          )}
 
           {/* Shareable Analysis Permalink Button */}
           {onShareLink && (
