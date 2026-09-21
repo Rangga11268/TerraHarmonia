@@ -431,46 +431,47 @@ export const FullMapModal: React.FC<FullMapModalProps> = ({
 
       const popupHtml = `
         <div class="hotspot-popup">
-          <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.15);padding-bottom:6px;margin-bottom:8px;">
+          <div class="hotspot-popup-header">
             <div style="display:flex;align-items:center;gap:6px;">
-              <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};"></span>
-              <strong style="color:#ffffff;font-size:12px;">${spot.instrument} (${spot.satellite})</strong>
+              <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${color};"></span>
+              <strong class="hotspot-popup-title">${spot.instrument} (${spot.satellite})</strong>
             </div>
-            <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;background:${intensityColor}25;color:${intensityColor};border:1px solid ${intensityColor}50;">
+            <span class="hotspot-popup-badge" style="background:${intensityColor}20;color:${intensityColor};border-color:${intensityColor}50;">
               ${intensity.toUpperCase()} &bull; ${spot.frp} MW
             </span>
           </div>
 
-          <div style="background:rgba(255,255,255,0.06);padding:8px;border-radius:8px;margin-bottom:8px;">
-            <div style="font-weight:700;font-size:12px;color:#ffffff;">${loc.regency}</div>
-            ${loc.district ? `<div style="font-size:11px;color:#cbd5e1;margin-top:2px;"><b>${language === 'id' ? 'Kecamatan' : 'District'}:</b> ${loc.district}</div>` : ''}
-            <div style="font-size:11px;color:#94a3b8;margin-top:2px;">${loc.landscape}</div>
-            ${loc.isPeatland ? `<div style="font-size:11px;color:#fbbf24;margin-top:3px;font-weight:600;"><b>${language === 'id' ? 'Kedalaman Gambut' : 'Peat Depth'}:</b> ${loc.peatDepthEstimate}</div>` : ''}
+          <div class="hotspot-popup-card">
+            <div class="hotspot-popup-regency">${loc.regency}</div>
+            ${loc.district ? `<div class="hotspot-popup-district"><b>${language === 'id' ? 'Kecamatan' : 'District'}:</b> ${loc.district}</div>` : ''}
+            <div class="hotspot-popup-landscape">${loc.landscape}</div>
+            ${loc.isPeatland ? `<div class="hotspot-popup-peat"><b>${language === 'id' ? 'Kedalaman Gambut' : 'Peat Depth'}:</b> ${loc.peatDepthEstimate}</div>` : ''}
           </div>
 
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;margin-bottom:8px;">
-            <div style="background:rgba(0,0,0,0.3);padding:6px;border-radius:6px;">
-              <span style="display:block;font-size:9px;color:#94a3b8;text-transform:uppercase;">${language === 'id' ? 'Koordinat' : 'Coords'}</span>
-              <strong style="color:#ffffff;font-family:monospace;font-size:11px;">${spot.lat.toFixed(4)}&deg;, ${spot.lon.toFixed(4)}&deg;</strong>
+          <div class="hotspot-popup-grid">
+            <div class="hotspot-popup-grid-cell">
+              <span class="hotspot-popup-cell-label">${language === 'id' ? 'Koordinat' : 'Coordinates'}</span>
+              <strong class="hotspot-popup-cell-val">${spot.lat.toFixed(4)}&deg;, ${spot.lon.toFixed(4)}&deg;</strong>
+              <span class="hotspot-popup-cell-sub">${loc.coordinatesDMS}</span>
             </div>
 
-            <div style="background:rgba(0,0,0,0.3);padding:6px;border-radius:6px;">
-              <span style="display:block;font-size:9px;color:#94a3b8;text-transform:uppercase;">${language === 'id' ? 'Waktu Deteksi' : 'Time'}</span>
-              <strong style="color:#ffffff;font-size:11px;">${localTime.timeFormatted}</strong>
-              <span style="display:block;font-size:9px;color:#64748b;">${spot.date}</span>
+            <div class="hotspot-popup-grid-cell">
+              <span class="hotspot-popup-cell-label">${language === 'id' ? 'Waktu Deteksi' : 'Detection Time'}</span>
+              <strong class="hotspot-popup-cell-val">${localTime.timeFormatted}</strong>
+              <span class="hotspot-popup-cell-sub">${spot.date}</span>
             </div>
           </div>
 
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:#cbd5e1;padding-top:4px;border-top:1px solid rgba(255,255,255,0.1);">
-            <span><b>Suhu:</b> ${tempCelsius}&deg;C</span>
-            <span><b>Keyakinan:</b> ${spot.confidence}%</span>
+          <div class="hotspot-popup-stats">
+            <span><b>${language === 'id' ? 'Suhu' : 'Temp'}:</b> ${tempCelsius}&deg;C</span>
+            <span><b>${language === 'id' ? 'Keyakinan' : 'Confidence'}:</b> ${spot.confidence}%</span>
           </div>
 
-          <div style="margin-top:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.1);display:flex;justify-content:space-between;align-items:center;">
-            <a href="${loc.googleMapsUrl}" target="_blank" rel="noopener noreferrer" style="color:#38bdf8;font-size:11px;text-decoration:underline;">
-              ${language === 'id' ? 'Buka Google Maps' : 'Google Maps'}
+          <div class="hotspot-popup-footer">
+            <a href="${loc.googleMapsUrl}" target="_blank" rel="noopener noreferrer" class="hotspot-popup-link">
+              ${language === 'id' ? 'Buka Google Maps' : 'Open in Google Maps'} &rarr;
             </a>
-            <span style="font-size:10px;color:#64748b;">NASA FIRMS</span>
+            <span class="hotspot-popup-source">NASA FIRMS NRT</span>
           </div>
         </div>
       `;
