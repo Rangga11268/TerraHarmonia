@@ -10,7 +10,7 @@ import { RiskForecast } from './components/RiskForecast';
 import { JudgesEvaluationGuide } from './components/JudgesEvaluationGuide';
 import { Footer } from './components/Footer';
 import { NasaApiKeyModal } from './components/NasaApiKeyModal';
-import { ScienceTourModal } from './components/ScienceTourModal';
+import { CinematicIntroTour } from './components/CinematicIntroTour';
 import { ExecutiveBriefingModal } from './components/ExecutiveBriefingModal';
 import { PRESET_AOIS, AOIRegion, RawHotspot, HarmonizedWeekData, harmonizeHotspots } from './engine/harmonizer';
 import { generateHistoricalFireData } from './data/generator';
@@ -123,7 +123,15 @@ export function App() {
   const [selectedKey, setSelectedKey] = useState<string | null>('2015-38');
   const [selectedWeekData, setSelectedWeekData] = useState<HarmonizedWeekData | null>(null);
   const [isNasaModalOpen, setIsNasaModalOpen] = useState<boolean>(false);
-  const [isTourModalOpen, setIsTourModalOpen] = useState<boolean>(false);
+  const [isTourModalOpen, setIsTourModalOpen] = useState<boolean>(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const seen = localStorage.getItem('terra_harmonia_intro_seen');
+        if (!seen) return true; // Auto-open for first-time visitors!
+      }
+    } catch (e) {}
+    return false;
+  });
   const [isBriefingModalOpen, setIsBriefingModalOpen] = useState<boolean>(false);
   const [activeScenario, setActiveScenario] = useState<string | null>(null);
   const [isLinkCopied, setIsLinkCopied] = useState<boolean>(false);
@@ -617,12 +625,23 @@ export function App() {
         }
       />
 
-      {/* 30-Second Science Briefing & Pitching Shortcuts Modal */}
-      <ScienceTourModal
+      {/* 30-Second Cinematic Interactive Orbital & Satellite Mission Briefing Tour */}
+      <CinematicIntroTour
         language={language}
+        onToggleLanguage={setLanguage}
         isOpen={isTourModalOpen}
-        onClose={() => setIsTourModalOpen(false)}
-        onSelectTab={setActiveTab}
+        onClose={() => {
+          setIsTourModalOpen(false);
+          try {
+            localStorage.setItem('terra_harmonia_intro_seen', 'true');
+          } catch (e) {}
+        }}
+        onEnterApp={() => {
+          setIsTourModalOpen(false);
+          try {
+            localStorage.setItem('terra_harmonia_intro_seen', 'true');
+          } catch (e) {}
+        }}
       />
 
       {/* 1-Click Printable Executive Briefing Modal */}
